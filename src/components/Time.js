@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaCirclePause, FaCirclePlay } from 'react-icons/fa6';
+import { FaCirclePause, FaCirclePlay, FaFeather } from 'react-icons/fa6';
 import PrimaryButton from './PrimaryButton';
 import TimeText from './TimeText';
 
@@ -40,7 +40,8 @@ export default function Time() {
   return (
     <div
       style={{
-        // marginTop: '40px',
+        paddingTop: '20px',
+        paddingBottom: '20px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -48,6 +49,24 @@ export default function Time() {
         color: 'white',
       }}
     >
+      <div
+        style={{
+          marginBottom: '20px',
+          width: '40px',
+          height: '40px',
+          borderRadius: '50%',
+          backgroundColor: '#40366d',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+          border: '1px solid #40366d', // Added outline
+          cursor: 'pointer', // Add cursor style to indicate clickable
+        }}
+        onClick={() => window.open('https://www.google.com', '_blank')}
+      >
+        <FaFeather style={{ color: '#c5c1f0', fontSize: '20px' }} />
+      </div>
       <TimeText time={time} />
       <PrimaryButton onClick={toggleTimer} icon={isRunning ? <FaCirclePause /> : <FaCirclePlay />}>
         {isRunning ? 'Pause' : 'Start'}

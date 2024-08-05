@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import Time from './components/Time';
+import TrackingCard from './components/TrackingCard';
 
 function App() {
   return (
@@ -17,8 +18,11 @@ function App() {
         boxSizing: 'border-box',
       }}
     >
-      <div style={{ padding: '2rem' }}>
+      <div style={{ width: '100%' }}>
         <Time />
+        <div style={{ height: '1px', background: '#40366d' }} />
+
+        <TrackingCard />
       </div>
       {/* line break */}
       <div style={{ height: '1px', background: '#40366d' }} />
