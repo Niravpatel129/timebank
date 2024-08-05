@@ -9,11 +9,11 @@ function createWindow() {
   window = new BrowserWindow({
     width: 300,
     height: 500,
-    show: false,
+    show: true,
     frame: false,
     resizable: false,
     transparent: true,
-    vibrancy: 'under-window',
+    // vibrancy: 'under-window',
     visualEffectState: 'active',
     opacity: 0.9,
     webPreferences: {
@@ -84,6 +84,10 @@ function createTray() {
     });
 
     window.isVisible() ? window.hide() : window.show();
+  });
+
+  tray.on('right-click', (event, bounds) => {
+    tray.popUpContextMenu();
   });
 }
 
