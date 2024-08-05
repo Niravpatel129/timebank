@@ -5,7 +5,7 @@ import { LuUsers2 } from 'react-icons/lu';
 
 export default function TrackingCard() {
   return (
-    <div>
+    <div style={{ marginBottom: '14px', marginTop: '14px' }}>
       <h2
         style={{
           fontSize: '1.1rem',
@@ -13,6 +13,7 @@ export default function TrackingCard() {
           color: '#d7ceed',
           margin: '16px',
           marginBottom: '8px',
+          marginTop: '0px',
         }}
       >
         Tracking
@@ -20,14 +21,15 @@ export default function TrackingCard() {
       <div
         style={{
           margin: '16px',
+          marginBottom: '0px',
           borderRadius: '12px',
           color: 'white',
-          // width: '100%',
           backgroundColor: '#15093d',
           borderRadius: '12px',
+          border: '0.1px solid #483776',
         }}
       >
-        <div style={{ padding: '16px' }}>
+        <div style={{ paddingLeft: '16px', paddingRight: '16px', paddingTop: '16px' }}>
           <h2
             style={{
               fontSize: '0.9rem',
@@ -53,7 +55,15 @@ export default function TrackingCard() {
           </h3>
         </div>
         {/* hr */}
-        <hr style={{ border: '1px solid #25164d' }} />
+        <hr
+          style={{
+            border: '1px solid #25164d',
+            margin: '0',
+            padding: '0',
+            marginTop: '8px',
+            marginBottom: '8px',
+          }}
+        />
         <div
           style={{
             display: 'flex',
