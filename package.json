@@ -4,9 +4,11 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=development concurrently \"npm run start:renderer\" \"npm run start:main\"",
-    "start:main": "electron .",
-    "start:renderer": "webpack serve --config webpack.config.js"
+    "start": "concurrently \"npm run start:renderer\" \"npm run start:main\"",
+    "start:main": "cross-env NODE_ENV=development electron .",
+    "start:renderer": "cross-env NODE_ENV=development webpack serve --config webpack.config.js",
+    "build": "webpack --config webpack.config.js && electron-builder",
+    "package": "electron-builder"
   },
   "author": "",
   "license": "ISC",
@@ -20,6 +22,7 @@
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.2",
     "electron": "^31.3.1",
+    "electron-builder": "^24.13.3",
     "electron-reloader": "^1.2.3",
     "electronmon": "^2.0.3",
     "html-webpack-plugin": "^5.6.0",
