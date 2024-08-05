@@ -7,7 +7,7 @@
     "start": "concurrently \"npm run start:renderer\" \"npm run start:main\"",
     "start:main": "cross-env NODE_ENV=development electron .",
     "start:renderer": "cross-env NODE_ENV=development webpack serve --config webpack.config.js",
-    "build": "webpack --config webpack.config.js && electron-builder",
+    "build": "webpack --config webpack.config.js && electron-builder --publish always",
     "package": "electron-builder"
   },
   "author": "",
@@ -48,5 +48,26 @@
       "src/main/**"
     ],
     "logLevel": "quiet"
+  },
+  "build": {
+    "appId": "com.your-app-id",
+    "productName": "Your App Name",
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.utilities"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ]
+    }
   }
 }
