@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { FaCirclePause, FaCirclePlay } from 'react-icons/fa6';
+import PrimaryButton from './PrimaryButton';
+import TimeText from './TimeText';
 
 export default function Time() {
   const [time, setTime] = useState('00:00:00');
@@ -37,7 +40,7 @@ export default function Time() {
   return (
     <div
       style={{
-        marginTop: '40px',
+        // marginTop: '40px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -45,30 +48,10 @@ export default function Time() {
         color: 'white',
       }}
     >
-      <div
-        style={{
-          fontSize: '3rem',
-          fontWeight: '100',
-          marginBottom: '20px',
-        }}
-      >
-        {time}
-      </div>
-      <button
-        onClick={toggleTimer}
-        style={{
-          padding: '10px 20px',
-          fontSize: '1.2rem',
-          backgroundColor: '#6c5ce7',
-          color: 'white',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-          WebkitAppRegion: 'no-drag', // This prevents the button from being part of the draggable area in Electron
-        }}
-      >
+      <TimeText time={time} />
+      <PrimaryButton onClick={toggleTimer} icon={isRunning ? <FaCirclePause /> : <FaCirclePlay />}>
         {isRunning ? 'Pause' : 'Start'}
-      </button>
+      </PrimaryButton>
     </div>
   );
 }

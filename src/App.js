@@ -11,14 +11,17 @@ function App() {
           'radial-gradient(circle at top center, rgba(255,255,255,0.2) 0%, rgba(28,8,74,1) 70%)',
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
-        padding: '1rem',
         margin: '0',
         height: '100vh',
         width: '100vw',
         boxSizing: 'border-box',
       }}
     >
-      <Time />
+      <div style={{ padding: '2rem' }}>
+        <Time />
+      </div>
+      {/* line break */}
+      <div style={{ height: '1px', background: '#40366d' }} />
     </div>
   );
 }

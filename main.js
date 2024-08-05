@@ -15,7 +15,7 @@ function createWindow() {
     transparent: true,
     // vibrancy: 'under-window',
     visualEffectState: 'active',
-    opacity: 0.9,
+    opacity: 0.98,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
