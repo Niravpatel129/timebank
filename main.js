@@ -1,6 +1,7 @@
 const { app, BrowserWindow, Tray, nativeImage, Menu, globalShortcut } = require('electron');
 const path = require('path');
 const url = require('url');
+const { ipcMain } = require('electron');
 
 let tray = null;
 let window = null;
@@ -36,6 +37,10 @@ function createWindow() {
   if (process.env.NODE_ENV === 'development') {
     window.webContents.openDevTools({ mode: 'detach' });
   }
+
+  ipcMain.on('quit-app', () => {
+    app.quit();
+  });
 
   window.on('blur', () => {
     window.hide();
