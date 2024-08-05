@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { FaCirclePause, FaCirclePlay, FaFeather } from 'react-icons/fa6';
 import PrimaryButton from './PrimaryButton';
@@ -38,7 +39,10 @@ export default function Time() {
   };
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
       style={{
         paddingTop: '20px',
         paddingBottom: '20px',
@@ -49,7 +53,9 @@ export default function Time() {
         color: 'white',
       }}
     >
-      <div
+      <motion.div
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
         style={{
           marginBottom: '20px',
           width: '40px',
@@ -60,17 +66,24 @@ export default function Time() {
           justifyContent: 'center',
           alignItems: 'center',
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-          border: '1px solid #40366d', // Added outline
-          cursor: 'pointer', // Add cursor style to indicate clickable
+          border: '1px solid #40366d',
+          cursor: 'pointer',
         }}
         onClick={() => window.open('https://www.google.com', '_blank')}
       >
         <FaFeather style={{ color: '#c5c1f0', fontSize: '20px' }} />
-      </div>
-      <TimeText time={time} />
-      <PrimaryButton onClick={toggleTimer} icon={isRunning ? <FaCirclePause /> : <FaCirclePlay />}>
-        {isRunning ? 'Pause' : 'Start'}
-      </PrimaryButton>
-    </div>
+      </motion.div>
+      <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ duration: 0.3 }}>
+        <TimeText time={time} />
+      </motion.div>
+      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+        <PrimaryButton
+          onClick={toggleTimer}
+          icon={isRunning ? <FaCirclePause /> : <FaCirclePlay />}
+        >
+          {isRunning ? 'Pause' : 'Start'}
+        </PrimaryButton>
+      </motion.div>
+    </motion.div>
   );
 }

@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 
 export default function PrimaryButton({ children, onClick, icon }) {
@@ -5,7 +6,7 @@ export default function PrimaryButton({ children, onClick, icon }) {
   const [isActive, setIsActive] = useState(false);
 
   return (
-    <button
+    <motion.button
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
@@ -14,6 +15,9 @@ export default function PrimaryButton({ children, onClick, icon }) {
       }}
       onMouseDown={() => setIsActive(true)}
       onMouseUp={() => setIsActive(false)}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: 'tween', duration: 0.2 }}
       style={{
         padding: '10px 20px',
         fontSize: '1.1rem',
@@ -31,14 +35,15 @@ export default function PrimaryButton({ children, onClick, icon }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        boxShadow: isActive ? 'inset 0 2px 4px rgba(0, 0, 0, 0.1)' : '0 2px 4px rgba(0, 0, 0, 0.1)',
-        transition: 'all 0.2s ease',
+        boxShadow: isActive
+          ? 'inset 0 2px 4px rgba(0, 0, 0, 0.1)'
+          : '0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.05)',
         minWidth: '120px',
-        transform: isActive ? 'scale(0.98)' : 'scale(1)',
+        transition: 'all 0.2s ease-in-out',
       }}
     >
       {icon && <span style={{ marginRight: '8px' }}>{icon}</span>}
       {children}
-    </button>
+    </motion.button>
   );
 }
