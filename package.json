@@ -4,7 +4,7 @@
   "description": "A simple and efficient time tracking application for managing your daily tasks and projects.",
   "main": "main.js",
   "scripts": {
-    "start": "concurrently \"npm run start:renderer\" \"sleep 1 && npm run start:main\"",
+    "start": "concurrently \"npm run start:renderer\" \"npm run start:main\"",
     "start:main": "cross-env NODE_ENV=development electron .",
     "start:renderer": "cross-env NODE_ENV=development webpack serve --config webpack.config.js",
     "build": "webpack --config webpack.config.js && electron-builder --mac",
@@ -17,6 +17,8 @@
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@babel/plugin-transform-runtime": "^7.24.7",
+    "@babel/preset-env": "^7.25.3",
     "@babel/preset-react": "^7.24.7",
     "@electron/notarize": "^2.3.2",
     "@electron/packager": "^18.3.3",
@@ -32,12 +34,15 @@
     "electron-reloader": "^1.2.3",
     "electronmon": "^2.0.3",
     "html-webpack-plugin": "^5.6.0",
+    "mini-css-extract-plugin": "^2.9.0",
     "postcss": "^8.4.40",
     "postcss-loader": "^8.1.1",
     "react-refresh": "^0.14.2",
     "style-loader": "^4.0.0",
     "tailwindcss": "^3.4.7",
+    "terser-webpack-plugin": "^5.3.10",
     "webpack": "^5.93.0",
+    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.2"
   },

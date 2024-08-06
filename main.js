@@ -106,15 +106,17 @@ function cleanup() {
 }
 
 app.whenReady().then(() => {
-  createWindow();
-  createTray();
+  setTimeout(() => {
+    createWindow();
+    createTray();
 
-  if (process.env.NODE_ENV === 'development') {
-    globalShortcut.register('CommandOrControl+Q', () => {
-      cleanup();
-      app.quit();
-    });
-  }
+    if (process.env.NODE_ENV === 'development') {
+      globalShortcut.register('CommandOrControl+Q', () => {
+        cleanup();
+        app.quit();
+      });
+    }
+  }, 3000);
 });
 
 app.dock.hide();
