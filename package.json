@@ -48,6 +48,7 @@
   },
   "dependencies": {
     "dotenv": "^16.4.5",
+    "electron-store": "^10.0.0",
     "framer-motion": "^11.3.21",
     "fs": "^0.0.1-security",
     "react": "^18.3.1",

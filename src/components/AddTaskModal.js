@@ -16,6 +16,8 @@ export default function AddTaskModal({ onClose }) {
     e.preventDefault();
     // Handle form submission here
     console.log({ taskName, duration, startTime, endTime });
+    // save to local electron storage
+
     onClose();
   };
 
