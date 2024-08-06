@@ -10,12 +10,14 @@ export default function AddTaskModal({ onClose }) {
   const [showCustomDuration, setShowCustomDuration] = useState(false);
   const [customHours, setCustomHours] = useState(0);
   const [customMinutes, setCustomMinutes] = useState(0);
+  const [category, setCategory] = useState('');
+  const [date, setDate] = useState('');
   const modalRef = useRef(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle form submission here
-    console.log({ taskName, duration, startTime, endTime });
+    console.log({ taskName, duration, startTime, endTime, category, date });
     // save to local electron storage
 
     onClose();
@@ -196,12 +198,92 @@ export default function AddTaskModal({ onClose }) {
               </div>
             </div>
           )}
+          <div style={{ marginBottom: '15px' }}>
+            <label htmlFor='category'>Category</label>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                padding: '4px',
+                marginTop: '5px',
+              }}
+            >
+              <input
+                type='text'
+                id='category'
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                placeholder='e.g. Development, Design'
+                style={{
+                  flex: 1,
+                  border: 'none',
+                  outline: 'none',
+                  padding: '8px',
+                }}
+              />
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                type='button'
+                onClick={() => setCategory('')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px',
+                }}
+              >
+                <FaTimes />
+              </motion.button>
+            </div>
+          </div>
+          <div style={{ marginBottom: '15px' }}>
+            <label htmlFor='date'>Date Due</label>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                padding: '4px',
+                marginTop: '5px',
+              }}
+            >
+              <input
+                type='date'
+                id='date'
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                style={{
+                  flex: 1,
+                  border: 'none',
+                  outline: 'none',
+                  padding: '8px',
+                }}
+              />
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                type='button'
+                onClick={() => setDate('')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px',
+                }}
+              >
+                <FaTimes />
+              </motion.button>
+            </div>
+          </div>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             type='submit'
             style={{
-              width: '100%',
               padding: '10px',
               backgroundColor: 'black',
               color: 'white',

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './App.css';
-import AddTask from './screens/AddTask';
 import Home from './screens/Home';
 import Tasks from './screens/Tasks';
 function App() {
@@ -23,7 +22,6 @@ function App() {
     >
       {screen === 'home' && <Home setScreen={setScreen} />}
       {screen === 'tasks' && <Tasks setScreen={setScreen} />}
-      {screen === 'addTask' && <AddTask setScreen={setScreen} />}
     </div>
   );
 }
