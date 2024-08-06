@@ -2,6 +2,7 @@ import React from 'react';
 import { FaDollarSign } from 'react-icons/fa6';
 import { GoTag } from 'react-icons/go';
 import { LuUsers2 } from 'react-icons/lu';
+import { Tooltip } from 'react-tooltip';
 
 export default function TrackingCard({ currentTask, setCurrentTask }) {
   const hours = currentTask?.hours || '00';
@@ -76,15 +77,36 @@ export default function TrackingCard({ currentTask, setCurrentTask }) {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <FaDollarSign style={{ marginRight: '8px', color: '#8c82c6', fontSize: '0.9rem' }} />
-            <LuUsers2 style={{ marginRight: '8px', color: '#8c82c6', fontSize: '0.9rem' }} />
-            <GoTag style={{ color: '#8c82c6', fontSize: '0.9rem' }} />
+            <div
+              data-tooltip-id='billable-tooltip'
+              data-tooltip-content='Billable'
+              style={{ display: 'inline-block', marginRight: '8px' }}
+            >
+              <FaDollarSign style={{ color: '#8c82c6', fontSize: '0.9rem' }} />
+            </div>
+            <div
+              data-tooltip-id='client-tooltip'
+              data-tooltip-content='Client'
+              style={{ display: 'inline-block', marginRight: '8px' }}
+            >
+              <LuUsers2 style={{ color: '#8c82c6', fontSize: '0.9rem' }} />
+            </div>
+            <div
+              data-tooltip-id='project-tooltip'
+              data-tooltip-content='Project'
+              style={{ display: 'inline-block' }}
+            >
+              <GoTag style={{ color: '#8c82c6', fontSize: '0.9rem' }} />
+            </div>
           </div>
           <div style={{ fontSize: '1rem', color: '#8c82c6', fontWeight: '300' }}>
             {currentTask ? `${hours || '00'}:${minutes || '00'}:${seconds || '00'}` : '--:--:--'}
           </div>
         </div>
       </div>
+      <Tooltip id='billable-tooltip' />
+      <Tooltip id='client-tooltip' />
+      <Tooltip id='project-tooltip' />
     </div>
   );
 }

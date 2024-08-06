@@ -79,7 +79,7 @@ export default function TrackingCardsBeno() {
           marginTop: '0px',
         }}
       >
-        Today's History
+        History
       </h2>
       <div style={{ display: 'flex', flexWrap: 'nowrap' }}>
         {cardContent('Terracoz Landing Page', 'Create 2 Options for Hero', '01:32:44')}
