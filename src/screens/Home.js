@@ -8,7 +8,7 @@ import TrackingCardsBeno from '../components/TrackingCardsBeno';
 
 const { ipcRenderer } = window.require('electron');
 
-export default function Home({ setScreen }) {
+export default function Home({ setScreen, currentTask, setCurrentTask }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -112,7 +112,7 @@ export default function Home({ setScreen }) {
         <Time />
         <div style={{ height: '1px', background: '#40366d' }} />
 
-        <TrackingCard />
+        <TrackingCard currentTask={currentTask} setCurrentTask={setCurrentTask} />
         <TrackingCardsBeno />
 
         <AllTasksButton onClick={handleShowAllTasks} />

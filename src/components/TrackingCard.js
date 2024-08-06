@@ -3,7 +3,7 @@ import { FaDollarSign } from 'react-icons/fa6';
 import { GoTag } from 'react-icons/go';
 import { LuUsers2 } from 'react-icons/lu';
 
-export default function TrackingCard() {
+export default function TrackingCard({ currentTask, setCurrentTask }) {
   return (
     <div style={{ marginBottom: '14px', marginTop: '14px' }}>
       <h2
@@ -40,7 +40,7 @@ export default function TrackingCard() {
               marginBottom: '4px',
             }}
           >
-            Terracoz Landing Page
+            {currentTask ? currentTask.category : 'No Task'}
           </h2>
           <h3
             style={{
@@ -51,10 +51,9 @@ export default function TrackingCard() {
               padding: 0,
             }}
           >
-            Create 2 Options for Hero
+            {currentTask ? currentTask.name : 'No task in progress'}
           </h3>
         </div>
-        {/* hr */}
         <hr
           style={{
             border: '1px solid #25164d',
@@ -77,7 +76,9 @@ export default function TrackingCard() {
             <LuUsers2 style={{ marginRight: '8px', color: '#8c82c6', fontSize: '0.9rem' }} />
             <GoTag style={{ color: '#8c82c6', fontSize: '0.9rem' }} />
           </div>
-          <div style={{ fontSize: '1rem', color: '#8c82c6', fontWeight: '300' }}>01:32:44</div>
+          <div style={{ fontSize: '1rem', color: '#8c82c6', fontWeight: '300' }}>
+            {currentTask ? '00:00:00' : '--:--:--'}
+          </div>
         </div>
       </div>
     </div>

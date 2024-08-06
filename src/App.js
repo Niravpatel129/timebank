@@ -4,6 +4,7 @@ import Home from './screens/Home';
 import Tasks from './screens/Tasks';
 function App() {
   const [screen, setScreen] = useState('home');
+  const [currentTask, setCurrentTask] = useState(null);
 
   return (
     <div
@@ -20,8 +21,10 @@ function App() {
         position: 'relative',
       }}
     >
-      {screen === 'home' && <Home setScreen={setScreen} />}
-      {screen === 'tasks' && <Tasks setScreen={setScreen} />}
+      {screen === 'home' && (
+        <Home setScreen={setScreen} currentTask={currentTask} setCurrentTask={setCurrentTask} />
+      )}
+      {screen === 'tasks' && <Tasks setScreen={setScreen} currentTask={currentTask} />}
     </div>
   );
 }
