@@ -19,17 +19,32 @@ export default function AddTaskModal({ onClose, onAddTask }) {
     // Handle form submission here
     console.log({ taskName, duration, startTime, endTime, category, date });
     // save to local electron storage
+    const taskDurationInSeconds = calculateDurationInSeconds(duration);
     const newTask = {
       id: Date.now(),
       name: taskName,
       status: 'in-progress',
-      hours: parseFloat(duration.replace('h', '')),
-      category: category,
+      taskDuration: taskDurationInSeconds,
+      hours: taskDurationInSeconds / 3600,
+      category: category || 'Other',
       date: date,
     };
     onAddTask(newTask);
 
     onClose();
+  };
+
+  const calculateDurationInSeconds = (durationString) => {
+    if (durationString === 'custom') {
+      return parseInt(customHours) * 3600 + parseInt(customMinutes) * 60;
+    }
+    const match = durationString.match(/(\d+)([hm])/);
+    if (match) {
+      const value = parseInt(match[1]);
+      const unit = match[2];
+      return unit === 'h' ? value * 3600 : value * 60;
+    }
+    return 0;
   };
 
   useEffect(() => {
@@ -61,7 +76,7 @@ export default function AddTaskModal({ onClose, onAddTask }) {
     } else {
       setCustomMinutes(value);
     }
-    setDuration(`${customHours}h ${customMinutes}m`);
+    setDuration('custom');
   };
 
   return (

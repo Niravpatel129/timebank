@@ -3,11 +3,10 @@ import { FaDollarSign } from 'react-icons/fa6';
 import { GoTag } from 'react-icons/go';
 import { LuUsers2 } from 'react-icons/lu';
 import { Tooltip } from 'react-tooltip';
+import secondsToTime from '../helpers/secondsToTime';
 
 export default function TrackingCard({ currentTask, setCurrentTask }) {
-  const hours = currentTask?.hours || '00';
-  const minutes = currentTask?.minutes || '00';
-  const seconds = currentTask?.seconds || '00';
+  const time = secondsToTime(currentTask?.taskDuration || 100);
 
   return (
     <div style={{ marginBottom: '14px', marginTop: '14px' }}>
@@ -100,7 +99,7 @@ export default function TrackingCard({ currentTask, setCurrentTask }) {
             </div>
           </div>
           <div style={{ fontSize: '1rem', color: '#8c82c6', fontWeight: '300' }}>
-            {currentTask ? `${hours || '00'}:${minutes || '00'}:${seconds || '00'}` : '--:--:--'}
+            {currentTask ? time : '--:--:--'}
           </div>
         </div>
       </div>

@@ -6,6 +6,7 @@ import { GoTag } from 'react-icons/go';
 import { LuUsers2 } from 'react-icons/lu';
 import AddTaskModal from '../components/AddTaskModal';
 import { useScreenContext } from '../context/useScreenContext';
+import secondsToTime from '../helpers/secondsToTime';
 
 export default function Tasks({ setScreen }) {
   const { setCurrentTask } = useScreenContext();
@@ -133,7 +134,10 @@ export default function Tasks({ setScreen }) {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 10 }}
                         style={{ marginRight: '10px', cursor: 'pointer' }}
-                        onClick={() => handleDeleteTask(task.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteTask(task.id);
+                        }}
                       >
                         <FaTrash style={{ color: '#ff6b6b', fontSize: '16px' }} />
                       </motion.div>
@@ -155,7 +159,9 @@ export default function Tasks({ setScreen }) {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <LuUsers2 style={{ color: '#8c82c6', fontSize: '0.9rem', marginRight: '5px' }} />
-                  <span style={{ color: '#8c82c6', fontSize: '0.9rem' }}>{task.hours}h</span>
+                  <span style={{ color: '#8c82c6', fontSize: '0.9rem' }}>
+                    {secondsToTime(task.taskDuration)}
+                  </span>
                 </div>
                 {task.date && (
                   <span style={{ color: '#8c82c6', fontSize: '0.9rem' }}>{task.date}</span>

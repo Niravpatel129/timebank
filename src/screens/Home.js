@@ -29,9 +29,7 @@ export default function Home({ setScreen, currentTask, setCurrentTask }) {
   };
 
   const handleTrackingCardClick = () => {
-    if (!currentTask) {
-      setScreen('tasks');
-    }
+    setScreen('tasks');
   };
 
   useEffect(() => {

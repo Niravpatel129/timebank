@@ -3,12 +3,14 @@ import React from 'react';
 import { FaCirclePause, FaCirclePlay, FaFeather } from 'react-icons/fa6';
 import { useScreenContext } from '../context/useScreenContext';
 import { useTimerContext } from '../context/useTimerContext';
+import secondsToTime from '../helpers/secondsToTime';
 import PrimaryButton from './PrimaryButton';
 import TimeText from './TimeText';
 
 export default function Time() {
   const { currentTask, finishCurrentTask } = useScreenContext();
   const { isRunning, time, startTimer, stopTimer } = useTimerContext();
+  const parsedTime = secondsToTime(currentTask.taskDuration || 100);
 
   const toggleTimer = () => {
     if (isRunning) {
@@ -61,7 +63,7 @@ export default function Time() {
         <FaFeather style={{ color: '#c5c1f0', fontSize: '20px' }} />
       </motion.div>
       <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ duration: 0.3 }}>
-        <TimeText time={formatTime(time)} />
+        <TimeText time={parsedTime} />
       </motion.div>
       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
         <PrimaryButton
