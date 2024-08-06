@@ -11,7 +11,7 @@ export default function TrackingCard() {
           fontSize: '1.1rem',
           fontWeight: '100',
           color: '#d7ceed',
-          margin: '16px',
+          margin: '8px',
           marginBottom: '8px',
           marginTop: '0px',
         }}
@@ -20,7 +20,7 @@ export default function TrackingCard() {
       </h2>
       <div
         style={{
-          margin: '16px',
+          margin: '8px',
           marginBottom: '0px',
           borderRadius: '12px',
           color: 'white',
