@@ -1,10 +1,21 @@
 import { motion } from 'framer-motion';
-import React from 'react';
-import { FaArrowLeft, FaCheckCircle, FaHourglassHalf } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaArrowLeft, FaCheckCircle, FaHourglassHalf, FaPlus } from 'react-icons/fa';
+import AddTaskModal from '../components/AddTaskModal';
 
 export default function Tasks({ setScreen }) {
+  const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+
   const handleBack = () => {
     setScreen('home');
+  };
+
+  const handleAddTask = () => {
+    setShowAddTaskModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowAddTaskModal(false);
   };
 
   const fakeTasks = [
@@ -32,7 +43,27 @@ export default function Tasks({ setScreen }) {
         <FaArrowLeft style={{ color: '#8c82c6', fontSize: '24px' }} />
       </motion.div>
       <div style={{ padding: '50px 20px' }}>
-        <h1 style={{ color: '#fff', marginBottom: '20px' }}>All Tasks</h1>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '20px',
+          }}
+        >
+          <h1 style={{ color: '#fff' }}>All Tasks</h1>
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            style={{
+              cursor: 'pointer',
+              zIndex: 1000,
+            }}
+            onClick={handleAddTask}
+          >
+            <FaPlus style={{ color: '#8c82c6', fontSize: '24px' }} />
+          </motion.div>
+        </div>
         {fakeTasks.map((task) => (
           <div
             key={task.id}
@@ -53,6 +84,9 @@ export default function Tasks({ setScreen }) {
             )}
           </div>
         ))}
+      </div>
+      <div style={{ margin: '20px' }}>
+        {showAddTaskModal && <AddTaskModal onClose={handleCloseModal} />}
       </div>
     </div>
   );
