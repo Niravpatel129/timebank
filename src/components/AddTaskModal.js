@@ -7,6 +7,9 @@ export default function AddTaskModal({ onClose }) {
   const [duration, setDuration] = useState('30m');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
+  const [showCustomDuration, setShowCustomDuration] = useState(false);
+  const [customHours, setCustomHours] = useState(0);
+  const [customMinutes, setCustomMinutes] = useState(0);
   const modalRef = useRef(null);
 
   const handleSubmit = (e) => {
@@ -28,6 +31,25 @@ export default function AddTaskModal({ onClose }) {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [onClose]);
+
+  const handleDurationClick = (time) => {
+    if (time === 'Other') {
+      setShowCustomDuration(true);
+      setDuration('custom');
+    } else {
+      setShowCustomDuration(false);
+      setDuration(time);
+    }
+  };
+
+  const handleCustomDurationChange = (type, value) => {
+    if (type === 'hours') {
+      setCustomHours(value);
+    } else {
+      setCustomMinutes(value);
+    }
+    setDuration(`${customHours}h ${customMinutes}m`);
+  };
 
   return (
     <motion.div
@@ -54,8 +76,8 @@ export default function AddTaskModal({ onClose }) {
           backgroundColor: 'white',
           padding: '20px',
           borderRadius: '10px',
-          //   width: '90%',
-          //   maxWidth: '400px',
+          width: '90%',
+          maxWidth: '400px',
         }}
       >
         <div
@@ -119,21 +141,27 @@ export default function AddTaskModal({ onClose }) {
             </div>
           </div>
           <div style={{ marginBottom: '15px' }}>
-            <label>How long?</label>
-            <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
+            <label>How long will this take?</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
               {['5m', '15m', '30m', '45m', '1h', 'Other'].map((time) => (
                 <motion.button
                   key={time}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   type='button'
-                  onClick={() => setDuration(time)}
+                  onClick={() => handleDurationClick(time)}
                   style={{
                     padding: '8px 12px',
                     border: 'none',
                     borderRadius: '20px',
-                    backgroundColor: duration === time ? 'black' : '#e0e0e0',
-                    color: duration === time ? 'white' : 'black',
+                    backgroundColor:
+                      duration === time || (time === 'Other' && duration === 'custom')
+                        ? 'black'
+                        : '#e0e0e0',
+                    color:
+                      duration === time || (time === 'Other' && duration === 'custom')
+                        ? 'white'
+                        : 'black',
                     cursor: 'pointer',
                   }}
                 >
@@ -142,24 +170,30 @@ export default function AddTaskModal({ onClose }) {
               ))}
             </div>
           </div>
-          <div style={{ marginBottom: '15px' }}>
-            <label>Add time</label>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '5px' }}>
-              <input
-                type='time'
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                style={{ padding: '8px' }}
-              />
-              <span>to</span>
-              <input
-                type='time'
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                style={{ padding: '8px' }}
-              />
+          {showCustomDuration && (
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px' }}>Custom Duration</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <input
+                  type='number'
+                  min='0'
+                  value={customHours}
+                  onChange={(e) => handleCustomDurationChange('hours', e.target.value)}
+                  style={{ width: '50px', padding: '5px' }}
+                />
+                <span>h</span>
+                <input
+                  type='number'
+                  min='0'
+                  max='59'
+                  value={customMinutes}
+                  onChange={(e) => handleCustomDurationChange('minutes', e.target.value)}
+                  style={{ width: '50px', padding: '5px' }}
+                />
+                <span>m</span>
+              </div>
             </div>
-          </div>
+          )}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
