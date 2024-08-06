@@ -2,8 +2,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaCog } from 'react-icons/fa';
 import './App.css';
+import AllTasksButton from './components/AllTasksButton';
 import Time from './components/Time';
 import TrackingCard from './components/TrackingCard';
+import TrackingCardsBeno from './components/TrackingCardsBeno';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -116,9 +118,12 @@ function App() {
         <div style={{ height: '1px', background: '#40366d' }} />
 
         <TrackingCard />
+        <TrackingCardsBeno />
+
+        <AllTasksButton />
       </div>
       {/* line break */}
-      <div style={{ height: '1px', background: '#40366d' }} />
+      {/* <div style={{ height: '1px', background: '#40366d' }} /> */}
     </div>
   );
 }

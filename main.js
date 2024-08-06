@@ -9,7 +9,7 @@ let window = null;
 function createWindow() {
   window = new BrowserWindow({
     width: 400,
-    height: 700,
+    height: 710,
     show: false,
     frame: false,
     resizable: false,
