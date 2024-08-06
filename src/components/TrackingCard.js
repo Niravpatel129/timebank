@@ -4,6 +4,10 @@ import { GoTag } from 'react-icons/go';
 import { LuUsers2 } from 'react-icons/lu';
 
 export default function TrackingCard({ currentTask, setCurrentTask }) {
+  const hours = currentTask?.hours || '00';
+  const minutes = currentTask?.minutes || '00';
+  const seconds = currentTask?.seconds || '00';
+
   return (
     <div style={{ marginBottom: '14px', marginTop: '14px' }}>
       <h2
@@ -77,7 +81,7 @@ export default function TrackingCard({ currentTask, setCurrentTask }) {
             <GoTag style={{ color: '#8c82c6', fontSize: '0.9rem' }} />
           </div>
           <div style={{ fontSize: '1rem', color: '#8c82c6', fontWeight: '300' }}>
-            {currentTask ? '00:00:00' : '--:--:--'}
+            {currentTask ? `${hours || '00'}:${minutes || '00'}:${seconds || '00'}` : '--:--:--'}
           </div>
         </div>
       </div>

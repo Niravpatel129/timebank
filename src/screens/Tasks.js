@@ -5,8 +5,10 @@ import { FaArrowLeft, FaCheckCircle, FaHourglassHalf, FaPlus, FaTrash } from 're
 import { GoTag } from 'react-icons/go';
 import { LuUsers2 } from 'react-icons/lu';
 import AddTaskModal from '../components/AddTaskModal';
+import { useScreenContext } from '../context/useScreenContext';
 
 export default function Tasks({ setScreen }) {
+  const { setCurrentTask } = useScreenContext();
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [hoveredTaskId, setHoveredTaskId] = useState(null);
@@ -95,6 +97,7 @@ export default function Tasks({ setScreen }) {
               exit={{ opacity: 0, y: -20 }}
               transition={{ delay: index * 0.05 }}
               style={{
+                cursor: 'pointer',
                 borderRadius: '8px',
                 padding: '15px',
                 marginBottom: '10px',
@@ -106,6 +109,10 @@ export default function Tasks({ setScreen }) {
               }}
               onMouseEnter={() => setHoveredTaskId(task.id)}
               onMouseLeave={() => setHoveredTaskId(null)}
+              onClick={() => {
+                setCurrentTask(task);
+                setScreen('home');
+              }}
             >
               <div
                 style={{

@@ -28,6 +28,12 @@ export default function Home({ setScreen, currentTask, setCurrentTask }) {
     setScreen('tasks');
   };
 
+  const handleTrackingCardClick = () => {
+    if (!currentTask) {
+      setScreen('tasks');
+    }
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -112,7 +118,12 @@ export default function Home({ setScreen, currentTask, setCurrentTask }) {
         <Time />
         <div style={{ height: '1px', background: '#40366d' }} />
 
-        <TrackingCard currentTask={currentTask} setCurrentTask={setCurrentTask} />
+        <div
+          onClick={handleTrackingCardClick}
+          style={{ cursor: currentTask ? 'pointer' : 'default' }}
+        >
+          <TrackingCard currentTask={currentTask} setCurrentTask={setCurrentTask} />
+        </div>
         <TrackingCardsBeno />
 
         <AllTasksButton onClick={handleShowAllTasks} />

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './App.css';
+import { useScreenContext } from './context/useScreenContext';
 import Home from './screens/Home';
 import Tasks from './screens/Tasks';
 function App() {
-  const [screen, setScreen] = useState('home');
-  const [currentTask, setCurrentTask] = useState(null);
+  const { screen, setScreen, currentTask, setCurrentTask } = useScreenContext();
 
   return (
     <div
