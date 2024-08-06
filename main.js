@@ -4,17 +4,17 @@ const url = require('url');
 const { ipcMain } = require('electron');
 
 let tray = null;
-let window = null;
+let mainWindow = null;
+let settingsWindow = null;
 
-function createWindow() {
-  window = new BrowserWindow({
+function createMainWindow() {
+  mainWindow = new BrowserWindow({
     width: 400,
     height: 710,
     show: false,
     frame: false,
     resizable: false,
     transparent: true,
-    // vibrancy: 'under-window',
     visualEffectState: 'active',
     opacity: 0.98,
     webPreferences: {
@@ -32,24 +32,50 @@ function createWindow() {
           slashes: true,
         });
 
-  window.loadURL(startUrl);
+  mainWindow.loadURL(startUrl);
 
   if (process.env.NODE_ENV === 'development') {
-    window.webContents.openDevTools({ mode: 'detach' });
+    mainWindow.webContents.openDevTools({ mode: 'detach' });
   }
 
-  ipcMain.on('quit-app', () => {
-    app.quit();
+  mainWindow.on('blur', () => {
+    mainWindow.hide();
   });
 
-  window.on('blur', () => {
-    window.hide();
-  });
-
-  window.on('close', (event) => {
+  mainWindow.on('close', (event) => {
     if (!app.isQuitting) {
       event.preventDefault();
-      window.hide();
+      mainWindow.hide();
+    }
+    return false;
+  });
+}
+
+function createSettingsWindow() {
+  settingsWindow = new BrowserWindow({
+    width: 600,
+    height: 400,
+    show: false,
+    frame: true,
+    resizable: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  });
+
+  const settingsUrl = url.format({
+    pathname: path.join(__dirname, 'dist', 'settings.html'),
+    protocol: 'file:',
+    slashes: true,
+  });
+
+  settingsWindow.loadURL(settingsUrl);
+
+  settingsWindow.on('close', (event) => {
+    if (!app.isQuitting) {
+      event.preventDefault();
+      settingsWindow.hide();
     }
     return false;
   });
@@ -63,7 +89,8 @@ function createTray() {
   tray.setToolTip('Time Tracker');
 
   const contextMenu = Menu.buildFromTemplate([
-    { label: 'Show App', click: () => window.show() },
+    { label: 'Show App', click: () => mainWindow.show() },
+    { label: 'Settings', click: () => settingsWindow.show() },
     {
       label: 'Quit',
       click: () => {
@@ -73,26 +100,24 @@ function createTray() {
     },
   ]);
 
-  // tray.setContextMenu(contextMenu);
-
   tray.on('click', (event, bounds) => {
     const { x, y } = bounds;
-    const { height, width } = window.getBounds();
+    const { height, width } = mainWindow.getBounds();
 
     const yPosition = process.platform === 'darwin' ? y : y - height;
 
-    window.setBounds({
+    mainWindow.setBounds({
       x: Math.round(x - width / 2),
       y: Math.round(yPosition),
       height,
       width,
     });
 
-    window.isVisible() ? window.hide() : window.show();
+    mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
   });
 
-  tray.on('right-click', (event, bounds) => {
-    tray.popUpContextMenu();
+  tray.on('right-click', () => {
+    tray.popUpContextMenu(contextMenu);
   });
 }
 
@@ -100,14 +125,18 @@ function cleanup() {
   if (tray) {
     tray.destroy();
   }
-  if (window) {
-    window.destroy();
+  if (mainWindow) {
+    mainWindow.destroy();
+  }
+  if (settingsWindow) {
+    settingsWindow.destroy();
   }
 }
 
 app.whenReady().then(() => {
   setTimeout(() => {
-    createWindow();
+    createMainWindow();
+    createSettingsWindow();
     createTray();
 
     if (process.env.NODE_ENV === 'development') {
@@ -132,6 +161,15 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+ipcMain.on('quit-app', () => {
+  app.quit();
+});
+
+// show-settings
+ipcMain.on('show-settings', () => {
+  settingsWindow.show();
 });
 
 if (process.env.NODE_ENV === 'development') {

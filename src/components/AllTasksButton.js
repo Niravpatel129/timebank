@@ -2,13 +2,14 @@ import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { FaTasks } from 'react-icons/fa';
 
-export default function AllTasksButton() {
+export default function AllTasksButton({ onClick }) {
   const [isHovered, setIsHovered] = useState(false);
   const [isActive, setIsActive] = useState(false);
 
   const handleClick = () => {
     // Handle button click
     console.log('All Tasks button clicked');
+    onClick();
   };
 
   return (
