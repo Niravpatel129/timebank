@@ -1,41 +1,28 @@
 import { motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { FaCirclePause, FaCirclePlay, FaFeather } from 'react-icons/fa6';
+import { useScreenContext } from '../context/useScreenContext';
+import { useTimerContext } from '../context/useTimerContext';
 import PrimaryButton from './PrimaryButton';
 import TimeText from './TimeText';
 
 export default function Time() {
-  const [time, setTime] = useState('00:00:00');
-  const [isRunning, setIsRunning] = useState(false);
-  const [startTime, setStartTime] = useState(null);
-  const [elapsedTime, setElapsedTime] = useState(0);
-
-  useEffect(() => {
-    let interval;
-    if (isRunning) {
-      interval = setInterval(() => {
-        const now = Date.now();
-        const elapsed = now - startTime + elapsedTime;
-        const seconds = Math.floor(elapsed / 1000) % 60;
-        const minutes = Math.floor(elapsed / 60000) % 60;
-        const hours = Math.floor(elapsed / 3600000);
-        setTime(
-          `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds
-            .toString()
-            .padStart(2, '0')}`,
-        );
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isRunning, startTime, elapsedTime]);
+  const { currentTask, finishCurrentTask } = useScreenContext();
+  const { isRunning, time, startTimer, stopTimer } = useTimerContext();
 
   const toggleTimer = () => {
     if (isRunning) {
-      setElapsedTime((prevElapsedTime) => prevElapsedTime + Date.now() - startTime);
+      stopTimer();
     } else {
-      setStartTime(Date.now());
+      startTimer();
     }
-    setIsRunning((prevIsRunning) => !prevIsRunning);
+  };
+
+  const formatTime = (timeInSeconds) => {
+    const hours = String(Math.floor(timeInSeconds / 3600)).padStart(2, '0');
+    const minutes = String(Math.floor((timeInSeconds % 3600) / 60)).padStart(2, '0');
+    const seconds = String(timeInSeconds % 60).padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
   };
 
   return (
@@ -69,19 +56,19 @@ export default function Time() {
           border: '1px solid #40366d',
           cursor: 'pointer',
         }}
-        onClick={() => window.open('https://www.google.com', '_blank')}
+        onClick={finishCurrentTask}
       >
         <FaFeather style={{ color: '#c5c1f0', fontSize: '20px' }} />
       </motion.div>
       <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ duration: 0.3 }}>
-        <TimeText time={time} />
+        <TimeText time={formatTime(time)} />
       </motion.div>
       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
         <PrimaryButton
           onClick={toggleTimer}
           icon={isRunning ? <FaCirclePause /> : <FaCirclePlay />}
         >
-          {isRunning ? 'Pause' : 'Start'}
+          {currentTask ? (isRunning ? 'Pause' : 'Start') : 'Set Task'}
         </PrimaryButton>
       </motion.div>
     </motion.div>
