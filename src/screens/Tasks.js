@@ -1,5 +1,6 @@
+// Tasks.js
 import { motion } from 'framer-motion';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaArrowLeft, FaCheckCircle, FaHourglassHalf, FaPlus } from 'react-icons/fa';
 import { GoTag } from 'react-icons/go';
 import { LuUsers2 } from 'react-icons/lu';
@@ -7,58 +8,29 @@ import AddTaskModal from '../components/AddTaskModal';
 
 export default function Tasks({ setScreen }) {
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    // Load tasks from localStorage when component mounts
+    const savedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    setTasks(savedTasks);
+  }, []);
 
   const handleBack = () => {
     setScreen('home');
   };
 
-  const handleAddTask = () => {
-    setShowAddTaskModal(true);
+  const handleAddTask = (newTask) => {
+    const updatedTasks = [...tasks, newTask];
+    setTasks(updatedTasks);
+    // Save to localStorage
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    setShowAddTaskModal(false);
   };
 
   const handleCloseModal = () => {
     setShowAddTaskModal(false);
   };
-
-  const fakeTasks = [
-    {
-      id: 1,
-      name: 'Design new logo',
-      status: 'completed',
-      hours: 2,
-      category: 'Design',
-      date: '2023-05-15',
-    },
-    {
-      id: 2,
-      name: 'Implement user authentication',
-      status: 'in-progress',
-      hours: 4,
-      category: 'Development',
-    },
-    {
-      id: 3,
-      name: 'Write API documentation',
-      status: 'in-progress',
-      hours: 3,
-      category: 'Documentation',
-    },
-    {
-      id: 4,
-      name: 'Fix responsive layout issues',
-      status: 'completed',
-      hours: 1.5,
-      category: 'Development',
-      date: '2023-05-14',
-    },
-    {
-      id: 5,
-      name: 'Optimize database queries',
-      status: 'in-progress',
-      hours: 2.5,
-      category: 'Database',
-    },
-  ];
 
   return (
     <div>
@@ -93,12 +65,12 @@ export default function Tasks({ setScreen }) {
               cursor: 'pointer',
               zIndex: 1000,
             }}
-            onClick={handleAddTask}
+            onClick={() => setShowAddTaskModal(true)}
           >
             <FaPlus style={{ color: '#8c82c6', fontSize: '24px' }} />
           </motion.div>
         </div>
-        {fakeTasks.map((task) => (
+        {tasks.map((task) => (
           <div
             key={task.id}
             style={{
@@ -145,7 +117,7 @@ export default function Tasks({ setScreen }) {
         ))}
       </div>
       <div style={{ margin: '20px' }}>
-        {showAddTaskModal && <AddTaskModal onClose={handleCloseModal} />}
+        {showAddTaskModal && <AddTaskModal onClose={handleCloseModal} onAddTask={handleAddTask} />}
       </div>
     </div>
   );

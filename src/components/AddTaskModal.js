@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 
-export default function AddTaskModal({ onClose }) {
+export default function AddTaskModal({ onClose, onAddTask }) {
   const [taskName, setTaskName] = useState('');
   const [duration, setDuration] = useState('30m');
   const [startTime, setStartTime] = useState('');
@@ -19,6 +19,15 @@ export default function AddTaskModal({ onClose }) {
     // Handle form submission here
     console.log({ taskName, duration, startTime, endTime, category, date });
     // save to local electron storage
+    const newTask = {
+      id: Date.now(),
+      name: taskName,
+      status: 'in-progress',
+      hours: parseFloat(duration.replace('h', '')),
+      category: category,
+      date: date,
+    };
+    onAddTask(newTask);
 
     onClose();
   };
