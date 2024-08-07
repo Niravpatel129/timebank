@@ -16,7 +16,7 @@ export default function TrackingCardsBeno() {
     color: 'white',
     backgroundColor: '#15093d',
     border: '0.1px solid #483776',
-    width: '200px',
+    width: '180px',
     flexShrink: 0,
     position: 'relative',
     overflow: 'hidden',

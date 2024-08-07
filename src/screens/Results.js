@@ -10,10 +10,6 @@ export default function Results({ setScreen, currentTask }) {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [contributionsData, setContributionsData] = useState([]);
 
-  const handleBackClick = () => {
-    setScreen('home');
-  };
-
   // Generate data for GitHub Contributions Calendar (yearly)
   const generateContributionsData = (year) => {
     const data = [];
@@ -21,16 +17,12 @@ export default function Results({ setScreen, currentTask }) {
     const endDate = new Date(year, 11, 31);
     for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
       const dateString = d.toISOString().split('T')[0];
-
-      const count = finishedTasks.filter((entry) => {
-        return entry.completedAt.split('T')[0] === dateString;
-      }).length;
-
-      console.log('🚀  count:', count);
-
+      const tasksForDay = finishedTasks.filter(
+        (task) => new Date(task.completedAt).toISOString().split('T')[0] === dateString,
+      );
       data.push({
         date: dateString,
-        count: count,
+        count: tasksForDay.length,
       });
     }
     return data;
@@ -39,6 +31,10 @@ export default function Results({ setScreen, currentTask }) {
   useEffect(() => {
     setContributionsData(generateContributionsData(currentYear));
   }, [currentYear, finishedTasks]);
+
+  const handleBackClick = () => {
+    setScreen('home');
+  };
 
   const handlePrevYear = () => {
     setCurrentYear((prevYear) => prevYear - 1);
@@ -198,31 +194,26 @@ export default function Results({ setScreen, currentTask }) {
           overflowX: 'auto',
         }}
       >
-        <div style={{ display: 'flex', marginTop: '10px', minWidth: 'max-content' }}>
-          <div style={{ display: 'flex', gap: '3px' }}>
-            {contributionWeeks.map((week, weekIndex) => (
-              <div key={weekIndex} style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                {week.map((day, dayIndex) => (
-                  <div
-                    key={dayIndex}
-                    style={{
-                      width: '12px',
-                      height: '12px',
-                      backgroundColor:
-                        day.count > 0
-                          ? `rgba(140, 130, 198, ${Math.min(day.count * 0.2, 1)})`
-                          : 'rgba(140, 130, 198, 0.1)',
-                      borderRadius: '2px',
-                    }}
-                    data-tooltip-id={`day-${weekIndex}-${dayIndex}`}
-                    data-tooltip-content={`${day.date}: ${day.count} contributions`}
-                  />
-                ))}
-              </div>
+        <div style={{ display: 'flex', marginTop: '10px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '3px' }}>
+            {contributionsData.map((day, index) => (
+              <div
+                key={index}
+                style={{
+                  width: '12px',
+                  height: '12px',
+                  backgroundColor: day.count
+                    ? `rgba(140, 130, 198, ${day.count * 0.4})`
+                    : 'rgba(140, 130, 198, 0.2)',
+                  borderRadius: '2px',
+                }}
+                data-tooltip-id={`day-${index}`}
+                data-tooltip-content={`${day.date}: ${day.count} contributions`}
+              />
             ))}
           </div>
         </div>
-        <div
+        {/* <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -236,13 +227,11 @@ export default function Results({ setScreen, currentTask }) {
               {month}
             </span>
           ))}
-        </div>
+        </div> */}
       </div>
-      {contributionWeeks.map((week, weekIndex) =>
-        week.map((day, dayIndex) => (
-          <Tooltip key={`${weekIndex}-${dayIndex}`} id={`day-${weekIndex}-${dayIndex}`} />
-        )),
-      )}
+      {contributionsData.map((day, index) => (
+        <Tooltip key={`${index}`} id={`day-${index}`} />
+      ))}
     </div>
   );
 }
