@@ -13,11 +13,12 @@ export default function Tasks({ setScreen }) {
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [hoveredTaskId, setHoveredTaskId] = useState(null);
+  const [filter, setFilter] = useState('all');
 
   useEffect(() => {
     // Load tasks from localStorage when component mounts
     const savedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    setTasks(savedTasks);
+    setTasks(savedTasks.reverse()); // Reverse the order of tasks
   }, []);
 
   const handleBack = () => {
@@ -25,7 +26,7 @@ export default function Tasks({ setScreen }) {
   };
 
   const handleAddTask = (newTask) => {
-    const updatedTasks = [...tasks, newTask];
+    const updatedTasks = [newTask, ...tasks]; // Add new task to the beginning
     setTasks(updatedTasks);
     // Save to localStorage
     localStorage.setItem('tasks', JSON.stringify(updatedTasks));
@@ -37,7 +38,6 @@ export default function Tasks({ setScreen }) {
   };
 
   const handleDeleteTask = (taskId) => {
-    // when i delete a task, i want to delete the task from the current task if it is the current task
     if (currentTask && currentTask?.id === taskId) {
       setCurrentTask(null);
     }
@@ -47,6 +47,14 @@ export default function Tasks({ setScreen }) {
 
     localStorage.setItem('tasks', JSON.stringify(updatedTasks));
   };
+
+  // Filter tasks based on the current filter
+  const filteredTasks = tasks.filter((task) => {
+    if (filter === 'all') return true;
+    if (filter === 'completed') return task.status === 'completed';
+    if (filter === 'in-progress') return task.status === 'in-progress';
+    return true;
+  });
 
   return (
     <motion.div
@@ -94,8 +102,29 @@ export default function Tasks({ setScreen }) {
             <FaPlus style={{ color: '#8c82c6', fontSize: '24px' }} />
           </motion.div>
         </motion.div>
+        <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
+          {['all', 'completed', 'in-progress'].map((filterOption) => (
+            <motion.div
+              key={filterOption}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              style={{
+                backgroundColor: filter === filterOption ? '#483776' : '#15093d',
+                color: '#fff',
+                padding: '8px 16px',
+                borderRadius: '20px',
+                margin: '0 5px',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s ease',
+              }}
+              onClick={() => setFilter(filterOption)}
+            >
+              {filterOption.charAt(0).toUpperCase() + filterOption.slice(1)}
+            </motion.div>
+          ))}
+        </div>
         <AnimatePresence>
-          {tasks.map((task, index) => (
+          {filteredTasks.map((task, index) => (
             <motion.div
               layout
               key={task.id}
@@ -176,7 +205,7 @@ export default function Tasks({ setScreen }) {
             </motion.div>
           ))}
         </AnimatePresence>
-        {tasks.length === 0 && (
+        {filteredTasks.length === 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -188,7 +217,10 @@ export default function Tasks({ setScreen }) {
               marginTop: '50px',
             }}
           >
-            No tasks yet. Click the plus icon to add a new task!
+            No tasks found.{' '}
+            {filter === 'all'
+              ? 'Click the plus icon to add a new task!'
+              : 'Try changing the filter.'}
           </motion.div>
         )}
       </div>
