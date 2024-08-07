@@ -1,12 +1,27 @@
 import React from 'react';
+import { FaCircle } from 'react-icons/fa';
 import { FaDollarSign } from 'react-icons/fa6';
 import { GoTag } from 'react-icons/go';
 import { LuUsers2 } from 'react-icons/lu';
 import { Tooltip } from 'react-tooltip';
+import { useScreenContext } from '../context/useScreenContext';
 import secondsToTime from '../helpers/secondsToTime';
 
-export default function TrackingCard({ currentTask, setCurrentTask }) {
-  const time = secondsToTime(currentTask?.taskDuration || 100);
+export default function TrackingCard({ currentTask }) {
+  const { isRunning, getDisplayTime } = useScreenContext();
+  const displayTime = secondsToTime(getDisplayTime());
+  const status = currentTask ? (isRunning ? 'running' : 'paused') : 'not-started';
+
+  const getStatusColor = () => {
+    switch (status) {
+      case 'running':
+        return '#4CAF50';
+      case 'paused':
+        return '#FFC107';
+      default:
+        return '#9E9E9E';
+    }
+  };
 
   return (
     <div style={{ marginBottom: '14px', marginTop: '14px' }}>
@@ -31,8 +46,20 @@ export default function TrackingCard({ currentTask, setCurrentTask }) {
           backgroundColor: '#15093d',
           borderRadius: '12px',
           border: '0.1px solid #483776',
+          position: 'relative',
         }}
       >
+        <div
+          data-tooltip-id='status-tooltip'
+          data-tooltip-content={status}
+          style={{
+            position: 'absolute',
+            top: '8px',
+            right: '8px',
+          }}
+        >
+          <FaCircle style={{ color: getStatusColor(), fontSize: '0.8rem' }} />
+        </div>
         <div style={{ paddingLeft: '16px', paddingRight: '16px', paddingTop: '16px' }}>
           <h2
             style={{
@@ -99,13 +126,14 @@ export default function TrackingCard({ currentTask, setCurrentTask }) {
             </div>
           </div>
           <div style={{ fontSize: '1rem', color: '#8c82c6', fontWeight: '300' }}>
-            {currentTask ? time : '--:--:--'}
+            {currentTask ? displayTime : '--:--:--'}
           </div>
         </div>
       </div>
       <Tooltip id='billable-tooltip' />
       <Tooltip id='client-tooltip' />
       <Tooltip id='project-tooltip' />
+      <Tooltip id='status-tooltip' />
     </div>
   );
 }

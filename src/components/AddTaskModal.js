@@ -23,7 +23,7 @@ export default function AddTaskModal({ onClose, onAddTask }) {
     const newTask = {
       id: Date.now(),
       name: taskName,
-      status: 'in-progress',
+      status: 'not-started',
       taskDuration: taskDurationInSeconds,
       hours: taskDurationInSeconds / 3600,
       category: category || 'Other',
