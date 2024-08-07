@@ -129,6 +129,10 @@ export const ScreenProvider = ({ children }) => {
     if (isRunning) {
       stopTimer();
     }
+    if (!newTask) {
+      setCurrentTask(null);
+      return;
+    }
 
     let updatedTask;
     if (taskHistory[newTask.id]) {
@@ -136,7 +140,7 @@ export const ScreenProvider = ({ children }) => {
       const historyData = taskHistory[newTask.id];
       updatedTask = {
         ...newTask,
-        originalDuration: newTask.taskDuration || 0,
+        originalDuration: newTask?.taskDuration || 0,
         timeRemaining: historyData.timeRemaining,
         timeSpent: historyData.timeSpent,
         isCountingUp: historyData.isCountingUp,
@@ -172,9 +176,8 @@ export const ScreenProvider = ({ children }) => {
       finishedTasks.push(finishedTask);
       localStorage.setItem('finishedTasks', JSON.stringify(finishedTasks));
 
-      // Remove the task from history
       setTaskHistory((prev) => {
-        const { [currentTask.id]: _, ...rest } = prev;
+        const { [currentTask?.id]: _, ...rest } = prev;
         return rest;
       });
 
