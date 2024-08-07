@@ -31,6 +31,7 @@
     "css-loader": "^7.1.2",
     "electron": "^31.3.1",
     "electron-builder": "^24.13.3",
+    "electron-notarize": "^1.2.2",
     "electron-osx-sign": "^0.6.0",
     "electron-reloader": "^1.2.3",
     "electronmon": "^2.0.3",
@@ -77,6 +78,7 @@
       "output": "release"
     },
     "mac": {
+      "identity": "Strive Games Inc (RCJS4748VY)",
       "target": [
         "dmg",
         "zip"
@@ -89,6 +91,7 @@
       "signIgnore": [
         "node_modules/*"
       ]
-    }
+    },
+    "afterSign": "scripts/notarize.js"
   }
 }
