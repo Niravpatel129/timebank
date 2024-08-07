@@ -47,6 +47,37 @@ export default function Results({ setScreen, currentTask }) {
   const totalTasks = 45;
   const streakDays = 7;
 
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+
+  // Function to group contributions by week
+  const groupContributionsByWeek = (data) => {
+    const weeks = [];
+    let currentWeek = [];
+    data.forEach((day, index) => {
+      currentWeek.push(day);
+      if ((index + 1) % 7 === 0 || index === data.length - 1) {
+        weeks.push(currentWeek);
+        currentWeek = [];
+      }
+    });
+    return weeks;
+  };
+
+  const contributionWeeks = groupContributionsByWeek(contributionsData);
+
   return (
     <div style={{ padding: '20px', color: '#d7ceed' }}>
       <motion.div
@@ -126,24 +157,72 @@ export default function Results({ setScreen, currentTask }) {
           />
         </div>
       </div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '3px' }}>
-        {contributionsData.map((day, index) => (
-          <div
-            key={index}
-            style={{
-              width: '12px',
-              height: '12px',
-              backgroundColor: `rgba(140, 130, 198, ${day.count * 0.2})`,
-              borderRadius: '2px',
-            }}
-            data-tooltip-id={`day-${index}`}
-            data-tooltip-content={`${day.date}: ${day.count} contributions`}
-          />
-        ))}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          width: '100%',
+          overflowX: 'auto',
+        }}
+      >
+        <div style={{ display: 'flex', marginTop: '10px', minWidth: 'max-content' }}>
+          {/* <div
+            style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginRight: '10px' }}
+          >
+            {['', 'Mon', '', 'Wed', '', 'Fri', ''].map((day, index) => (
+              <span
+                key={index}
+                style={{ fontSize: '12px', color: '#8c82c6', height: '12px', lineHeight: '12px' }}
+              >
+                {day}
+              </span>
+            ))}
+          </div> */}
+          <div style={{ display: 'flex', gap: '3px' }}>
+            {contributionWeeks.map((week, weekIndex) => (
+              <div key={weekIndex} style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                {week.map((day, dayIndex) => (
+                  <div
+                    key={dayIndex}
+                    style={{
+                      width: '12px',
+                      height: '12px',
+                      backgroundColor:
+                        day.count > 0
+                          ? `rgba(140, 130, 198, ${day.count * 0.4})`
+                          : 'rgba(140, 130, 198, 0.1)',
+                      borderRadius: '2px',
+                    }}
+                    data-tooltip-id={`day-${weekIndex}-${dayIndex}`}
+                    data-tooltip-content={`${day.date}: ${day.count} contributions`}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            width: '100%',
+            marginTop: '10px',
+            minWidth: 'max-content',
+          }}
+        >
+          {months.map((month, index) => (
+            <span key={index} style={{ fontSize: '12px', color: '#8c82c6' }}>
+              {month}
+            </span>
+          ))}
+        </div>
       </div>
-      {contributionsData.map((day, index) => (
-        <Tooltip key={index} id={`day-${index}`} />
-      ))}
+      {contributionWeeks.map((week, weekIndex) =>
+        week.map((day, dayIndex) => (
+          <Tooltip key={`${weekIndex}-${dayIndex}`} id={`day-${weekIndex}-${dayIndex}`} />
+        )),
+      )}
     </div>
   );
 }
