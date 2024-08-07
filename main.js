@@ -17,6 +17,7 @@ function createMainWindow() {
     transparent: true,
     visualEffectState: 'active',
     opacity: 0.98,
+    backgroundColor: '#15093d',
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
