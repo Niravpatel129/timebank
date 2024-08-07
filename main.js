@@ -39,6 +39,15 @@ function createMainWindow() {
     mainWindow.webContents.openDevTools({ mode: 'detach' });
   }
 
+  mainWindow.on('ready-to-show', () => {
+    mainWindow.setSize(400, 1);
+    mainWindow.show();
+    setTimeout(() => {
+      mainWindow.hide();
+      mainWindow.setSize(400, 710);
+    }, 1000);
+  });
+
   mainWindow.on('blur', () => {
     mainWindow.hide();
   });
