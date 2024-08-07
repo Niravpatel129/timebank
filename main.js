@@ -1,4 +1,5 @@
-const { app, BrowserWindow, Tray, nativeImage, Menu, globalShortcut } = require('electron');
+const { app, BrowserWindow, Tray, nativeImage, Menu, globalShortcut, dialog } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const url = require('url');
 const { ipcMain } = require('electron');
@@ -6,6 +7,14 @@ const { ipcMain } = require('electron');
 let tray = null;
 let mainWindow = null;
 let settingsWindow = null;
+
+// Configure logging for autoUpdater
+autoUpdater.logger = require('electron-log');
+autoUpdater.logger.transports.file.level = 'info';
+
+function checkForUpdates() {
+  autoUpdater.checkForUpdatesAndNotify();
+}
 
 function createMainWindow() {
   mainWindow = new BrowserWindow({
@@ -161,6 +170,11 @@ app.whenReady().then(() => {
         app.quit();
       });
     }
+
+    // Check for updates
+    checkForUpdates();
+    // Check for updates every hour
+    setInterval(checkForUpdates, 60 * 60 * 1000);
   }, 1000);
 });
 
@@ -186,6 +200,41 @@ ipcMain.on('quit-app', () => {
 // show-settings
 ipcMain.on('show-settings', () => {
   settingsWindow.show();
+});
+
+// Auto-updater events
+autoUpdater.on('update-available', () => {
+  dialog
+    .showMessageBox({
+      type: 'info',
+      title: 'Update available',
+      message: 'A new version of Timebank is available. Do you want to update now?',
+      buttons: ['Update', 'Later'],
+    })
+    .then((result) => {
+      if (result.response === 0) {
+        autoUpdater.downloadUpdate();
+      }
+    });
+});
+
+autoUpdater.on('update-downloaded', () => {
+  dialog
+    .showMessageBox({
+      type: 'info',
+      title: 'Update ready',
+      message: 'Install and restart now?',
+      buttons: ['Yes', 'Later'],
+    })
+    .then((result) => {
+      if (result.response === 0) {
+        autoUpdater.quitAndInstall(false, true);
+      }
+    });
+});
+
+autoUpdater.on('error', (err) => {
+  dialog.showErrorBox('Error: ', err == null ? 'unknown' : (err.stack || err).toString());
 });
 
 if (process.env.NODE_ENV === 'development') {
