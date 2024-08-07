@@ -133,7 +133,7 @@ export default function Tasks({ setScreen }) {
               exit={{ opacity: 0, y: -20 }}
               transition={{ delay: index * 0.05 }}
               style={{
-                cursor: 'pointer',
+                cursor: task.status !== 'completed' ? 'pointer' : 'default',
                 borderRadius: '8px',
                 padding: '15px',
                 marginBottom: '10px',
@@ -146,8 +146,10 @@ export default function Tasks({ setScreen }) {
               onMouseEnter={() => setHoveredTaskId(task.id)}
               onMouseLeave={() => setHoveredTaskId(null)}
               onClick={() => {
-                setCurrentTask(task);
-                setScreen('home');
+                if (task.status !== 'completed') {
+                  setCurrentTask(task);
+                  setScreen('home');
+                }
               }}
             >
               <div
