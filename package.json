@@ -70,6 +70,7 @@
   "build": {
     "appId": "com.timebank.app",
     "productName": "Timebank",
+    "afterSign": "scripts/notarize.js",
     "files": [
       "dist/**/*",
       "main.js",
@@ -80,21 +81,19 @@
       "output": "release"
     },
     "mac": {
-      "identity": "Strive Games Inc (RCJS4748VY)",
-      "target": [
-        "dmg",
-        "zip"
-      ],
       "category": "public.app-category.utilities",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
-      "signIgnore": [
-        "node_modules/*"
+      "target": [
+        "dmg",
+        "zip"
       ]
     },
-    "afterSign": "scripts/notarize.js",
+    "dmg": {
+      "sign": false
+    },
     "publish": [
       {
         "provider": "github",
@@ -102,6 +101,5 @@
         "repo": "timebank"
       }
     ]
-  },
-  "afterSign": "scripts/notarize.js"
+  }
 }
