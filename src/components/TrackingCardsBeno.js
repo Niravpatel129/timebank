@@ -1,17 +1,15 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { FaDollarSign, FaTrashCan } from 'react-icons/fa6';
 import { GoTag } from 'react-icons/go';
 import { LuUsers2 } from 'react-icons/lu';
 import { Tooltip } from 'react-tooltip';
+import { useScreenContext } from '../context/useScreenContext';
+import secondsToTime from '../helpers/secondsToTime';
 
 export default function TrackingCardsBeno() {
-  const [finishedTasks, setFinishedTasks] = useState([]);
-
-  useEffect(() => {
-    const tasks = JSON.parse(localStorage.getItem('finishedTasks') || '[]');
-    setFinishedTasks(tasks);
-  }, []);
+  const { finishedTasks, deleteTask } = useScreenContext();
+  console.log('🚀  finishedTasks:', finishedTasks);
 
   const cardStyle = {
     margin: '8px',
@@ -22,12 +20,6 @@ export default function TrackingCardsBeno() {
     width: 'calc(50% - 16px)',
     position: 'relative',
     overflow: 'hidden',
-  };
-
-  const deleteTask = (taskId) => {
-    const updatedTasks = finishedTasks.filter((task) => task.id !== taskId);
-    setFinishedTasks(updatedTasks);
-    localStorage.setItem('finishedTasks', JSON.stringify(updatedTasks));
   };
 
   return (
@@ -143,7 +135,7 @@ export default function TrackingCardsBeno() {
                       task.completedAt,
                     ).toLocaleString()}`}
                   >
-                    {`${task.hours}:${task.minutes}:${task.seconds}`}
+                    {secondsToTime(task.taskDuration - task.timeRemaining)}
                   </div>
                 </div>
               </motion.div>

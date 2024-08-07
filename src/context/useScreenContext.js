@@ -35,11 +35,17 @@ export const ScreenProvider = ({ children }) => {
     const savedTask = localStorage.getItem('currentTask');
     return savedTask ? JSON.parse(savedTask) : null;
   });
+  const [finishedTasks, setFinishedTasks] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
   const [taskHistory, setTaskHistory] = useState(() => {
     const savedHistory = localStorage.getItem('taskHistory');
     return savedHistory ? JSON.parse(savedHistory) : {};
   });
+
+  useEffect(() => {
+    const tasks = JSON.parse(localStorage.getItem('finishedTasks') || '[]');
+    setFinishedTasks(tasks);
+  }, []);
 
   useEffect(() => {
     if (Object.keys(taskHistory).length === 0) {
@@ -101,6 +107,12 @@ export const ScreenProvider = ({ children }) => {
     if (currentTask) {
       setIsRunning(true);
     }
+  };
+
+  const deleteTask = (taskId) => {
+    const updatedTasks = finishedTasks.filter((task) => task.id !== taskId);
+    setFinishedTasks(updatedTasks);
+    localStorage.setItem('finishedTasks', JSON.stringify(updatedTasks));
   };
 
   const stopTimer = () => setIsRunning(false);
@@ -182,6 +194,9 @@ export const ScreenProvider = ({ children }) => {
       });
 
       setCurrentTask(null);
+
+      // update finishedTasks
+      setFinishedTasks((prev) => [...prev, finishedTask]);
     }
   };
 
@@ -203,6 +218,8 @@ export const ScreenProvider = ({ children }) => {
         stopTimer,
         resetTimer,
         getDisplayTime,
+        deleteTask,
+        finishedTasks,
       }}
     >
       {children}
