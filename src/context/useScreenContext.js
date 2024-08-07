@@ -2,6 +2,33 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 
 const ScreenContext = createContext();
 
+const defaultTasks = [
+  {
+    id: '1',
+    name: 'Morning check-in',
+    taskDuration: 900, // 15 minutes
+    originalDuration: 900,
+    timeRemaining: 900,
+    timeSpent: 0,
+    isCountingUp: false,
+    status: 'not-started',
+    category: 'Meetings',
+    date: '2023-05-15',
+  },
+  {
+    id: '2',
+    name: 'Code review',
+    taskDuration: 3600, // 1 hour
+    originalDuration: 3600,
+    timeRemaining: 3600,
+    timeSpent: 0,
+    isCountingUp: false,
+    status: 'not-started',
+    category: 'Development',
+    date: '2023-05-15',
+  },
+];
+
 export const ScreenProvider = ({ children }) => {
   const [screen, setScreen] = useState('home');
   const [currentTask, setCurrentTask] = useState(() => {
@@ -13,6 +40,20 @@ export const ScreenProvider = ({ children }) => {
     const savedHistory = localStorage.getItem('taskHistory');
     return savedHistory ? JSON.parse(savedHistory) : {};
   });
+
+  useEffect(() => {
+    if (Object.keys(taskHistory).length === 0) {
+      const initialTaskHistory = {};
+      defaultTasks.forEach((task) => {
+        initialTaskHistory[task.id] = {
+          timeSpent: task.timeSpent,
+          timeRemaining: task.timeRemaining,
+          isCountingUp: task.isCountingUp,
+        };
+      });
+      setTaskHistory(initialTaskHistory);
+    }
+  }, []);
 
   useEffect(() => {
     let interval;
