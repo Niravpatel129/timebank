@@ -159,9 +159,11 @@ export const ScreenProvider = ({ children }) => {
   const finishCurrentTask = () => {
     if (currentTask) {
       stopTimer();
+      const completedAt = new Date().toISOString();
       const finishedTask = {
         ...currentTask,
-        finishedAt: new Date().toISOString(),
+        completedAt,
+        finishedAt: completedAt,
         hours: String(Math.floor(currentTask.timeSpent / 3600)).padStart(2, '0'),
         minutes: String(Math.floor((currentTask.timeSpent % 3600) / 60)).padStart(2, '0'),
         seconds: String(currentTask.timeSpent % 60).padStart(2, '0'),
