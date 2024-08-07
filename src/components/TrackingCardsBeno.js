@@ -17,7 +17,8 @@ export default function TrackingCardsBeno() {
     color: 'white',
     backgroundColor: '#15093d',
     border: '0.1px solid #483776',
-    width: 'calc(50% - 16px)',
+    width: '200px',
+    flexShrink: 0,
     position: 'relative',
     overflow: 'hidden',
   };
@@ -37,15 +38,24 @@ export default function TrackingCardsBeno() {
         History
       </h2>
       {finishedTasks.length === 0 ? (
-        <div style={{ ...cardStyle, width: '', padding: '16px', textAlign: 'center' }}>
+        <div style={{ ...cardStyle, width: 'auto', padding: '16px', textAlign: 'center' }}>
           <p style={{ color: '#8c82c6', margin: 0 }}>
             No completed tasks yet. Start tracking to see your history!
           </p>
         </div>
       ) : (
         <AnimatePresence>
-          <motion.div style={{ display: 'flex', flexWrap: 'nowrap' }} layout>
-            {finishedTasks.slice(0, 2).map((task) => (
+          <motion.div
+            style={{
+              display: 'flex',
+              overflowX: 'auto',
+              overflowY: 'hidden',
+              whiteSpace: 'nowrap',
+              padding: '8px 0',
+            }}
+            layout
+          >
+            {finishedTasks.map((task) => (
               <motion.div
                 key={task.id}
                 style={cardStyle}
