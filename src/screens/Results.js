@@ -107,7 +107,12 @@ export default function Results({ setScreen, currentTask }) {
   }
 
   return (
-    <div style={{ padding: '20px', color: '#d7ceed' }}>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      style={{ padding: '20px', color: '#d7ceed' }}
+    >
       <motion.div
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
@@ -123,11 +128,19 @@ export default function Results({ setScreen, currentTask }) {
         <FaArrowLeft style={{ color: '#8c82c6', fontSize: '24px' }} />
       </motion.div>
 
-      <h1 style={{ textAlign: 'center', marginBottom: '30px', fontWeight: 200 }}>
+      <motion.h1
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+        style={{ textAlign: 'center', marginBottom: '30px', fontWeight: 200 }}
+      >
         Your Productivity
-      </h1>
+      </motion.h1>
 
-      <div
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.4, duration: 0.5 }}
         style={{
           display: 'flex',
           justifyContent: 'space-around',
@@ -162,10 +175,22 @@ export default function Results({ setScreen, currentTask }) {
           <h4>Current Streak</h4>
           <p>{streakDays} days</p>
         </div>
-      </div>
+      </motion.div>
 
-      <h2 style={{ textAlign: 'center', fontWeight: 100, margin: 0 }}>Contribution Calendar</h2>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <motion.h2
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+        style={{ textAlign: 'center', fontWeight: 100, margin: 0 }}
+      >
+        Contribution Calendar
+      </motion.h2>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8, duration: 0.5 }}
+        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+      >
         <h3 style={{ margin: 0, fontWeight: 100 }}>{currentYear}</h3>
         <div style={{ display: 'flex', gap: '10px' }}>
           <FaArrowLeft
@@ -184,8 +209,11 @@ export default function Results({ setScreen, currentTask }) {
             onClick={handleNextYear}
           />
         </div>
-      </div>
-      <div
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 1, duration: 0.5 }}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -197,8 +225,11 @@ export default function Results({ setScreen, currentTask }) {
         <div style={{ display: 'flex', marginTop: '10px' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '3px' }}>
             {contributionsData.map((day, index) => (
-              <div
+              <motion.div
                 key={index}
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 1 + index * 0.001, duration: 0.3 }}
                 style={{
                   width: '12px',
                   height: '12px',
@@ -228,10 +259,10 @@ export default function Results({ setScreen, currentTask }) {
             </span>
           ))}
         </div> */}
-      </div>
+      </motion.div>
       {contributionsData.map((day, index) => (
         <Tooltip key={`${index}`} id={`day-${index}`} />
       ))}
-    </div>
+    </motion.div>
   );
 }

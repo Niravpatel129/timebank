@@ -130,6 +130,11 @@ export const ScreenProvider = ({ children }) => {
     const updatedFinishedTasks = finishedTasks.filter((task) => task.id !== taskId);
     setFinishedTasks(updatedFinishedTasks);
     localStorage.setItem('finishedTasks', JSON.stringify(updatedFinishedTasks));
+
+    // delete from tasks
+    const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    const updatedTasks2 = tasks.filter((task) => task.id !== taskId);
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks2));
   };
 
   const stopTimer = () => {
