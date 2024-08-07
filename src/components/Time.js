@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import React from 'react';
+import React, { useState } from 'react';
 import { FaCheck, FaCirclePause, FaCirclePlay, FaFeather } from 'react-icons/fa6';
 import { useScreenContext } from '../context/useScreenContext';
 import PrimaryButton from './PrimaryButton';
@@ -15,6 +15,8 @@ export default function Time() {
     getDisplayTime,
     setScreen,
   } = useScreenContext();
+
+  const [timeDisplayMode, setTimeDisplayMode] = useState('normal');
 
   const toggleTimer = () => {
     if (isRunning) {
@@ -35,6 +37,36 @@ export default function Time() {
   };
 
   const displayTime = getDisplayTime();
+
+  const toggleTimeDisplay = () => {
+    setTimeDisplayMode((prevMode) => {
+      switch (prevMode) {
+        case 'normal':
+          return 'countdown';
+        case 'countdown':
+          return 'percentage';
+        default:
+          return 'normal';
+      }
+    });
+  };
+
+  const renderTimeDisplay = () => {
+    switch (timeDisplayMode) {
+      case 'normal':
+        return <TimeText variation={2} time={formatTime(displayTime)} />;
+      case 'countdown':
+        const remainingTime = currentTask ? currentTask.taskDuration - displayTime : 0;
+        return <TimeText variation={2} time={formatTime(remainingTime)} />;
+      case 'percentage':
+        const percentage = currentTask
+          ? Math.max(0, 100 - Math.round((displayTime / currentTask.taskDuration) * 100))
+          : 100;
+        return <TimeText variation={3} time={`${percentage}% remaining`} />;
+      default:
+        return <TimeText variation={1} time={formatTime(displayTime)} />;
+    }
+  };
 
   return (
     <motion.div
@@ -71,8 +103,14 @@ export default function Time() {
       >
         <FaFeather style={{ color: '#c5c1f0', fontSize: '20px' }} />
       </motion.div>
-      <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ duration: 0.3 }}>
-        <TimeText time={formatTime(displayTime)} />
+      <motion.div
+        initial={{ scale: 0.8 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.3 }}
+        onClick={toggleTimeDisplay}
+        style={{ cursor: 'pointer' }}
+      >
+        {renderTimeDisplay()}
       </motion.div>
       <motion.div
         style={{
