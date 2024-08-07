@@ -9,7 +9,6 @@ import secondsToTime from '../helpers/secondsToTime';
 
 export default function TrackingCardsBeno() {
   const { finishedTasks, deleteTask } = useScreenContext();
-  console.log('🚀  finishedTasks:', finishedTasks);
 
   const cardStyle = {
     margin: '8px',
@@ -158,11 +157,6 @@ export default function TrackingCardsBeno() {
       <Tooltip id='project-tooltip' />
       <Tooltip id='date-completed-tooltip' />
       <Tooltip id='delete' />
-      <style jsx>{`
-        .delete-icon:hover {
-          opacity: 1 !important;
-        }
-      `}</style>
     </div>
   );
 }

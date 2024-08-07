@@ -18,3 +18,7 @@ body {
   height: 100%;
   width: 100%;
 }
+
+.delete-icon:hover {
+  opacity: 1 !important;
+}
