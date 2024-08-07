@@ -45,7 +45,7 @@ function createMainWindow() {
     setTimeout(() => {
       mainWindow.hide();
       mainWindow.setSize(400, 710);
-    }, 1000);
+    }, 100);
   });
 
   mainWindow.on('blur', () => {
@@ -80,7 +80,7 @@ function createSettingsWindow() {
     slashes: true,
   });
 
-  settingsWindow.loadURL(settingsUrl);
+  // settingsWindow.loadURL();
 
   settingsWindow.on('close', (event) => {
     if (!app.isQuitting) {
