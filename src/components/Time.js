@@ -10,7 +10,7 @@ import TimeText from './TimeText';
 export default function Time() {
   const { currentTask, finishCurrentTask } = useScreenContext();
   const { isRunning, time, startTimer, stopTimer } = useTimerContext();
-  const parsedTime = secondsToTime(currentTask.taskDuration || 100);
+  const parsedTime = secondsToTime(currentTask?.taskDuration || 100);
 
   const toggleTimer = () => {
     if (isRunning) {
