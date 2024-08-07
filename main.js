@@ -40,12 +40,12 @@ function createMainWindow() {
   }
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.setSize(400, 1);
-    mainWindow.show();
-    setTimeout(() => {
-      mainWindow.hide();
-      mainWindow.setSize(400, 710);
-    }, 100);
+    // mainWindow.setSize(400, 1);
+    // mainWindow.show();
+    // setTimeout(() => {
+    //   mainWindow.hide();
+    //   mainWindow.setSize(400, 710);
+    // }, 100);
   });
 
   mainWindow.on('blur', () => {
@@ -148,6 +148,12 @@ app.whenReady().then(() => {
     createMainWindow();
     createSettingsWindow();
     createTray();
+    mainWindow.setSize(400, 1);
+    mainWindow.show();
+    setTimeout(() => {
+      mainWindow.hide();
+      mainWindow.setSize(400, 710);
+    }, 100);
 
     if (process.env.NODE_ENV === 'development') {
       globalShortcut.register('CommandOrControl+Q', () => {

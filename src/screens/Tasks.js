@@ -89,105 +89,102 @@ export default function Tasks({ setScreen }) {
           </motion.div>
         </motion.div>
         <AnimatePresence>
-          {tasks.length === 0 ? (
+          {tasks.map((task, index) => (
             <motion.div
+              layout
+              key={task.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
+              transition={{ delay: index * 0.05 }}
               style={{
-                color: '#8c82c6',
-                fontSize: '1rem',
-                textAlign: 'center',
-                marginTop: '50px',
+                cursor: 'pointer',
+                borderRadius: '8px',
+                padding: '15px',
+                marginBottom: '10px',
+                display: 'flex',
+                flexDirection: 'column',
+                backgroundColor: '#15093d',
+                border: '0.1px solid #483776',
+                position: 'relative',
+              }}
+              onMouseEnter={() => setHoveredTaskId(task.id)}
+              onMouseLeave={() => setHoveredTaskId(null)}
+              onClick={() => {
+                setCurrentTask(task);
+                setScreen('home');
               }}
             >
-              No tasks yet. Click the plus icon to add a new task!
-            </motion.div>
-          ) : (
-            tasks.map((task, index) => (
-              <motion.div
-                layout
-                key={task.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ delay: index * 0.05 }}
+              <div
                 style={{
-                  cursor: 'pointer',
-                  borderRadius: '8px',
-                  padding: '15px',
-                  marginBottom: '10px',
                   display: 'flex',
-                  flexDirection: 'column',
-                  backgroundColor: '#15093d',
-                  border: '0.1px solid #483776',
-                  position: 'relative',
-                }}
-                onMouseEnter={() => setHoveredTaskId(task.id)}
-                onMouseLeave={() => setHoveredTaskId(null)}
-                onClick={() => {
-                  setCurrentTask(task);
-                  setScreen('home');
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '10px',
                 }}
               >
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '10px',
-                  }}
-                >
-                  <span style={{ color: '#fff', fontSize: '1rem', fontWeight: '500' }}>
-                    {task.name}
-                  </span>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <AnimatePresence>
-                      {hoveredTaskId === task.id && (
-                        <motion.div
-                          initial={{ opacity: 0, x: 10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: 10 }}
-                          style={{ marginRight: '10px', cursor: 'pointer' }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteTask(task.id);
-                          }}
-                        >
-                          <FaTrash style={{ color: '#ff6b6b', fontSize: '16px' }} />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                    {task.status === 'completed' ? (
-                      <FaCheckCircle style={{ color: '#4CAF50' }} />
-                    ) : (
-                      <FaHourglassHalf style={{ color: '#FFC107' }} />
+                <span style={{ color: '#fff', fontSize: '1rem', fontWeight: '500' }}>
+                  {task.name}
+                </span>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <AnimatePresence>
+                    {hoveredTaskId === task.id && (
+                      <motion.div
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 10 }}
+                        style={{ marginRight: '10px', cursor: 'pointer' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteTask(task.id);
+                        }}
+                      >
+                        <FaTrash style={{ color: '#ff6b6b', fontSize: '16px' }} />
+                      </motion.div>
                     )}
-                  </div>
-                </div>
-                <div
-                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <GoTag style={{ color: '#8c82c6', fontSize: '0.9rem', marginRight: '5px' }} />
-                    <span style={{ color: '#8c82c6', fontSize: '0.9rem' }}>{task.category}</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <LuUsers2
-                      style={{ color: '#8c82c6', fontSize: '0.9rem', marginRight: '5px' }}
-                    />
-                    <span style={{ color: '#8c82c6', fontSize: '0.9rem' }}>
-                      {secondsToTime(task.taskDuration)}
-                    </span>
-                  </div>
-                  {task.date && (
-                    <span style={{ color: '#8c82c6', fontSize: '0.9rem' }}>{task.date}</span>
+                  </AnimatePresence>
+                  {task.status === 'completed' ? (
+                    <FaCheckCircle style={{ color: '#4CAF50' }} />
+                  ) : (
+                    <FaHourglassHalf style={{ color: '#FFC107' }} />
                   )}
                 </div>
-              </motion.div>
-            ))
-          )}
+              </div>
+              <div
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <GoTag style={{ color: '#8c82c6', fontSize: '0.9rem', marginRight: '5px' }} />
+                  <span style={{ color: '#8c82c6', fontSize: '0.9rem' }}>{task.category}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <LuUsers2 style={{ color: '#8c82c6', fontSize: '0.9rem', marginRight: '5px' }} />
+                  <span style={{ color: '#8c82c6', fontSize: '0.9rem' }}>
+                    {secondsToTime(task.taskDuration)}
+                  </span>
+                </div>
+                {task.date && (
+                  <span style={{ color: '#8c82c6', fontSize: '0.9rem' }}>{task.date}</span>
+                )}
+              </div>
+            </motion.div>
+          ))}
         </AnimatePresence>
+        {tasks.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            style={{
+              color: '#8c82c6',
+              fontSize: '1rem',
+              textAlign: 'center',
+              marginTop: '50px',
+            }}
+          >
+            No tasks yet. Click the plus icon to add a new task!
+          </motion.div>
+        )}
       </div>
       <div>
         <AnimatePresence>
