@@ -106,6 +106,7 @@ export default function AddTaskModal({ onClose, onAddTask }) {
           borderRadius: '10px',
           width: '90%',
           maxWidth: '400px',
+          margin: '10px',
         }}
       >
         <div

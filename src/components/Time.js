@@ -1,19 +1,28 @@
 import { motion } from 'framer-motion';
 import React from 'react';
-import { FaCirclePause, FaCirclePlay, FaFeather } from 'react-icons/fa6';
+import { FaCheck, FaCirclePause, FaCirclePlay, FaFeather } from 'react-icons/fa6';
 import { useScreenContext } from '../context/useScreenContext';
 import PrimaryButton from './PrimaryButton';
 import TimeText from './TimeText';
 
 export default function Time() {
-  const { currentTask, finishCurrentTask, isRunning, startTimer, stopTimer, getDisplayTime } =
-    useScreenContext();
+  const {
+    currentTask,
+    finishCurrentTask,
+    isRunning,
+    startTimer,
+    stopTimer,
+    getDisplayTime,
+    setScreen,
+  } = useScreenContext();
 
   const toggleTimer = () => {
     if (isRunning) {
       stopTimer();
-    } else {
+    } else if (currentTask) {
       startTimer();
+    } else {
+      setScreen('tasks');
     }
   };
 
@@ -65,13 +74,27 @@ export default function Time() {
       <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ duration: 0.3 }}>
         <TimeText time={formatTime(displayTime)} />
       </motion.div>
-      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-        <PrimaryButton
-          onClick={toggleTimer}
-          icon={isRunning ? <FaCirclePause /> : <FaCirclePlay />}
-        >
-          {currentTask ? (isRunning ? 'Pause' : 'Start') : 'Set Task'}
-        </PrimaryButton>
+      <motion.div
+        style={{
+          display: 'flex',
+          gap: '10px',
+        }}
+      >
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <PrimaryButton
+            onClick={toggleTimer}
+            icon={currentTask ? isRunning ? <FaCirclePause /> : <FaCirclePlay /> : null}
+          >
+            {currentTask ? (isRunning ? 'Pause' : 'Start') : 'Set Task'}
+          </PrimaryButton>
+        </motion.div>
+        {currentTask && (
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <PrimaryButton onClick={finishCurrentTask} icon={<FaCheck />}>
+              Complete
+            </PrimaryButton>
+          </motion.div>
+        )}
       </motion.div>
     </motion.div>
   );

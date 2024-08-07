@@ -45,7 +45,7 @@ function createMainWindow() {
     setTimeout(() => {
       mainWindow.hide();
       mainWindow.setSize(400, 710);
-    }, 500);
+    }, 100);
   });
 
   mainWindow.on('blur', () => {
@@ -155,7 +155,7 @@ app.whenReady().then(() => {
         app.quit();
       });
     }
-  }, 3000);
+  }, 1000);
 });
 
 app.dock.hide();
