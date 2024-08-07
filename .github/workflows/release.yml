@@ -1,11 +1,12 @@
-name: Release
+name: Build and Release
+
 on:
   push:
     tags:
       - 'v*'
 
 jobs:
-  release:
+  build:
     runs-on: macos-latest
 
     steps:
@@ -20,20 +21,46 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check secrets
+        run: |
+          echo "APPLE_CERTIFICATE_BASE64 is set: ${{ secrets.APPLE_CERTIFICATE_BASE64 != '' }}"
+          echo "APPLE_CERTIFICATE_PASSWORD is set: ${{ secrets.APPLE_CERTIFICATE_PASSWORD != '' }}"
+          echo "KEYCHAIN_PASSWORD is set: ${{ secrets.KEYCHAIN_PASSWORD != '' }}"
+          echo "APPLE_ID is set: ${{ secrets.APPLE_ID != '' }}"
+          echo "APPLE_ID_PASSWORD is set: ${{ secrets.APPLE_ID_PASSWORD != '' }}"
+          echo "APPLE_TEAM_ID is set: ${{ secrets.APPLE_TEAM_ID != '' }}"
+
+      - name: Debug Certificate
+        env:
+          APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          echo "Certificate length: ${#APPLE_CERTIFICATE_BASE64}"
+          echo $APPLE_CERTIFICATE_BASE64 | base64 --decode > certificate.p12
+          ls -l certificate.p12
+          file certificate.p12
+
       - name: Import Apple Developer Certificate
         env:
           APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         run: |
-          echo $APPLE_CERTIFICATE_BASE64 | base64 --decode > certificate.p12
+          echo "Creating keychain..."
           security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          echo "Setting default keychain..."
           security default-keychain -s build.keychain
+          echo "Unlocking keychain..."
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          echo "Importing certificate..."
           security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          echo "Setting key partition list..."
           security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+          echo "Finding identity..."
+          security find-identity -v -p codesigning build.keychain
 
-      - name: Build and release Electron app
+      - name: Build Electron app
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -41,14 +68,22 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           CSC_LINK: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-        run: npm run build
+        run: |
+          echo "APPLE_ID is: $APPLE_ID"
+          echo "Building app..."
+          npm run build
+
+      - name: List build artifacts
+        run: |
+          echo "Listing release directory:"
+          ls -R release
 
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            dist/*.dmg
-            dist/*.zip
+            release/*.dmg
+            release/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
