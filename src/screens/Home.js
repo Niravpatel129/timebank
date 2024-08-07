@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
-import { FaCog } from 'react-icons/fa';
+import { FaChartBar, FaCog } from 'react-icons/fa';
 import AllTasksButton from '../components/AllTasksButton';
 import Time from '../components/Time';
 import TrackingCard from '../components/TrackingCard';
@@ -30,6 +30,10 @@ export default function Home({ setScreen, currentTask, setCurrentTask }) {
 
   const handleTrackingCardClick = () => {
     setScreen('tasks');
+  };
+
+  const handleShowResults = () => {
+    setScreen('results');
   };
 
   useEffect(() => {
@@ -70,6 +74,20 @@ export default function Home({ setScreen, currentTask, setCurrentTask }) {
         onClick={toggleMenu}
       >
         <FaCog style={{ color: '#8c82c6', fontSize: '24px' }} />
+      </motion.div>
+      <motion.div
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        style={{
+          position: 'absolute',
+          top: '10px',
+          right: '10px',
+          cursor: 'pointer',
+          zIndex: 1000,
+        }}
+        onClick={handleShowResults}
+      >
+        <FaChartBar style={{ color: '#8c82c6', fontSize: '24px' }} />
       </motion.div>
       <AnimatePresence>
         {isMenuOpen && (
