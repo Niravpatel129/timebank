@@ -1,32 +1,46 @@
 import { motion } from 'framer-motion';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaArrowLeft, FaCalendarAlt, FaClock } from 'react-icons/fa';
-import { FaArrowRight } from 'react-icons/fa6';
 import { Tooltip } from 'react-tooltip';
 import { useScreenContext } from '../context/useScreenContext';
 
 export default function Results({ setScreen, currentTask }) {
   const { savedHistory } = useScreenContext();
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [contributionsData, setContributionsData] = useState([]);
+
   const handleBackClick = () => {
     setScreen('home');
   };
 
-  // Generate data for GitHub Contributions Calendar (full year)
-  const generateContributionsData = () => {
+  // Generate data for GitHub Contributions Calendar (yearly)
+  const generateContributionsData = (year) => {
     const data = [];
-    const today = new Date();
-    for (let i = 364; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(today.getDate() - i);
+    const startDate = new Date(year, 0, 1);
+    const endDate = new Date(year, 11, 31);
+    for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
       data.push({
-        date: date.toISOString().split('T')[0],
+        date: d.toISOString().split('T')[0],
         count: Math.floor(Math.random() * 6), // Random count between 0 and 5
       });
     }
     return data;
   };
 
-  const contributionsData = generateContributionsData();
+  useEffect(() => {
+    setContributionsData(generateContributionsData(currentYear));
+  }, [currentYear]);
+
+  const handlePrevYear = () => {
+    setCurrentYear((prevYear) => prevYear - 1);
+  };
+
+  const handleNextYear = () => {
+    const nextYear = currentYear + 1;
+    if (nextYear <= new Date().getFullYear()) {
+      setCurrentYear(nextYear);
+    }
+  };
 
   // Fake summary data
   const totalHours = 120;
@@ -82,7 +96,6 @@ export default function Results({ setScreen, currentTask }) {
             padding: '20px',
             background: '#15093d',
             borderRadius: '10px',
-            // width: '25%',
             width: '100%',
           }}
         >
@@ -94,10 +107,23 @@ export default function Results({ setScreen, currentTask }) {
 
       <h2 style={{ textAlign: 'center', fontWeight: 100, margin: 0 }}>Contribution Calendar</h2>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3 style={{ margin: 0, fontWeight: 100 }}>2024 January</h3>
+        <h3 style={{ margin: 0, fontWeight: 100 }}>{currentYear}</h3>
         <div style={{ display: 'flex', gap: '10px' }}>
-          <FaArrowLeft style={{ cursor: 'pointer' }} />
-          <FaArrowRight style={{ cursor: 'pointer' }} />
+          <FaArrowLeft
+            style={{
+              cursor: 'pointer',
+              opacity: currentYear > new Date().getFullYear() - 5 ? 1 : 0.5,
+            }}
+            onClick={handlePrevYear}
+          />
+          <FaArrowLeft
+            style={{
+              cursor: 'pointer',
+              transform: 'rotate(180deg)',
+              opacity: currentYear < new Date().getFullYear() ? 1 : 0.5,
+            }}
+            onClick={handleNextYear}
+          />
         </div>
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '3px' }}>
