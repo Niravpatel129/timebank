@@ -1,7 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
-import { FaTrash } from 'react-icons/fa';
-import { FaDollarSign } from 'react-icons/fa6';
+import { FaDollarSign, FaTrashCan } from 'react-icons/fa6';
 import { GoTag } from 'react-icons/go';
 import { LuUsers2 } from 'react-icons/lu';
 import { Tooltip } from 'react-tooltip';
@@ -45,109 +44,118 @@ export default function TrackingCardsBeno() {
       >
         History
       </h2>
-      <AnimatePresence>
-        <motion.div style={{ display: 'flex', flexWrap: 'nowrap' }} layout>
-          {finishedTasks.slice(0, 2).map((task) => (
-            <motion.div
-              key={task.id}
-              style={cardStyle}
-              layout
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '8px',
-                  left: '8px',
-                  opacity: 0,
-                  transition: 'opacity 0.3s',
-                  zIndex: 1,
-                }}
-                className='delete-icon'
+      {finishedTasks.length === 0 ? (
+        <div style={{ ...cardStyle, width: '', padding: '16px', textAlign: 'center' }}>
+          <p style={{ color: '#8c82c6', margin: 0 }}>
+            No completed tasks yet. Start tracking to see your history!
+          </p>
+        </div>
+      ) : (
+        <AnimatePresence>
+          <motion.div style={{ display: 'flex', flexWrap: 'nowrap' }} layout>
+            {finishedTasks.slice(0, 2).map((task) => (
+              <motion.div
+                key={task.id}
+                style={cardStyle}
+                layout
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.3 }}
               >
-                <FaTrash
-                  style={{ color: '#ff6b6b', cursor: 'pointer' }}
-                  onClick={() => deleteTask(task.id)}
-                />
-              </div>
-              <div style={{ padding: '16px' }}>
-                <h2
-                  style={{
-                    fontSize: '0.9rem',
-                    fontWeight: '100',
-                    color: '#e4e1e4',
-                    margin: 0,
-                    padding: 0,
-                    marginBottom: '4px',
-                  }}
-                >
-                  {task.category}
-                </h2>
-                <h3
-                  style={{
-                    fontSize: '1rem',
-                    fontWeight: '300',
-                    color: '#d7ceed',
-                    margin: 0,
-                    padding: 0,
-                  }}
-                >
-                  {task.name}
-                </h3>
-              </div>
-              <hr
-                style={{
-                  border: '1px solid #25164d',
-                  margin: '0',
-                  padding: '0',
-                  marginTop: '8px',
-                  marginBottom: '8px',
-                }}
-              />
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '16px',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <FaDollarSign
-                    style={{ marginRight: '8px', color: '#8c82c6', fontSize: '0.9rem' }}
-                    data-tooltip-id='billable-tooltip'
-                    data-tooltip-content={task.billable ? 'Billable' : 'Non-billable'}
-                  />
-                  <LuUsers2
-                    style={{ marginRight: '8px', color: '#8c82c6', fontSize: '0.9rem' }}
-                    data-tooltip-id='client-tooltip'
-                    data-tooltip-content={task.client || 'No client'}
-                  />
-                  <GoTag
-                    style={{ color: '#8c82c6', fontSize: '0.9rem' }}
-                    data-tooltip-id='project-tooltip'
-                    data-tooltip-content={task.project || 'No project'}
-                  />
-                </div>
                 <div
-                  style={{ fontSize: '1rem', color: '#8c82c6', fontWeight: '300' }}
-                  data-tooltip-id='date-completed-tooltip'
-                  data-tooltip-content={`Completed: ${new Date(task.completedAt).toLocaleString()}`}
+                  onClick={() => deleteTask(task.id)}
+                  data-tooltip-id='delete'
+                  data-tooltip-content={'Delete'}
+                  style={{
+                    position: 'absolute',
+                    top: '8px',
+                    right: '8px',
+                    cursor: 'pointer',
+                  }}
                 >
-                  {`${task.hours}:${task.minutes}:${task.seconds}`}
+                  <FaTrashCan style={{ color: 'white', fontSize: '0.8rem' }} />
                 </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </AnimatePresence>
+
+                <div style={{ padding: '16px' }}>
+                  <h2
+                    style={{
+                      fontSize: '0.9rem',
+                      fontWeight: '100',
+                      color: '#e4e1e4',
+                      margin: 0,
+                      padding: 0,
+                      marginBottom: '4px',
+                    }}
+                  >
+                    {task.category}
+                  </h2>
+                  <h3
+                    style={{
+                      fontSize: '1rem',
+                      fontWeight: '300',
+                      color: '#d7ceed',
+                      margin: 0,
+                      padding: 0,
+                    }}
+                  >
+                    {task.name}
+                  </h3>
+                </div>
+                <hr
+                  style={{
+                    border: '1px solid #25164d',
+                    margin: '0',
+                    padding: '0',
+                    marginTop: '8px',
+                    marginBottom: '8px',
+                  }}
+                />
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '16px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <FaDollarSign
+                      style={{ marginRight: '8px', color: '#8c82c6', fontSize: '0.9rem' }}
+                      data-tooltip-id='billable-tooltip'
+                      data-tooltip-content={task.billable ? 'Billable' : 'Non-billable'}
+                    />
+                    <LuUsers2
+                      style={{ marginRight: '8px', color: '#8c82c6', fontSize: '0.9rem' }}
+                      data-tooltip-id='client-tooltip'
+                      data-tooltip-content={task.client || 'No client'}
+                    />
+                    <GoTag
+                      style={{ color: '#8c82c6', fontSize: '0.9rem' }}
+                      data-tooltip-id='project-tooltip'
+                      data-tooltip-content={task.project || 'No project'}
+                    />
+                  </div>
+                  <div
+                    style={{ fontSize: '1rem', color: '#8c82c6', fontWeight: '300' }}
+                    data-tooltip-id='date-completed-tooltip'
+                    data-tooltip-content={`Completed: ${new Date(
+                      task.completedAt,
+                    ).toLocaleString()}`}
+                  >
+                    {`${task.hours}:${task.minutes}:${task.seconds}`}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </AnimatePresence>
+      )}
       <Tooltip id='billable-tooltip' />
       <Tooltip id='client-tooltip' />
       <Tooltip id='project-tooltip' />
       <Tooltip id='date-completed-tooltip' />
+      <Tooltip id='delete' />
       <style jsx>{`
         .delete-icon:hover {
           opacity: 1 !important;
