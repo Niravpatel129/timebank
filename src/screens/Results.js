@@ -5,7 +5,8 @@ import { Tooltip } from 'react-tooltip';
 import { useScreenContext } from '../context/useScreenContext';
 
 export default function Results({ setScreen, currentTask }) {
-  const { savedHistory } = useScreenContext();
+  const { finishedTasks } = useScreenContext();
+  console.log('🚀  finishedTasks:', finishedTasks);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [contributionsData, setContributionsData] = useState([]);
 
@@ -19,9 +20,17 @@ export default function Results({ setScreen, currentTask }) {
     const startDate = new Date(year, 0, 1);
     const endDate = new Date(year, 11, 31);
     for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
+      const dateString = d.toISOString().split('T')[0];
+
+      const count = finishedTasks.filter((entry) => {
+        return entry.completedAt.split('T')[0] === dateString;
+      }).length;
+
+      console.log('🚀  count:', count);
+
       data.push({
-        date: d.toISOString().split('T')[0],
-        count: Math.floor(Math.random() * 6), // Random count between 0 and 5
+        date: dateString,
+        count: count,
       });
     }
     return data;
@@ -29,7 +38,7 @@ export default function Results({ setScreen, currentTask }) {
 
   useEffect(() => {
     setContributionsData(generateContributionsData(currentYear));
-  }, [currentYear]);
+  }, [currentYear, finishedTasks]);
 
   const handlePrevYear = () => {
     setCurrentYear((prevYear) => prevYear - 1);
@@ -42,10 +51,12 @@ export default function Results({ setScreen, currentTask }) {
     }
   };
 
-  // Fake summary data
-  const totalHours = 120;
-  const totalTasks = 45;
-  const streakDays = 7;
+  // Calculate summary data from finishedTasks
+  const totalHours = finishedTasks
+    .reduce((total, entry) => total + entry.taskDuration / 3600, 0)
+    .toFixed(2);
+  const totalTasks = finishedTasks.length;
+  const streakDays = calculateStreak(finishedTasks);
 
   const months = [
     'Jan',
@@ -77,6 +88,27 @@ export default function Results({ setScreen, currentTask }) {
   };
 
   const contributionWeeks = groupContributionsByWeek(contributionsData);
+
+  // Function to calculate streak
+  function calculateStreak(history) {
+    let streak = 0;
+    let currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+
+    for (let i = 0; i < history.length; i++) {
+      const entryDate = new Date(history[i].completedAt);
+      entryDate.setHours(0, 0, 0, 0);
+
+      if (entryDate.getTime() === currentDate.getTime()) {
+        streak++;
+        currentDate.setDate(currentDate.getDate() - 1);
+      } else if (entryDate < currentDate) {
+        break;
+      }
+    }
+
+    return streak;
+  }
 
   return (
     <div style={{ padding: '20px', color: '#d7ceed' }}>
@@ -167,18 +199,6 @@ export default function Results({ setScreen, currentTask }) {
         }}
       >
         <div style={{ display: 'flex', marginTop: '10px', minWidth: 'max-content' }}>
-          {/* <div
-            style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginRight: '10px' }}
-          >
-            {['', 'Mon', '', 'Wed', '', 'Fri', ''].map((day, index) => (
-              <span
-                key={index}
-                style={{ fontSize: '12px', color: '#8c82c6', height: '12px', lineHeight: '12px' }}
-              >
-                {day}
-              </span>
-            ))}
-          </div> */}
           <div style={{ display: 'flex', gap: '3px' }}>
             {contributionWeeks.map((week, weekIndex) => (
               <div key={weekIndex} style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
@@ -190,7 +210,7 @@ export default function Results({ setScreen, currentTask }) {
                       height: '12px',
                       backgroundColor:
                         day.count > 0
-                          ? `rgba(140, 130, 198, ${day.count * 0.4})`
+                          ? `rgba(140, 130, 198, ${Math.min(day.count * 0.2, 1)})`
                           : 'rgba(140, 130, 198, 0.1)',
                       borderRadius: '2px',
                     }}
