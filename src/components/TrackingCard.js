@@ -125,7 +125,15 @@ export default function TrackingCard({ currentTask }) {
               <GoTag style={{ color: '#8c82c6', fontSize: '0.9rem' }} />
             </div>
           </div>
-          <div style={{ fontSize: '1rem', color: '#8c82c6', fontWeight: '300' }}>
+          <div
+            style={{ fontSize: '1rem', color: '#8c82c6', fontWeight: '300' }}
+            data-tooltip-id='time-tooltip'
+            data-tooltip-content={
+              currentTask
+                ? `Created: ${new Date(currentTask.dateCreated).toLocaleString()}`
+                : 'No task'
+            }
+          >
             {currentTask ? displayTime : '--:--:--'}
           </div>
         </div>
@@ -134,6 +142,7 @@ export default function TrackingCard({ currentTask }) {
       <Tooltip id='client-tooltip' />
       <Tooltip id='project-tooltip' />
       <Tooltip id='status-tooltip' />
+      <Tooltip id='time-tooltip' />
     </div>
   );
 }

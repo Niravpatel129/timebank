@@ -9,7 +9,7 @@ import { useScreenContext } from '../context/useScreenContext';
 import secondsToTime from '../helpers/secondsToTime';
 
 export default function Tasks({ setScreen }) {
-  const { setCurrentTask } = useScreenContext();
+  const { setCurrentTask, currentTask } = useScreenContext();
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [hoveredTaskId, setHoveredTaskId] = useState(null);
@@ -37,8 +37,14 @@ export default function Tasks({ setScreen }) {
   };
 
   const handleDeleteTask = (taskId) => {
+    // when i delete a task, i want to delete the task from the current task if it is the current task
+    if (currentTask && currentTask?.id === taskId) {
+      setCurrentTask(null);
+    }
+
     const updatedTasks = tasks.filter((task) => task.id !== taskId);
     setTasks(updatedTasks);
+
     localStorage.setItem('tasks', JSON.stringify(updatedTasks));
   };
 

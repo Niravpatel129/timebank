@@ -28,6 +28,7 @@ export default function AddTaskModal({ onClose, onAddTask }) {
       hours: taskDurationInSeconds / 3600,
       category: category || 'Other',
       date: date,
+      dateCreated: new Date().toISOString(),
     };
     onAddTask(newTask);
 
