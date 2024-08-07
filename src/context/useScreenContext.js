@@ -55,6 +55,7 @@ export const ScreenProvider = ({ children }) => {
           timeSpent: task.timeSpent,
           timeRemaining: task.timeRemaining,
           isCountingUp: task.isCountingUp,
+          status: task.status,
         };
       });
       setTaskHistory(initialTaskHistory);
@@ -67,8 +68,12 @@ export const ScreenProvider = ({ children }) => {
       interval = setInterval(() => {
         setCurrentTask((prevTask) => {
           const updatedTask = prevTask.isCountingUp
-            ? { ...prevTask, timeSpent: prevTask.timeSpent + 1 }
-            : { ...prevTask, timeRemaining: Math.max(0, prevTask.timeRemaining - 1) };
+            ? { ...prevTask, timeSpent: prevTask.timeSpent + 1, status: 'in-progress' }
+            : {
+                ...prevTask,
+                timeRemaining: Math.max(0, prevTask.timeRemaining - 1),
+                status: 'in-progress',
+              };
 
           // Update task history
           setTaskHistory((prev) => ({
@@ -77,11 +82,13 @@ export const ScreenProvider = ({ children }) => {
               timeSpent: updatedTask.timeSpent,
               timeRemaining: updatedTask.timeRemaining,
               isCountingUp: updatedTask.isCountingUp,
+              status: updatedTask.status,
             },
           }));
 
           if (updatedTask.timeRemaining === 0 && !updatedTask.isCountingUp) {
             setIsRunning(false);
+            updatedTask.status = 'completed';
           }
 
           return updatedTask;
@@ -106,6 +113,7 @@ export const ScreenProvider = ({ children }) => {
   const startTimer = () => {
     if (currentTask) {
       setIsRunning(true);
+      setCurrentTask((prevTask) => ({ ...prevTask, status: 'in-progress' }));
     }
   };
 
@@ -115,7 +123,10 @@ export const ScreenProvider = ({ children }) => {
     localStorage.setItem('finishedTasks', JSON.stringify(updatedTasks));
   };
 
-  const stopTimer = () => setIsRunning(false);
+  const stopTimer = () => {
+    setIsRunning(false);
+    setCurrentTask((prevTask) => ({ ...prevTask, status: 'paused' }));
+  };
 
   const resetTimer = () => {
     setIsRunning(false);
@@ -124,6 +135,7 @@ export const ScreenProvider = ({ children }) => {
         ...currentTask,
         timeSpent: 0,
         timeRemaining: currentTask.originalDuration,
+        status: 'not-started',
       };
       setCurrentTask(resetTask);
       setTaskHistory((prev) => ({
@@ -132,6 +144,7 @@ export const ScreenProvider = ({ children }) => {
           timeSpent: 0,
           timeRemaining: currentTask.originalDuration,
           isCountingUp: currentTask.isCountingUp,
+          status: 'not-started',
         },
       }));
     }
@@ -156,6 +169,7 @@ export const ScreenProvider = ({ children }) => {
         timeRemaining: historyData.timeRemaining,
         timeSpent: historyData.timeSpent,
         isCountingUp: historyData.isCountingUp,
+        status: historyData.status,
       };
     } else {
       // If it's a new task, set up new time values
@@ -166,6 +180,7 @@ export const ScreenProvider = ({ children }) => {
         timeRemaining: taskDuration,
         timeSpent: 0,
         isCountingUp: !taskDuration,
+        status: 'not-started',
       };
     }
 
@@ -183,6 +198,7 @@ export const ScreenProvider = ({ children }) => {
         hours: String(Math.floor(currentTask.timeSpent / 3600)).padStart(2, '0'),
         minutes: String(Math.floor((currentTask.timeSpent % 3600) / 60)).padStart(2, '0'),
         seconds: String(currentTask.timeSpent % 60).padStart(2, '0'),
+        status: 'completed',
       };
       const finishedTasks = JSON.parse(localStorage.getItem('finishedTasks') || '[]');
       finishedTasks.push(finishedTask);
@@ -197,6 +213,17 @@ export const ScreenProvider = ({ children }) => {
 
       // update finishedTasks
       setFinishedTasks((prev) => [...prev, finishedTask]);
+
+      // update tasks
+      const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+      const updatedTasks = tasks.map((task) => {
+        if (task.id === finishedTask.id) {
+          return finishedTask;
+        }
+        return task;
+      });
+
+      localStorage.setItem('tasks', JSON.stringify(updatedTasks));
     }
   };
 
