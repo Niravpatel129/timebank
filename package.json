@@ -11,7 +11,7 @@
     "build:local": "webpack --config webpack.config.js",
     "start:local": "cross-env NODE_ENV=production electron .",
     "package": "electron-builder",
-    "release": "node scripts/release.js",
+    "release": "npm run build && npm run package && node scripts/release.js",
     "build-and-start": "npm run build:local && npm run start:local"
   },
   "author": "",
