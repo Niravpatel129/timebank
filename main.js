@@ -11,7 +11,7 @@ const {
 const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const url = require('url');
-const { ipcMain } = require('electron');
+const { ipcMain, screen } = require('electron');
 const TimerManager = require('./utils/timerManager');
 
 let tray = null;
@@ -47,9 +47,10 @@ function checkForUpdates() {
 }
 
 function createMainWindow() {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   mainWindow = new BrowserWindow({
-    width: 400,
-    height: 710,
+    width: Math.round(width * 0.2),
+    height: Math.round(height * 0.72),
     show: false,
     frame: false,
     resizable: false,
@@ -186,7 +187,8 @@ app.whenReady().then(() => {
     mainWindow.show();
     setTimeout(() => {
       mainWindow.hide();
-      mainWindow.setSize(400, 710);
+      const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+      mainWindow.setSize(Math.round(width * 0.23), Math.round(height * 0.72));
     }, 100);
 
     if (process.env.NODE_ENV === 'development') {
