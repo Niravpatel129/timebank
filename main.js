@@ -125,6 +125,7 @@ function createTray() {
 
   tray = new Tray(icon);
   tray.setToolTip('Time Tracker');
+  tray.setTitle('');
 
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Show App', click: () => mainWindow.show() },
@@ -284,6 +285,14 @@ ipcMain.on('start-timer', (event, task) => {
     }
     event.reply('timer-update', currentTask);
 
+    // Update tray title
+    const time = currentTask.isCountingUp ? currentTask.timeSpent : currentTask.timeRemaining;
+    const minutes = Math.floor(time / 60)
+      .toString()
+      .padStart(2, '0');
+    const seconds = (time % 60).toString().padStart(2, '0');
+    tray.setTitle(`${minutes}:${seconds}`);
+
     if (currentTask.timeRemaining === 0 && !currentTask.isCountingUp) {
       clearInterval(timerInterval);
       new Notification({
@@ -296,12 +305,14 @@ ipcMain.on('start-timer', (event, task) => {
 
 ipcMain.on('stop-timer', () => {
   clearInterval(timerInterval);
+  tray.setTitle(''); // Reset tray title when timer stops
 });
 
 ipcMain.on('reset-timer', (event, task) => {
   currentTask = task;
   clearInterval(timerInterval);
   event.reply('timer-update', currentTask);
+  tray.setTitle(''); // Reset tray title when timer resets
 });
 
 ipcMain.on('show-notification', (event, { title, body }) => {
