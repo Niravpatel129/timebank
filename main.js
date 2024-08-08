@@ -13,7 +13,13 @@ autoUpdater.logger = require('electron-log');
 autoUpdater.logger.transports.file.level = 'info';
 
 function checkForUpdates() {
-  autoUpdater.checkForUpdatesAndNotify();
+  console.log('Checking for updates...');
+  autoUpdater.logger.info('Checking for updates...');
+
+  autoUpdater.checkForUpdatesAndNotify().catch((error) => {
+    console.error('Error checking for updates:', error);
+    autoUpdater.logger.error('Error checking for updates:', error);
+  });
 }
 
 function createMainWindow() {
@@ -110,6 +116,7 @@ function createTray() {
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Show App', click: () => mainWindow.show() },
     { label: 'Settings', click: () => settingsWindow.show() },
+    { label: 'Check for Updates', click: () => checkForUpdates() },
     {
       label: 'Quit',
       click: () => {
@@ -200,6 +207,16 @@ ipcMain.on('quit-app', () => {
 // show-settings
 ipcMain.on('show-settings', () => {
   settingsWindow.show();
+});
+
+ipcMain.handle('check-for-updates', async () => {
+  try {
+    const result = await autoUpdater.checkForUpdatesAndNotify();
+    return { updateAvailable: !!result };
+  } catch (error) {
+    console.error('Error checking for updates:', error);
+    return { error: error.message };
+  }
 });
 
 // Auto-updater events
