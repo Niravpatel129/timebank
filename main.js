@@ -11,17 +11,28 @@ let settingsWindow = null;
 // Configure logging for autoUpdater
 autoUpdater.logger = require('electron-log');
 autoUpdater.logger.transports.file.level = 'info';
-autoUpdater.autoDownload = true;
+autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 
 function checkForUpdates() {
   console.log('Checking for updates...');
   autoUpdater.logger.info('Checking for updates...');
 
-  autoUpdater.checkForUpdatesAndNotify().catch((error) => {
-    console.error('Error checking for updates:', error);
-    autoUpdater.logger.error('Error checking for updates:', error);
-  });
+  autoUpdater
+    .checkForUpdatesAndNotify()
+    .then((result) => {
+      if (result === null) {
+        dialog.showMessageBox({
+          type: 'info',
+          title: 'No Updates Available',
+          message: 'You are using the latest version of the application.',
+        });
+      }
+    })
+    .catch((error) => {
+      console.error('Error checking for updates:', error);
+      autoUpdater.logger.error('Error checking for updates:', error);
+    });
 }
 
 function createMainWindow() {
