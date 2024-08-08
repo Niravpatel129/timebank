@@ -22,6 +22,11 @@ export default function Time() {
     if (isRunning) {
       stopTimer();
     } else if (currentTask) {
+      // dont allow starting a timer if there is no time on the task
+      if (currentTask.taskDuration === 0) {
+        // alert the user to set the time on the task
+        return;
+      }
       startTimer();
     } else {
       setScreen('tasks');
