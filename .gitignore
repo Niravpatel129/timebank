@@ -9,7 +9,7 @@ release/*
 # But don't ignore these files
 !release/*.yml
 !release/*.yaml
-
+!/release/download
 # Environment variables
 .env
 
