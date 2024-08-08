@@ -1,6 +1,6 @@
 {
   "name": "timebank",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "A simple and efficient time tracking application for managing your daily tasks and projects.",
   "main": "main.js",
   "scripts": {
@@ -13,6 +13,10 @@
     "package": "electron-builder",
     "release": "electron-builder --mac --publish always",
     "build-and-start": "npm run build:local && npm run start:local"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/niravpatel129/timebank"
   },
   "author": "",
   "license": "ISC",
@@ -77,7 +81,7 @@
       "assets/**/*"
     ],
     "directories": {
-      "output": "release"
+      "output": "dist"
     },
     "mac": {
       "identity": "Strive Games Inc (RCJS4748VY)",

@@ -1,11 +1,11 @@
-version: 1.0.12
+version: 1.0.13
 files:
-  - url: Timebank-1.0.12-arm64-mac.zip
-    sha512: x0BaoFpbBoypVKoP7renE9P1R68GRzMm435J+tVG6kzhW9QFJQBe+3diAML+rW+iOvGGbUEhRNpPyuF0b0pNTg==
-    size: 119162772
-  - url: Timebank-1.0.12-arm64.dmg
-    sha512: odreBD49vcyYuo+h+5iYd+rXUWSfg8JV4Pjv4nP6Am5Tg2WCg89jsXhLpWihxQA8Liaz+sgB+4C8zytcbOMXBQ==
-    size: 124188651
-path: Timebank-1.0.12-arm64-mac.zip
-sha512: x0BaoFpbBoypVKoP7renE9P1R68GRzMm435J+tVG6kzhW9QFJQBe+3diAML+rW+iOvGGbUEhRNpPyuF0b0pNTg==
-releaseDate: '2024-08-08T02:05:56.545Z'
+  - url: Timebank-1.0.13-arm64-mac.zip
+    sha512: BXGdL0q6ZlMPui7yebj6vkAQKv7uNBkFbjgLep7cFOGD3jYU6U8C1hQioEetNkI8gFlhfYK2UsQ8zl2/ATnSfQ==
+    size: 119162757
+  - url: Timebank-1.0.13-arm64.dmg
+    sha512: Si1DOs8iOPw0HbwIIZmCc0ZLa4IkFlt8LLxX8NW3/hfrd5SgWSopCY1ckjjXk0+2vFDcfL72STV5Kee4RuqrdA==
+    size: 124189225
+path: Timebank-1.0.13-arm64-mac.zip
+sha512: BXGdL0q6ZlMPui7yebj6vkAQKv7uNBkFbjgLep7cFOGD3jYU6U8C1hQioEetNkI8gFlhfYK2UsQ8zl2/ATnSfQ==
+releaseDate: '2024-08-08T02:50:43.131Z'

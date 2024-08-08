@@ -11,6 +11,8 @@ let settingsWindow = null;
 // Configure logging for autoUpdater
 autoUpdater.logger = require('electron-log');
 autoUpdater.logger.transports.file.level = 'info';
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = true;
 
 function checkForUpdates() {
   console.log('Checking for updates...');
