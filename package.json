@@ -1,6 +1,6 @@
 {
   "name": "timebank",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "A simple and efficient time tracking application for managing your daily tasks and projects.",
   "main": "main.js",
   "scripts": {
