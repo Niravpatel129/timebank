@@ -10,8 +10,6 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    // ./ for build
-    // / for local
     publicPath: '/',
   },
   module: {

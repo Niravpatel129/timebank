@@ -190,11 +190,6 @@ app.whenReady().then(() => {
         app.quit();
       });
     }
-
-    // Check for updates
-    checkForUpdates();
-    // Check for updates every hour
-    setInterval(checkForUpdates, 60 * 60 * 1000);
   }, 1000);
 });
 
