@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaChartBar, FaCog } from 'react-icons/fa';
 import AllTasksButton from '../components/AllTasksButton';
+import QuickAlarmModal from '../components/QuickAlarmModal';
 import Time from '../components/Time';
 import TrackingCard from '../components/TrackingCard';
 import TrackingCardsBeno from '../components/TrackingCardsBeno';
@@ -10,10 +11,15 @@ const { ipcRenderer } = window.require('electron');
 
 export default function Home({ setScreen, currentTask, setCurrentTask }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAddTimeModalOpen, setIsAddTimeModalOpen] = useState(false);
   const menuRef = useRef(null);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const toggleAddTimeModal = () => {
+    setIsAddTimeModalOpen(!isAddTimeModalOpen);
   };
 
   const handleQuit = () => {
@@ -138,11 +144,17 @@ export default function Home({ setScreen, currentTask, setCurrentTask }) {
           onClick={handleTrackingCardClick}
           style={{ cursor: currentTask ? 'pointer' : 'default' }}
         >
-          <TrackingCard currentTask={currentTask} setCurrentTask={setCurrentTask} />
+          <TrackingCard
+            currentTask={currentTask}
+            setCurrentTask={setCurrentTask}
+            toggleAddTimeModal={toggleAddTimeModal}
+          />
         </div>
         <TrackingCardsBeno />
 
         <AllTasksButton onClick={handleShowAllTasks} />
+
+        <QuickAlarmModal isOpen={isAddTimeModalOpen} toggleAddTimeModal={toggleAddTimeModal} />
       </div>
     </>
   );

@@ -153,6 +153,7 @@ export const ScreenProvider = ({ children }) => {
     setFinishedTasks(updatedFinishedTasks);
     localStorage.setItem('finishedTasks', JSON.stringify(updatedFinishedTasks));
   };
+
   const stopTimer = () => {
     setIsRunning(false);
     setCurrentTask((prevTask) => ({ ...prevTask, status: 'paused' }));
@@ -197,8 +198,8 @@ export const ScreenProvider = ({ children }) => {
       const historyData = taskHistory[newTask.id];
       updatedTask = {
         ...newTask,
-        originalDuration: newTask?.taskDuration || 0,
-        timeRemaining: historyData.timeRemaining,
+        originalDuration: newTask.taskDuration || 0,
+        timeRemaining: newTask.timeRemaining || historyData.timeRemaining,
         timeSpent: historyData.timeSpent,
         isCountingUp: historyData.isCountingUp,
         status: historyData.status,
@@ -217,6 +218,22 @@ export const ScreenProvider = ({ children }) => {
     }
 
     setCurrentTask(updatedTask);
+
+    // Update the task in the tasks array
+    setTasks((prevTasks) =>
+      prevTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task)),
+    );
+
+    // Update the task history
+    setTaskHistory((prev) => ({
+      ...prev,
+      [updatedTask.id]: {
+        timeSpent: updatedTask.timeSpent,
+        timeRemaining: updatedTask.timeRemaining,
+        isCountingUp: updatedTask.isCountingUp,
+        status: updatedTask.status,
+      },
+    }));
   };
 
   const finishCurrentTask = () => {

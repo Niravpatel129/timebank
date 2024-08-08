@@ -1,16 +1,18 @@
-import React from 'react';
+import { motion } from 'framer-motion';
+import React, { useState } from 'react';
 import { FaCircle } from 'react-icons/fa';
-import { FaDollarSign } from 'react-icons/fa6';
+import { FaDollarSign, FaPlus } from 'react-icons/fa6';
 import { GoTag } from 'react-icons/go';
 import { LuUsers2 } from 'react-icons/lu';
 import { Tooltip } from 'react-tooltip';
 import { useScreenContext } from '../context/useScreenContext';
 import secondsToTime from '../helpers/secondsToTime';
 
-export default function TrackingCard({ currentTask }) {
+export default function TrackingCard({ currentTask, toggleAddTimeModal }) {
   const { isRunning, getDisplayTime } = useScreenContext();
   const displayTime = secondsToTime(getDisplayTime());
   const status = currentTask ? (isRunning ? 'running' : 'paused') : 'not-started';
+  const [isHovered, setIsHovered] = useState(false);
 
   const getStatusColor = () => {
     switch (status) {
@@ -24,7 +26,12 @@ export default function TrackingCard({ currentTask }) {
   };
 
   return (
-    <div style={{ marginBottom: '14px', marginTop: '14px' }}>
+    <motion.div
+      style={{ marginBottom: '14px', marginTop: '14px', position: 'relative' }}
+      className='tracking-card'
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+    >
       <h2
         style={{
           fontSize: '1.1rem',
@@ -37,7 +44,7 @@ export default function TrackingCard({ currentTask }) {
       >
         Tracking
       </h2>
-      <div
+      <motion.div
         style={{
           margin: '8px',
           marginBottom: '0px',
@@ -48,17 +55,45 @@ export default function TrackingCard({ currentTask }) {
           border: '0.1px solid #483776',
           position: 'relative',
         }}
+        className='tracking-card-inner'
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
       >
         <div
-          data-tooltip-id='status-tooltip'
-          data-tooltip-content={status}
           style={{
             position: 'absolute',
-            top: '8px',
             right: '8px',
+            top: '8px',
           }}
         >
-          <FaCircle style={{ color: getStatusColor(), fontSize: '0.8rem' }} />
+          <div
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}
+          >
+            <motion.div
+              onClick={(e) => {
+                e.stopPropagation();
+                console.log('clicked');
+                toggleAddTimeModal();
+              }}
+              style={{
+                cursor: 'pointer',
+              }}
+              className='add-time-icon'
+              initial={{ scale: 0 }}
+              animate={{ scale: isHovered ? 1 : 0, color: isHovered ? '#ffffff' : '#8c82c6' }}
+              transition={{ duration: 0.3 }}
+              data-tooltip-id='add-time-tooltip'
+              data-tooltip-content='Add time'
+            >
+              <FaPlus style={{ fontSize: '1rem', marginTop: '4px' }} />
+            </motion.div>
+            <FaCircle
+              style={{ color: getStatusColor(), fontSize: '0.8rem' }}
+              data-tooltip-id='status-tooltip'
+              data-tooltip-content={status}
+            />
+          </div>
         </div>
         <div style={{ paddingLeft: '16px', paddingRight: '16px', paddingTop: '16px' }}>
           <h2
@@ -125,24 +160,35 @@ export default function TrackingCard({ currentTask }) {
               <GoTag style={{ color: '#8c82c6', fontSize: '0.9rem' }} />
             </div>
           </div>
-          <div
-            style={{ fontSize: '1rem', color: '#8c82c6', fontWeight: '300' }}
-            data-tooltip-id='time-tooltip'
-            data-tooltip-content={
-              currentTask
-                ? `Created: ${new Date(currentTask.dateCreated).toLocaleString()}`
-                : 'No task'
-            }
-          >
-            {currentTask ? displayTime : '--:--:--'}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div
+              style={{
+                fontSize: '1rem',
+                color: '#8c82c6',
+                fontWeight: '300',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+              }}
+              data-tooltip-id='time-tooltip'
+              data-tooltip-content={
+                currentTask
+                  ? `Created: ${new Date(currentTask.dateCreated).toLocaleString()}`
+                  : 'No task'
+              }
+            >
+              <div>{currentTask ? displayTime : '--:--:--'}</div>
+            </div>
           </div>
         </div>
-      </div>
+      </motion.div>
       <Tooltip id='billable-tooltip' />
       <Tooltip id='client-tooltip' />
       <Tooltip id='project-tooltip' />
       <Tooltip id='status-tooltip' />
       <Tooltip id='time-tooltip' />
-    </div>
+      <Tooltip id='add-time-tooltip' />
+    </motion.div>
   );
 }
