@@ -5,8 +5,6 @@ import { FaTimes } from 'react-icons/fa';
 export default function AddTaskModal({ onClose, onAddTask }) {
   const [taskName, setTaskName] = useState('');
   const [duration, setDuration] = useState('30m');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
   const [showCustomDuration, setShowCustomDuration] = useState(false);
   const [customHours, setCustomHours] = useState(0);
   const [customMinutes, setCustomMinutes] = useState(0);
@@ -16,9 +14,6 @@ export default function AddTaskModal({ onClose, onAddTask }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log({ taskName, duration, startTime, endTime, category, date });
-    // save to local electron storage
     const taskDurationInSeconds = calculateDurationInSeconds(duration);
     const newTask = {
       id: Date.now(),
@@ -31,7 +26,6 @@ export default function AddTaskModal({ onClose, onAddTask }) {
       dateCreated: new Date().toISOString(),
     };
     onAddTask(newTask);
-
     onClose();
   };
 
@@ -129,6 +123,7 @@ export default function AddTaskModal({ onClose, onAddTask }) {
           </motion.button>
         </div>
         <form onSubmit={handleSubmit}>
+          {/* Task Name Input */}
           <div style={{ marginBottom: '15px' }}>
             <label htmlFor='taskName'>Add task</label>
             <div
@@ -170,6 +165,8 @@ export default function AddTaskModal({ onClose, onAddTask }) {
               </motion.button>
             </div>
           </div>
+
+          {/* Duration Selection */}
           <div style={{ marginBottom: '15px' }}>
             <label>How long will this take?</label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
@@ -200,6 +197,8 @@ export default function AddTaskModal({ onClose, onAddTask }) {
               ))}
             </div>
           </div>
+
+          {/* Custom Duration Input */}
           {showCustomDuration && (
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '5px' }}>Custom Duration</label>
@@ -224,6 +223,8 @@ export default function AddTaskModal({ onClose, onAddTask }) {
               </div>
             </div>
           )}
+
+          {/* Category Input */}
           <div style={{ marginBottom: '15px' }}>
             <label htmlFor='category'>Category</label>
             <div
@@ -265,6 +266,8 @@ export default function AddTaskModal({ onClose, onAddTask }) {
               </motion.button>
             </div>
           </div>
+
+          {/* Date Input */}
           <div style={{ marginBottom: '15px' }}>
             <label htmlFor='date'>Date Due</label>
             <div
@@ -305,6 +308,8 @@ export default function AddTaskModal({ onClose, onAddTask }) {
               </motion.button>
             </div>
           </div>
+
+          {/* Submit Button */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}

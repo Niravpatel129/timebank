@@ -12,12 +12,12 @@ const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const url = require('url');
 const { ipcMain } = require('electron');
+const TimerManager = require('./electron-utils/timerManager');
 
 let tray = null;
 let mainWindow = null;
 let settingsWindow = null;
-let timerInterval;
-let currentTask;
+let timerManager = null;
 
 // Configure logging for autoUpdater
 autoUpdater.logger = require('electron-log');
@@ -159,6 +159,8 @@ function createTray() {
   tray.on('right-click', () => {
     tray.popUpContextMenu(contextMenu);
   });
+
+  timerManager = new TimerManager(tray);
 }
 
 function cleanup() {
@@ -227,6 +229,10 @@ ipcMain.handle('check-for-updates', async () => {
   }
 });
 
+ipcMain.on('show-notification', (event, { title, body }) => {
+  new Notification({ title, body }).show();
+});
+
 // Auto-updater events
 autoUpdater.on('update-available', () => {
   dialog
@@ -272,49 +278,3 @@ if (process.env.NODE_ENV === 'development') {
     console.log('Error');
   }
 }
-
-// Timer functionality
-ipcMain.on('start-timer', (event, task) => {
-  currentTask = task;
-  clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    if (currentTask.isCountingUp) {
-      currentTask.timeSpent += 1;
-    } else {
-      currentTask.timeRemaining = Math.max(0, currentTask.timeRemaining - 1);
-    }
-    event.reply('timer-update', currentTask);
-
-    // Update tray title
-    const time = currentTask.isCountingUp ? currentTask.timeSpent : currentTask.timeRemaining;
-    const minutes = Math.floor(time / 60)
-      .toString()
-      .padStart(2, '0');
-    const seconds = (time % 60).toString().padStart(2, '0');
-    tray.setTitle(`${minutes}:${seconds}`);
-
-    if (currentTask.timeRemaining === 0 && !currentTask.isCountingUp) {
-      clearInterval(timerInterval);
-      new Notification({
-        title: "Time's up!",
-        body: `Time's up for task: ${currentTask.name}`,
-      }).show();
-    }
-  }, 1000);
-});
-
-ipcMain.on('stop-timer', () => {
-  clearInterval(timerInterval);
-  tray.setTitle(''); // Reset tray title when timer stops
-});
-
-ipcMain.on('reset-timer', (event, task) => {
-  currentTask = task;
-  clearInterval(timerInterval);
-  event.reply('timer-update', currentTask);
-  tray.setTitle(''); // Reset tray title when timer resets
-});
-
-ipcMain.on('show-notification', (event, { title, body }) => {
-  new Notification({ title, body }).show();
-});

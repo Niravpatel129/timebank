@@ -42,6 +42,9 @@ export const ScreenProvider = ({ children }) => {
     const savedHistory = localStorage.getItem('taskHistory');
     return savedHistory ? JSON.parse(savedHistory) : {};
   });
+  const [tasks, setTasks] = useState(() => {
+    return JSON.parse(localStorage.getItem('tasks') || '[]');
+  });
 
   useEffect(() => {
     const tasks = JSON.parse(localStorage.getItem('finishedTasks') || '[]');
@@ -97,7 +100,37 @@ export const ScreenProvider = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem('taskHistory', JSON.stringify(taskHistory));
+    updateUncompletedTasksCount();
   }, [taskHistory]);
+
+  useEffect(() => {
+    updateUncompletedTasksCount();
+  }, []);
+
+  const updateUncompletedTasksCount = (count) => {
+    if (count !== undefined) {
+      ipcRenderer.send('update-uncompleted-tasks', count);
+    } else {
+      const uncompletedCount = tasks.filter((task) => task.status !== 'completed').length;
+      ipcRenderer.send('update-uncompleted-tasks', uncompletedCount);
+    }
+  };
+
+  const updateTasks = (newTasks) => {
+    setTasks(newTasks);
+    localStorage.setItem('tasks', JSON.stringify(newTasks));
+    updateUncompletedTasksCount();
+  };
+
+  const addTask = (newTask) => {
+    const updatedTasks = [...tasks, newTask];
+    updateTasks(updatedTasks);
+  };
+
+  const modifyTask = (modifiedTask) => {
+    const updatedTasks = tasks.map((task) => (task.id === modifiedTask.id ? modifiedTask : task));
+    updateTasks(updatedTasks);
+  };
 
   const startTimer = () => {
     if (currentTask) {
@@ -108,9 +141,8 @@ export const ScreenProvider = ({ children }) => {
   };
 
   const deleteTask = (taskId) => {
-    const updatedTasks = finishedTasks.filter((task) => task.id !== taskId);
-    setFinishedTasks(updatedTasks);
-    localStorage.setItem('finishedTasks', JSON.stringify(updatedTasks));
+    const updatedTasks = tasks.filter((task) => task.id !== taskId);
+    updateTasks(updatedTasks);
 
     const updatedTaskHistory = { ...taskHistory };
     delete updatedTaskHistory[taskId];
@@ -120,13 +152,7 @@ export const ScreenProvider = ({ children }) => {
     const updatedFinishedTasks = finishedTasks.filter((task) => task.id !== taskId);
     setFinishedTasks(updatedFinishedTasks);
     localStorage.setItem('finishedTasks', JSON.stringify(updatedFinishedTasks));
-
-    // delete from tasks
-    const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-    const updatedTasks2 = tasks.filter((task) => task.id !== taskId);
-    localStorage.setItem('tasks', JSON.stringify(updatedTasks2));
   };
-
   const stopTimer = () => {
     setIsRunning(false);
     setCurrentTask((prevTask) => ({ ...prevTask, status: 'paused' }));
@@ -206,9 +232,9 @@ export const ScreenProvider = ({ children }) => {
         seconds: String(currentTask.timeSpent % 60).padStart(2, '0'),
         status: 'completed',
       };
-      const finishedTasks = JSON.parse(localStorage.getItem('finishedTasks') || '[]');
-      finishedTasks.push(finishedTask);
-      localStorage.setItem('finishedTasks', JSON.stringify(finishedTasks));
+      const updatedFinishedTasks = [...finishedTasks, finishedTask];
+      setFinishedTasks(updatedFinishedTasks);
+      localStorage.setItem('finishedTasks', JSON.stringify(updatedFinishedTasks));
 
       setTaskHistory((prev) => {
         const { [currentTask?.id]: _, ...rest } = prev;
@@ -217,11 +243,6 @@ export const ScreenProvider = ({ children }) => {
 
       setCurrentTask(null);
 
-      // update finishedTasks
-      setFinishedTasks((prev) => [...prev, finishedTask]);
-
-      // update tasks
-      const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
       const updatedTasks = tasks.map((task) => {
         if (task.id === finishedTask.id) {
           return finishedTask;
@@ -229,7 +250,7 @@ export const ScreenProvider = ({ children }) => {
         return task;
       });
 
-      localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+      updateTasks(updatedTasks);
     }
   };
 
@@ -253,6 +274,10 @@ export const ScreenProvider = ({ children }) => {
         getDisplayTime,
         deleteTask,
         finishedTasks,
+        tasks,
+        addTask,
+        modifyTask,
+        updateUncompletedTasksCount,
       }}
     >
       {children}
