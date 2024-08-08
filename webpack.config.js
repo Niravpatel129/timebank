@@ -3,6 +3,7 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
+const isProd = process.env.IS_PROD === 'true';
 
 module.exports = {
   mode: isDevelopment ? 'development' : 'production',
@@ -10,7 +11,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: isDevelopment ? '/' : './',
+    publicPath: isProd ? './' : '/',
   },
   module: {
     rules: [

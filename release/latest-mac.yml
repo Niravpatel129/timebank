@@ -1,0 +1,11 @@
+version: 1.0.22
+files:
+  - url: Timebank-1.0.22-arm64-mac.zip
+    sha512: IxCQFWNcyo3R7jwCzu38qv7F0lELvs8USttUgyjh8Hz10ebjYmh8zF227YhjtGh7CuR1Z0FdH99DCBqmKswqVQ==
+    size: 119163266
+  - url: Timebank-1.0.22-arm64.dmg
+    sha512: JVfL5YYanncmEcrS6jJL0Y7IUOk3hGhwcxgepUp4XSnnoQ9KY0eke6uIznQs8dVO8ByMjjSJDmhsnyzYs5ZiCg==
+    size: 124191283
+path: Timebank-1.0.22-arm64-mac.zip
+sha512: IxCQFWNcyo3R7jwCzu38qv7F0lELvs8USttUgyjh8Hz10ebjYmh8zF227YhjtGh7CuR1Z0FdH99DCBqmKswqVQ==
+releaseDate: '2024-08-08T08:38:32.858Z'

@@ -9,6 +9,7 @@ files:
       - main.js
       - package.json
       - assets/**/*
+      - utils/**/*
 mac:
   identity: Strive Games Inc (RCJS4748VY)
   target:
