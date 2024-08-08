@@ -1,11 +1,11 @@
-version: 1.0.18
+version: 1.0.19
 files:
-  - url: Timebank-1.0.18-arm64-mac.zip
-    sha512: aRoDdNzPV6O0bXeJ7dUZ8XT6UoIC1IzXezoDspcga25rsSdKdlruVed6DwBNYI3psLdsCrqi4Jhh9JHhmFBEZA==
-    size: 119162922
-  - url: Timebank-1.0.18-arm64.dmg
-    sha512: HmIKR1G86usLvbJc7ljAiEOGK2pEKXc+bQoaHAL03fFIQ8vHBUIegSOyALt0vIuiEan5J1Gv88UiQUKWp3oioQ==
-    size: 124184667
-path: Timebank-1.0.18-arm64-mac.zip
-sha512: aRoDdNzPV6O0bXeJ7dUZ8XT6UoIC1IzXezoDspcga25rsSdKdlruVed6DwBNYI3psLdsCrqi4Jhh9JHhmFBEZA==
-releaseDate: '2024-08-08T05:09:09.374Z'
+  - url: Timebank-1.0.19-arm64-mac.zip
+    sha512: loej2BO/nnDtiuBa/MIBz7I07XgNuIAWInYNuAX9ovNBajRO0UMARrDu1abgD5hnqJ5NU0tsrJ1fgACO2Vx0Fg==
+    size: 119161403
+  - url: Timebank-1.0.19-arm64.dmg
+    sha512: WUiXxYs3u2n1hSv8WS/Q4S2dHXoJffvLDexs8eyDudyHhIqWjPkoWpgUkyEsC5MWv5KrwD/MwMowPGK5J/Xt7g==
+    size: 124189887
+path: Timebank-1.0.19-arm64-mac.zip
+sha512: loej2BO/nnDtiuBa/MIBz7I07XgNuIAWInYNuAX9ovNBajRO0UMARrDu1abgD5hnqJ5NU0tsrJ1fgACO2Vx0Fg==
+releaseDate: '2024-08-08T08:12:46.109Z'

@@ -12,7 +12,7 @@ const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const url = require('url');
 const { ipcMain } = require('electron');
-const TimerManager = require('./electron-utils/timerManager');
+const TimerManager = require('./timerManager');
 
 let tray = null;
 let mainWindow = null;
