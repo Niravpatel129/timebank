@@ -2,6 +2,7 @@ directories:
   output: release
   buildResources: build
 appId: com.timebank.app
+icon: icon.icns
 productName: Timebank
 files:
   - filter:
