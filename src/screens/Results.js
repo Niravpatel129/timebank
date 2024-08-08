@@ -183,7 +183,7 @@ export default function Results({ setScreen, currentTask }) {
         transition={{ delay: 0.6, duration: 0.5 }}
         style={{ textAlign: 'center', fontWeight: 100, margin: 0 }}
       >
-        Contribution Calendar
+        Productivity Calendar
       </motion.h2>
       <motion.div
         initial={{ opacity: 0, y: 20 }}

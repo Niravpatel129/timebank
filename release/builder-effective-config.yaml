@@ -26,4 +26,5 @@ publish:
   - provider: github
     owner: niravpatel129
     repo: timebank
+    releaseType: release
 electronVersion: 31.3.1

@@ -1,6 +1,6 @@
 {
   "name": "timebank",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "A simple and efficient time tracking application for managing your daily tasks and projects.",
   "main": "main.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "build:local": "webpack --config webpack.config.js",
     "start:local": "cross-env NODE_ENV=production electron .",
     "package": "electron-builder",
-    "release": "electron-builder --mac --publish always --force",
+    "release": "electron-builder --mac --publish always",
     "build-and-start": "npm run build:local && npm run start:local"
   },
   "author": "",
