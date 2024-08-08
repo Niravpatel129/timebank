@@ -25,6 +25,9 @@ autoUpdater.logger.transports.file.level = 'info';
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 
+// Set app icon
+app.dock.setIcon(path.join(__dirname, 'icon.icns'));
+
 function checkForUpdates() {
   console.log('Checking for updates...');
   autoUpdater.logger.info('Checking for updates...');
@@ -61,6 +64,7 @@ function createMainWindow() {
       nodeIntegration: true,
       contextIsolation: false,
     },
+    icon: path.join(__dirname, 'assets', 'icon.icns'),
   });
 
   const startUrl =
@@ -102,6 +106,7 @@ function createSettingsWindow() {
       nodeIntegration: true,
       contextIsolation: false,
     },
+    icon: path.join(__dirname, 'assets', 'icon.icns'),
   });
 
   const settingsUrl = url.format({

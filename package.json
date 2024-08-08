@@ -74,6 +74,7 @@
   },
   "build": {
     "appId": "com.timebank.app",
+    "icon": "icon.icns",
     "productName": "Timebank",
     "files": [
       "dist/**/*",
