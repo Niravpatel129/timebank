@@ -1,4 +1,13 @@
-const { app, BrowserWindow, Tray, nativeImage, Menu, globalShortcut, dialog } = require('electron');
+const {
+  app,
+  BrowserWindow,
+  Tray,
+  nativeImage,
+  Menu,
+  globalShortcut,
+  dialog,
+  Notification,
+} = require('electron');
 const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const url = require('url');
@@ -7,6 +16,8 @@ const { ipcMain } = require('electron');
 let tray = null;
 let mainWindow = null;
 let settingsWindow = null;
+let timerInterval;
+let currentTask;
 
 // Configure logging for autoUpdater
 autoUpdater.logger = require('electron-log');
@@ -67,15 +78,6 @@ function createMainWindow() {
     mainWindow.webContents.openDevTools({ mode: 'detach' });
   }
 
-  mainWindow.on('ready-to-show', () => {
-    // mainWindow.setSize(400, 1);
-    // mainWindow.show();
-    // setTimeout(() => {
-    //   mainWindow.hide();
-    //   mainWindow.setSize(400, 710);
-    // }, 100);
-  });
-
   mainWindow.on('blur', () => {
     mainWindow.hide();
   });
@@ -107,8 +109,6 @@ function createSettingsWindow() {
     protocol: 'file:',
     slashes: true,
   });
-
-  // settingsWindow.loadURL();
 
   settingsWindow.on('close', (event) => {
     if (!app.isQuitting) {
@@ -212,7 +212,6 @@ ipcMain.on('quit-app', () => {
   app.quit();
 });
 
-// show-settings
 ipcMain.on('show-settings', () => {
   settingsWindow.show();
 });
@@ -272,3 +271,39 @@ if (process.env.NODE_ENV === 'development') {
     console.log('Error');
   }
 }
+
+// Timer functionality
+ipcMain.on('start-timer', (event, task) => {
+  currentTask = task;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (currentTask.isCountingUp) {
+      currentTask.timeSpent += 1;
+    } else {
+      currentTask.timeRemaining = Math.max(0, currentTask.timeRemaining - 1);
+    }
+    event.reply('timer-update', currentTask);
+
+    if (currentTask.timeRemaining === 0 && !currentTask.isCountingUp) {
+      clearInterval(timerInterval);
+      new Notification({
+        title: "Time's up!",
+        body: `Time's up for task: ${currentTask.name}`,
+      }).show();
+    }
+  }, 1000);
+});
+
+ipcMain.on('stop-timer', () => {
+  clearInterval(timerInterval);
+});
+
+ipcMain.on('reset-timer', (event, task) => {
+  currentTask = task;
+  clearInterval(timerInterval);
+  event.reply('timer-update', currentTask);
+});
+
+ipcMain.on('show-notification', (event, { title, body }) => {
+  new Notification({ title, body }).show();
+});

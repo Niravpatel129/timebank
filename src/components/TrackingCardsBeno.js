@@ -22,6 +22,12 @@ export default function TrackingCardsBeno() {
     overflow: 'hidden',
   };
 
+  const textOverflowStyle = {
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  };
+
   return (
     <div style={{ marginBottom: '14px', marginTop: '14px' }}>
       <h2
@@ -87,6 +93,7 @@ export default function TrackingCardsBeno() {
                       margin: 0,
                       padding: 0,
                       marginBottom: '4px',
+                      ...textOverflowStyle,
                     }}
                   >
                     {task.category}
@@ -98,6 +105,7 @@ export default function TrackingCardsBeno() {
                       color: '#d7ceed',
                       margin: 0,
                       padding: 0,
+                      ...textOverflowStyle,
                     }}
                   >
                     {task.name}
@@ -138,7 +146,12 @@ export default function TrackingCardsBeno() {
                     />
                   </div>
                   <div
-                    style={{ fontSize: '1rem', color: '#8c82c6', fontWeight: '300' }}
+                    style={{
+                      fontSize: '1rem',
+                      color: '#8c82c6',
+                      fontWeight: '300',
+                      ...textOverflowStyle,
+                    }}
                     data-tooltip-id='date-completed-tooltip'
                     data-tooltip-content={`Completed: ${new Date(
                       task.completedAt,

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+const { ipcRenderer } = window.require('electron');
 
 const ScreenContext = createContext();
 
@@ -63,40 +64,28 @@ export const ScreenProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    let interval;
     if (isRunning && currentTask) {
-      interval = setInterval(() => {
-        setCurrentTask((prevTask) => {
-          const updatedTask = prevTask.isCountingUp
-            ? { ...prevTask, timeSpent: prevTask.timeSpent + 1, status: 'in-progress' }
-            : {
-                ...prevTask,
-                timeRemaining: Math.max(0, prevTask.timeRemaining - 1),
-                status: 'in-progress',
-              };
-
-          // Update task history
-          setTaskHistory((prev) => ({
-            ...prev,
-            [prevTask.id]: {
-              timeSpent: updatedTask.timeSpent,
-              timeRemaining: updatedTask.timeRemaining,
-              isCountingUp: updatedTask.isCountingUp,
-              status: updatedTask.status,
-            },
-          }));
-
-          if (updatedTask.timeRemaining === 0 && !updatedTask.isCountingUp) {
-            setIsRunning(false);
-            updatedTask.status = 'completed';
-          }
-
-          return updatedTask;
-        });
-      }, 1000);
+      ipcRenderer.send('start-timer', currentTask);
+      ipcRenderer.on('timer-update', (event, updatedTask) => {
+        setCurrentTask(updatedTask);
+        setTaskHistory((prev) => ({
+          ...prev,
+          [updatedTask.id]: {
+            timeSpent: updatedTask.timeSpent,
+            timeRemaining: updatedTask.timeRemaining,
+            isCountingUp: updatedTask.isCountingUp,
+            status: updatedTask.status,
+          },
+        }));
+      });
+    } else {
+      ipcRenderer.send('stop-timer');
     }
-    return () => clearInterval(interval);
-  }, [isRunning]);
+
+    return () => {
+      ipcRenderer.removeAllListeners('timer-update');
+    };
+  }, [isRunning, currentTask]);
 
   useEffect(() => {
     if (currentTask) {
@@ -114,6 +103,7 @@ export const ScreenProvider = ({ children }) => {
     if (currentTask) {
       setIsRunning(true);
       setCurrentTask((prevTask) => ({ ...prevTask, status: 'in-progress' }));
+      ipcRenderer.send('start-timer', currentTask);
     }
   };
 
@@ -140,6 +130,7 @@ export const ScreenProvider = ({ children }) => {
   const stopTimer = () => {
     setIsRunning(false);
     setCurrentTask((prevTask) => ({ ...prevTask, status: 'paused' }));
+    ipcRenderer.send('stop-timer');
   };
 
   const resetTimer = () => {
@@ -161,6 +152,7 @@ export const ScreenProvider = ({ children }) => {
           status: 'not-started',
         },
       }));
+      ipcRenderer.send('reset-timer', resetTask);
     }
   };
 
