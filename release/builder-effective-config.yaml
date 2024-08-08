@@ -1,0 +1,30 @@
+directories:
+  output: release
+  buildResources: build
+appId: com.timebank.app
+productName: Timebank
+files:
+  - filter:
+      - dist/**/*
+      - main.js
+      - package.json
+      - assets/**/*
+mac:
+  identity: Strive Games Inc (RCJS4748VY)
+  target:
+    - dmg
+    - zip
+  category: public.app-category.utilities
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  signIgnore:
+    - node_modules/*
+afterSign: scripts/notarize.js
+publish:
+  - provider: github
+    owner: niravpatel129
+    repo: timebank
+    releaseType: release
+electronVersion: 31.3.1

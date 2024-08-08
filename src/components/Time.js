@@ -62,7 +62,7 @@ export default function Time() {
         const percentage = currentTask
           ? Math.max(0, 100 - Math.round((displayTime / currentTask.taskDuration) * 100))
           : 100;
-        return <TimeText variation={3} time={`${percentage}% remaining`} />;
+        return <TimeText variation={3} time={`${percentage}% progress`} />;
       default:
         return <TimeText variation={1} time={formatTime(displayTime)} />;
     }
