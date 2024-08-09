@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 import Bubble from './components/Bubble';
 import DashboardMiddleSection from './components/DashboardMiddleSection';
+import TimerTrack from './components/TimerTrack';
 const { ipcRenderer } = window.require('electron');
 
 const Dashboard = () => {
@@ -113,8 +114,9 @@ const Dashboard = () => {
         </div>
 
         {/* Right part of main content - 300px wide, full height */}
-        <div style={{ width: '300px', height: '100%', backgroundColor: '#c0c0c0' }}>
+        <div style={{ width: '400px', height: '100%', backgroundColor: '#c0c0c0' }}>
           {/* Content for right column */}
+          <TimerTrack />
         </div>
       </div>
     </div>
