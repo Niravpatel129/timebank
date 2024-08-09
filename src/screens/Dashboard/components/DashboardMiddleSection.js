@@ -40,9 +40,119 @@ const IconButton = ({ Icon, color, style, marginLeft = '10px' }) => (
   </div>
 );
 
+const ChecklistItem = ({ title, tag, status, time, profileImage }) => (
+  <div
+    style={{
+      ...commonStyles.taskItem,
+      padding: '4px 0',
+      borderBottom: '1px solid #eee',
+    }}
+  >
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <input
+        type='checkbox'
+        style={{
+          marginRight: '10px',
+          width: '20px',
+          height: '20px',
+          borderRadius: '50%',
+          border: '2px solid #ddd',
+          appearance: 'none',
+          cursor: 'pointer',
+        }}
+      />
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <span
+          style={{
+            flexGrow: 1,
+            fontSize: '16px',
+            fontWeight: '500',
+            color: '#333',
+          }}
+        >
+          {title}
+        </span>
+        <Tag
+          backgroundColor='#FFD700'
+          color='#B8860B'
+          style={{
+            fontWeight: 'bold',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+            fontSize: '8px',
+            padding: '4px 8px',
+          }}
+        >
+          {tag}
+        </Tag>
+      </div>
+    </div>
+
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <span
+        style={{
+          color: commonStyles.secondaryColor,
+          fontSize: '14px',
+          marginRight: '10px',
+        }}
+      >
+        {status}
+      </span>
+      <span
+        style={{
+          fontSize: '18px',
+          fontWeight: 'bold',
+          color: '#ced2d8',
+        }}
+      >
+        {time}
+      </span>
+      <IconButton
+        Icon={FaPlay}
+        color='#888'
+        style={{
+          backgroundColor: '#eee',
+          padding: '10px',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '10px',
+          height: '10px',
+          cursor: 'pointer',
+          marginRight: '10px',
+        }}
+      />
+      <div
+        style={{
+          width: '28px',
+          height: '28px',
+          borderRadius: '50%',
+          overflow: 'hidden',
+          marginLeft: '10px',
+        }}
+      >
+        <img
+          src={profileImage}
+          alt='profile'
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+      </div>
+    </div>
+  </div>
+);
+
 export default function DashboardComponent() {
   return (
-    <div style={{ fontFamily: 'Arial, sans-serif', padding: '20px' }}>
+    <div
+      style={{
+        fontFamily: 'Arial, sans-serif',
+        padding: '20px',
+        paddingBottom: '100px',
+        height: '100vh',
+        overflow: 'auto',
+      }}
+    >
       {/* Top Section */}
       <div
         style={{
@@ -229,105 +339,42 @@ export default function DashboardComponent() {
           </div>
         </div>
       </div>
-
-      <div
-        style={{
-          ...commonStyles.taskItem,
-          padding: '10px 0',
-          borderBottom: '1px solid #eee',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <input
-            type='checkbox'
-            style={{
-              marginRight: '10px',
-              width: '20px',
-              height: '20px',
-              borderRadius: '50%',
-              border: '2px solid #ddd',
-              appearance: 'none',
-              cursor: 'pointer',
-            }}
-          />
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span
-              style={{
-                flexGrow: 1,
-                fontSize: '16px',
-                fontWeight: '500',
-                color: '#333',
-              }}
-            >
-              Using Environment Variables
-            </span>
-            <Tag
-              backgroundColor='#FFD700'
-              color='#B8860B'
-              style={{
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                fontSize: '8px',
-                padding: '4px 8px',
-              }}
-            >
-              auth
-            </Tag>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span
-            style={{
-              color: commonStyles.secondaryColor,
-              fontSize: '14px',
-              marginRight: '10px',
-            }}
-          >
-            in progress
-          </span>
-          <span
-            style={{
-              fontSize: '18px',
-              fontWeight: 'bold',
-              color: '#ced2d8',
-            }}
-          >
-            02:36
-          </span>
-          <IconButton
-            Icon={FaPlay}
-            color='#888'
-            style={{
-              backgroundColor: '#eee',
-              padding: '10px',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '30px',
-              height: '30px',
-              cursor: 'pointer',
-            }}
-          />
-          <div
-            style={{
-              width: '50px',
-              height: '50px',
-              borderRadius: '50%',
-              overflow: 'hidden',
-              marginLeft: '10px',
-            }}
-          >
-            {/* profile icon */}
-            <img
-              src='https://hips.hearstapps.com/hmg-prod/images/cute-cat-photos-1593441022.jpg?crop=0.670xw:1.00xh;0.167xw,0&resize=640:*'
-              alt='profile'
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          </div>
-        </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <ChecklistItem
+          title='Implement User Authentication'
+          tag='auth'
+          status='in progress'
+          time='01:45'
+          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
+        />
+        <ChecklistItem
+          title='Design Landing Page'
+          tag='ui'
+          status='not started'
+          time='00:00'
+          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
+        />
+        <ChecklistItem
+          title='Optimize Database Queries'
+          tag='backend'
+          status='completed'
+          time='03:20'
+          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
+        />
+        <ChecklistItem
+          title='Write Unit Tests'
+          tag='testing'
+          status='in progress'
+          time='02:10'
+          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
+        />
+        <ChecklistItem
+          title='Integrate Payment Gateway'
+          tag='feature'
+          status='not started'
+          time='00:00'
+          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
+        />
       </div>
 
       <h2 style={{ color: commonStyles.primaryColor, marginTop: '30px', marginBottom: '20px' }}>
@@ -335,6 +382,43 @@ export default function DashboardComponent() {
       </h2>
 
       {/* items */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '50px' }}>
+        <ChecklistItem
+          title='Implement User Authentication'
+          tag='security'
+          status='not started'
+          time='00:00'
+          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
+        />
+        <ChecklistItem
+          title='Optimize API Endpoints'
+          tag='backend'
+          status='in progress'
+          time='01:45'
+          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
+        />
+        <ChecklistItem
+          title='Create Mobile-Responsive Layout'
+          tag='ui'
+          status='completed'
+          time='03:20'
+          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
+        />
+        <ChecklistItem
+          title='Set Up CI/CD Pipeline'
+          tag='devops'
+          status='in progress'
+          time='02:10'
+          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
+        />
+        <ChecklistItem
+          title='Implement Data Analytics Dashboard'
+          tag='feature'
+          status='not started'
+          time='00:00'
+          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
+        />
+      </div>
     </div>
   );
 }

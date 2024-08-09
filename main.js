@@ -131,7 +131,7 @@ function createSettingsWindow() {
 
 function createDashboardWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  const dashboardWidth = Math.round(width * 0.8);
+  const dashboardWidth = Math.round(width * 0.9); // Increased from 0.8 to 0.9
   const dashboardHeight = Math.round(dashboardWidth / dashboardAspectRatio);
   dashboardWindow = new BrowserWindow({
     width: dashboardWidth,
