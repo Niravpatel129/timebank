@@ -23,7 +23,6 @@ const Tag = ({ backgroundColor, color = 'white', children, style }) => (
     style={{
       backgroundColor,
       color,
-      padding: '2px 8px',
       borderRadius: '10px',
       fontSize: '12px',
       marginRight: '10px',
@@ -40,7 +39,7 @@ const IconButton = ({ Icon, color, style, marginLeft = '10px' }) => (
   </div>
 );
 
-const ChecklistItem = ({ title, tag, status, time, profileImage }) => (
+const ChecklistItem = ({ title, tag, status, time, profileImage, tagBackgroundColor }) => (
   <div
     style={{
       ...commonStyles.taskItem,
@@ -59,6 +58,10 @@ const ChecklistItem = ({ title, tag, status, time, profileImage }) => (
           border: '2px solid #ddd',
           appearance: 'none',
           cursor: 'pointer',
+          ':checked': {
+            backgroundColor: '#341dc0',
+            borderColor: '#341dc0',
+          },
         }}
       />
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -72,19 +75,21 @@ const ChecklistItem = ({ title, tag, status, time, profileImage }) => (
         >
           {title}
         </span>
-        <Tag
-          backgroundColor='#FFD700'
-          color='#B8860B'
-          style={{
-            fontWeight: 'bold',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            fontSize: '8px',
-            padding: '4px 8px',
-          }}
-        >
-          {tag}
-        </Tag>
+        {tag && (
+          <Tag
+            backgroundColor={tagBackgroundColor || commonStyles.primaryColor}
+            color='white'
+            style={{
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              fontSize: '10px',
+              padding: '4px 8px',
+            }}
+          >
+            {tag}
+          </Tag>
+        )}
       </div>
     </div>
 
@@ -349,28 +354,26 @@ export default function DashboardComponent() {
         />
         <ChecklistItem
           title='Design Landing Page'
-          tag='ui'
           status='not started'
+          tag='design'
+          tagBackgroundColor='#ffba3b'
           time='00:00'
           profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
         />
         <ChecklistItem
           title='Optimize Database Queries'
-          tag='backend'
           status='completed'
           time='03:20'
           profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
         />
         <ChecklistItem
           title='Write Unit Tests'
-          tag='testing'
           status='in progress'
           time='02:10'
           profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
         />
         <ChecklistItem
           title='Integrate Payment Gateway'
-          tag='feature'
           status='not started'
           time='00:00'
           profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
@@ -385,7 +388,6 @@ export default function DashboardComponent() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '50px' }}>
         <ChecklistItem
           title='Implement User Authentication'
-          tag='security'
           status='not started'
           time='00:00'
           profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
@@ -393,27 +395,25 @@ export default function DashboardComponent() {
         <ChecklistItem
           title='Optimize API Endpoints'
           tag='backend'
+          tagBackgroundColor='#ffba3b'
           status='in progress'
           time='01:45'
           profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
         />
         <ChecklistItem
           title='Create Mobile-Responsive Layout'
-          tag='ui'
           status='completed'
           time='03:20'
           profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
         />
         <ChecklistItem
           title='Set Up CI/CD Pipeline'
-          tag='devops'
           status='in progress'
           time='02:10'
           profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
         />
         <ChecklistItem
           title='Implement Data Analytics Dashboard'
-          tag='feature'
           status='not started'
           time='00:00'
           profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
