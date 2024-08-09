@@ -7,6 +7,22 @@ import IconButton from './IconButton';
 import Tag from './Tag';
 import { commonStyles } from './sharedStyles/commonStyles';
 
+const parseStatus = (status) => {
+  if (status === 'inProgress') {
+    return 'in progress';
+  }
+
+  if (status === 'completed') {
+    return 'completed';
+  }
+
+  if (status === 'paused') {
+    return 'paused';
+  }
+
+  return status;
+};
+
 const ChecklistItem = ({
   id,
   title,
@@ -117,9 +133,10 @@ const ChecklistItem = ({
             color: commonStyles.secondaryColor,
             fontSize: '14px',
             marginRight: '10px',
+            textTransform: 'capitalize',
           }}
         >
-          {status}
+          {parseStatus(status)}
         </span>
         <span
           style={{
