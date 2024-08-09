@@ -33,6 +33,10 @@ const Dashboard = () => {
     };
   }, []);
 
+  const handleAddTask = () => {
+    console.log('Add new task');
+  };
+
   const iconStyle = {
     fontSize: '24px',
     color: '#ffffff',
@@ -110,7 +114,7 @@ const Dashboard = () => {
         {/* Left part of main content - flexible width */}
         <div style={{ flex: 1, height: '100%' }}>
           {/* Content for main area */}
-          <DashboardMiddleSection />
+          <DashboardMiddleSection handleAddTask={handleAddTask} />
         </div>
 
         {/* Right part of main content - 300px wide, full height */}
