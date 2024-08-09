@@ -6,16 +6,11 @@ const TasksContext = createContext();
 export const useTasksContext = () => useContext(TasksContext);
 
 export const TasksProvider = ({ children }) => {
-  const [tasks, setTasks] = useState([]);
-  console.log('🚀  tasks:', tasks);
-
-  useEffect(() => {
-    // Load tasks from local storage on component mount
+  const [tasks, setTasks] = useState(() => {
     const storedTasks = localStorage.getItem('tasks');
-    if (storedTasks) {
-      setTasks(JSON.parse(storedTasks));
-    }
-  }, []);
+    return storedTasks ? JSON.parse(storedTasks) : [];
+  });
+  console.log('🚀  tasks:', tasks);
 
   useEffect(() => {
     // Save tasks to local storage whenever they change
