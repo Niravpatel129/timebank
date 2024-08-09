@@ -1,11 +1,14 @@
 import React from 'react';
+import { Route, Routes } from 'react-router-dom';
 import './App.css';
 import { useScreenContext } from './context/useScreenContext';
+import Dashboard from './screens/Dashboard/Dashboard.js';
 import Home from './screens/Home';
 import Results from './screens/Results';
 import Tasks from './screens/Tasks';
+
 function App() {
-  const { screen, setScreen, currentTask, setCurrentTask } = useScreenContext();
+  const { currentTask, setCurrentTask } = useScreenContext();
 
   return (
     <div
@@ -22,12 +25,15 @@ function App() {
         position: 'relative',
       }}
     >
-      {screen === 'home' && (
-        <Home setScreen={setScreen} currentTask={currentTask} setCurrentTask={setCurrentTask} />
-      )}
-      {screen === 'tasks' && <Tasks setScreen={setScreen} currentTask={currentTask} />}
-
-      {screen === 'results' && <Results setScreen={setScreen} currentTask={currentTask} />}
+      <Routes>
+        <Route
+          path='/'
+          element={<Home currentTask={currentTask} setCurrentTask={setCurrentTask} />}
+        />
+        <Route path='/tasks' element={<Tasks currentTask={currentTask} />} />
+        <Route path='/results' element={<Results currentTask={currentTask} />} />
+        <Route path='/dashboard' element={<Dashboard />} />
+      </Routes>
     </div>
   );
 }

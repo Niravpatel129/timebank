@@ -1,9 +1,9 @@
 directories:
   output: release
   buildResources: build
-appId: com.timebank.app
+appId: com.hourblock.app
 icon: icon.icns
-productName: Timebank
+productName: HourBlock
 files:
   - filter:
       - dist/**/*
@@ -23,6 +23,14 @@ mac:
   entitlementsInherit: build/entitlements.mac.plist
   signIgnore:
     - node_modules/*
+win:
+  target:
+    - nsis
+    - zip
+  icon: icon.ico
+  publisherName: Strive Games Inc
+  signingHashAlgorithms:
+    - sha256
 afterSign: scripts/notarize.js
 publish:
   - provider: github

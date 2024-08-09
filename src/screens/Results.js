@@ -4,9 +4,8 @@ import { FaArrowLeft, FaCalendarAlt, FaClock } from 'react-icons/fa';
 import { Tooltip } from 'react-tooltip';
 import { useScreenContext } from '../context/useScreenContext';
 
-export default function Results({ setScreen, currentTask }) {
-  const { finishedTasks } = useScreenContext();
-  console.log('🚀  finishedTasks:', finishedTasks);
+export default function Results({ currentTask }) {
+  const { finishedTasks, setScreen } = useScreenContext();
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [contributionsData, setContributionsData] = useState([]);
 
@@ -33,7 +32,7 @@ export default function Results({ setScreen, currentTask }) {
   }, [currentYear, finishedTasks]);
 
   const handleBackClick = () => {
-    setScreen('home');
+    setScreen('');
   };
 
   const handlePrevYear = () => {

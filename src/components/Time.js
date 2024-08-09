@@ -143,7 +143,7 @@ export default function Time() {
               onClick={toggleTimer}
               icon={currentTask ? isRunning ? <FaCirclePause /> : <FaCirclePlay /> : null}
             >
-              {currentTask ? (isRunning ? 'Pause' : 'Start') : 'Set Task'}
+              {currentTask ? (isRunning ? 'Pause' : 'Start') : 'Select Task'}
             </PrimaryButton>
           </motion.div>
           <AnimatePresence>

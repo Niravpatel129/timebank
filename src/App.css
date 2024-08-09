@@ -10,8 +10,8 @@ body {
   font-weight: 100;
   font-style: normal;
   box-sizing: border-box;
-  border: 0.1px solid #483776;
-  border-radius: 10px;
+  outline: 0.1px solid #483776;
+  /* border-radius: 10px; */
 }
 
 #root {

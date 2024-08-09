@@ -7,8 +7,9 @@ import AddTaskModal from '../components/AddTaskModal';
 import { useScreenContext } from '../context/useScreenContext';
 import secondsToTime from '../helpers/secondsToTime';
 
-export default function Tasks({ setScreen }) {
-  const { setCurrentTask, currentTask, updateUncompletedTasksCount } = useScreenContext();
+export default function Tasks() {
+  const { setCurrentTask, currentTask, updateUncompletedTasksCount, setScreen } =
+    useScreenContext();
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [hoveredTaskId, setHoveredTaskId] = useState(null);
@@ -27,7 +28,7 @@ export default function Tasks({ setScreen }) {
   }, []);
 
   const handleBack = () => {
-    setScreen('home');
+    setScreen('');
   };
 
   const handleAddTask = (newTask) => {
@@ -167,7 +168,7 @@ export default function Tasks({ setScreen }) {
                 onClick={() => {
                   if (task.status !== 'completed') {
                     setCurrentTask(task);
-                    setScreen('home');
+                    setScreen('');
                   }
                 }}
               >

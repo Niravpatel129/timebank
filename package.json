@@ -1,6 +1,6 @@
 {
-  "name": "timebank",
-  "version": "1.0.26",
+  "name": "hourblock",
+  "version": "1.0.27",
   "description": "A simple and efficient time tracking application for managing your daily tasks and projects.",
   "main": "main.js",
   "scripts": {
@@ -13,7 +13,9 @@
     "prebuild": "rimraf dist release",
     "package": "webpack --config webpack.config.js && electron-builder",
     "release": "npm run prebuild && cross-env IS_PROD=true webpack --config webpack.config.js && electron-builder --mac --publish always",
-    "build-and-start": "npm run build:local && npm run start:local"
+    "build-and-start": "npm run build:local && npm run start:local",
+    "build:win": "webpack --config webpack.config.js && electron-builder --win",
+    "release:win": "npm run prebuild && cross-env IS_PROD=true webpack --config webpack.config.js && electron-builder --win --publish always"
   },
   "repository": {
     "type": "git",
@@ -63,6 +65,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.2.1",
+    "react-router-dom": "^6.26.0",
     "react-tooltip": "^5.28.0"
   },
   "electronmon": {
@@ -73,9 +76,9 @@
     "logLevel": "quiet"
   },
   "build": {
-    "appId": "com.timebank.app",
+    "appId": "com.hourblock.app",
     "icon": "icon.icns",
-    "productName": "Timebank",
+    "productName": "HourBlock",
     "files": [
       "dist/**/*",
       "main.js",
@@ -99,6 +102,17 @@
       "entitlementsInherit": "build/entitlements.mac.plist",
       "signIgnore": [
         "node_modules/*"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "icon.ico",
+      "publisherName": "Strive Games Inc",
+      "signingHashAlgorithms": [
+        "sha256"
       ]
     },
     "afterSign": "scripts/notarize.js",

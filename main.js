@@ -17,7 +17,12 @@ const TimerManager = require('./utils/timerManager');
 let tray = null;
 let mainWindow = null;
 let settingsWindow = null;
+let dashboardWindow = null;
 let timerManager = null;
+
+const widthMultiplier = 0.25;
+const heightMultiplier = 0.72;
+const dashboardAspectRatio = 16 / 9;
 
 // Configure logging for autoUpdater
 autoUpdater.logger = require('electron-log');
@@ -49,8 +54,8 @@ function checkForUpdates() {
 function createMainWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   mainWindow = new BrowserWindow({
-    width: Math.round(width * 0.2),
-    height: Math.round(height * 0.72),
+    width: Math.round(width * widthMultiplier),
+    height: Math.round(height * heightMultiplier),
     show: false,
     frame: false,
     resizable: false,
@@ -113,6 +118,8 @@ function createSettingsWindow() {
     slashes: true,
   });
 
+  settingsWindow.loadURL(settingsUrl);
+
   settingsWindow.on('close', (event) => {
     if (!app.isQuitting) {
       event.preventDefault();
@@ -120,6 +127,53 @@ function createSettingsWindow() {
     }
     return false;
   });
+}
+
+function createDashboardWindow() {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  const dashboardWidth = Math.round(width * 0.8);
+  const dashboardHeight = Math.round(dashboardWidth / dashboardAspectRatio);
+  dashboardWindow = new BrowserWindow({
+    width: dashboardWidth,
+    height: dashboardHeight,
+    show: false,
+    frame: true,
+    resizable: true,
+    roundedCorners: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+    icon: path.join(__dirname, 'assets', 'docker-icon.png'),
+  });
+
+  const dashboardUrl =
+    process.env.NODE_ENV === 'development'
+      ? 'http://localhost:8080/#/dashboard'
+      : url.format({
+          pathname: path.join(__dirname, 'dist', 'index.html'),
+          protocol: 'file:',
+          slashes: true,
+          hash: 'dashboard',
+        });
+
+  dashboardWindow.loadURL(dashboardUrl);
+
+  dashboardWindow.webContents.on('did-finish-load', () => {
+    dashboardWindow.webContents.send('set-screen', 'dashboard');
+  });
+
+  dashboardWindow.on('close', (event) => {
+    if (!app.isQuitting) {
+      event.preventDefault();
+      dashboardWindow.hide();
+    }
+    return false;
+  });
+
+  if (process.env.NODE_ENV === 'development') {
+    dashboardWindow.show();
+  }
 }
 
 function createTray() {
@@ -133,6 +187,7 @@ function createTray() {
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Show App', click: () => mainWindow.show() },
     { label: 'Settings', click: () => settingsWindow.show() },
+    { label: 'Dashboard', click: () => dashboardWindow.show() },
     { label: 'Check for Updates', click: () => checkForUpdates() },
     {
       label: 'Quit',
@@ -176,19 +231,26 @@ function cleanup() {
   if (settingsWindow) {
     settingsWindow.destroy();
   }
+  if (dashboardWindow) {
+    dashboardWindow.destroy();
+  }
 }
 
 app.whenReady().then(() => {
   setTimeout(() => {
     createMainWindow();
     createSettingsWindow();
+    createDashboardWindow();
     createTray();
     mainWindow.setSize(400, 1);
     mainWindow.show();
     setTimeout(() => {
       mainWindow.hide();
       const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-      mainWindow.setSize(Math.round(width * 0.23), Math.round(height * 0.72));
+      mainWindow.setSize(
+        Math.round(width * widthMultiplier),
+        Math.round(height * heightMultiplier),
+      );
     }, 100);
 
     if (process.env.NODE_ENV === 'development') {
@@ -223,6 +285,10 @@ ipcMain.on('show-settings', () => {
   settingsWindow.show();
 });
 
+ipcMain.on('show-dashboard', () => {
+  dashboardWindow.show();
+});
+
 ipcMain.handle('check-for-updates', async () => {
   try {
     const result = await autoUpdater.checkForUpdatesAndNotify();
@@ -237,13 +303,25 @@ ipcMain.on('show-notification', (event, { title, body }) => {
   new Notification({ title, body }).show();
 });
 
+ipcMain.on('get-dashboard-data', (event) => {
+  const dashboardData = {
+    totalHours: 120,
+    projectBreakdown: [
+      { name: 'Project A', hours: 40 },
+      { name: 'Project B', hours: 30 },
+      { name: 'Project C', hours: 50 },
+    ],
+  };
+  event.reply('dashboard-data', dashboardData);
+});
+
 // Auto-updater events
 autoUpdater.on('update-available', () => {
   dialog
     .showMessageBox({
       type: 'info',
       title: 'Update available',
-      message: 'A new version of Timebank is available. Do you want to update now?',
+      message: 'A new version of HourBlock is available. Do you want to update now?',
       buttons: ['Update', 'Later'],
     })
     .then((result) => {

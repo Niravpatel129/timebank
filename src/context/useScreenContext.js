@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 const { ipcRenderer } = window.require('electron');
 
 const ScreenContext = createContext();
@@ -31,7 +32,9 @@ const defaultTasks = [
 ];
 
 export const ScreenProvider = ({ children }) => {
-  const [screen, setScreen] = useState('home');
+  // const [screen, setScreen] = useState('home');
+  const navigate = useNavigate();
+  const location = useLocation();
   const [currentTask, setCurrentTask] = useState(() => {
     const savedTask = localStorage.getItem('currentTask');
     return savedTask ? JSON.parse(savedTask) : null;
@@ -46,6 +49,9 @@ export const ScreenProvider = ({ children }) => {
     return JSON.parse(localStorage.getItem('tasks') || '[]');
   });
 
+  const setScreen = (screenName) => {
+    navigate('/' + screenName);
+  };
   useEffect(() => {
     const tasks = JSON.parse(localStorage.getItem('finishedTasks') || '[]');
     setFinishedTasks(tasks);
@@ -89,6 +95,11 @@ export const ScreenProvider = ({ children }) => {
       ipcRenderer.removeAllListeners('timer-update');
     };
   }, [isRunning, currentTask]);
+
+  useEffect(() => {
+    const currentScreen = location.pathname.slice(1) || 'home';
+    // You can perform any necessary actions when the screen changes here
+  }, [location]);
 
   useEffect(() => {
     if (currentTask) {

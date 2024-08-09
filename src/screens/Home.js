@@ -6,16 +6,23 @@ import QuickAlarmModal from '../components/QuickAlarmModal';
 import Time from '../components/Time';
 import TrackingCard from '../components/TrackingCard';
 import TrackingCardsBeno from '../components/TrackingCardsBeno';
+import { useScreenContext } from '../context/useScreenContext';
 
 const { ipcRenderer } = window.require('electron');
 
-export default function Home({ setScreen, currentTask, setCurrentTask }) {
+export default function Home({ currentTask, setCurrentTask }) {
+  const { setScreen } = useScreenContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAddTimeModalOpen, setIsAddTimeModalOpen] = useState(false);
   const menuRef = useRef(null);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleShowDashboard = () => {
+    ipcRenderer.send('show-dashboard');
+    toggleMenu();
   };
 
   const toggleAddTimeModal = () => {
@@ -28,6 +35,7 @@ export default function Home({ setScreen, currentTask, setCurrentTask }) {
 
   const handleShowSettings = () => {
     ipcRenderer.send('show-settings');
+    toggleMenu();
   };
 
   const handleShowAllTasks = () => {
@@ -113,6 +121,19 @@ export default function Home({ setScreen, currentTask, setCurrentTask }) {
               zIndex: 1000,
             }}
           >
+            <motion.div
+              whileHover={{ backgroundColor: '#2a1a5e' }}
+              style={{
+                color: 'white',
+                cursor: 'pointer',
+                marginBottom: '5px',
+                padding: '5px',
+                borderRadius: '4px',
+              }}
+              onClick={handleShowDashboard}
+            >
+              Dashboard
+            </motion.div>
             <motion.div
               whileHover={{ backgroundColor: '#2a1a5e' }}
               style={{
