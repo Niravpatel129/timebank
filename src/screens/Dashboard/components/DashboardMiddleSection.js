@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useCallback, useState } from 'react';
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FaPlay, FaPlus, FaSearch } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
@@ -55,32 +55,35 @@ const ChecklistItem = ({
   moveTask,
   listType,
 }) => {
-  const [{ isDragging }, drag, preview] = useDrag(() => ({
-    type: 'task',
-    item: { id, listType },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
-  }));
-
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div
-      ref={preview}
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
       style={{
         ...commonStyles.taskItem,
         padding: '4px 0',
         borderBottom: '1px solid #eee',
-        opacity: isDragging ? 0.5 : 1,
         cursor: 'default',
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      drag
+      dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+      dragElastic={1} // This will make the drag follow the cursor exactly
+      onDragEnd={(_, info) => {
+        if (Math.abs(info.offset.y) > 50) {
+          moveTask(id, listType, listType === 'currentWeek' ? 'thingsToDo' : 'currentWeek');
+        }
+      }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         {isHovered && (
-          <div ref={drag} style={{ cursor: 'move', marginRight: '5px' }}>
+          <div style={{ cursor: 'move', marginRight: '5px' }}>
             <GrDrag />
           </div>
         )}
@@ -180,40 +183,44 @@ const ChecklistItem = ({
           />
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
 const TaskList = ({ tasks, listType, moveTask }) => {
-  const [, drop] = useDrop(() => ({
-    accept: 'task',
-    drop: (item) => moveTask(item.id, item.listType, listType),
-  }));
-
   return (
-    <div ref={drop} style={{ minHeight: '50px', padding: '10px 0' }}>
-      {tasks.length > 0 ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {tasks.map((task) => (
-            <ChecklistItem
-              key={task.id}
-              id={task.id}
-              title={task.name}
-              tag={task.category}
-              status={task.status}
-              time={`${Math.floor(task.taskDuration / 3600)}:${String(
-                Math.floor((task.taskDuration % 3600) / 60),
-              ).padStart(2, '0')}`}
-              profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
-              listType={listType}
-              moveTask={moveTask}
-            />
-          ))}
-        </div>
-      ) : (
-        <div style={{ color: '#888', textAlign: 'center' }}>No tasks in this list</div>
-      )}
-    </div>
+    <motion.div style={{ minHeight: '50px', padding: '10px 0' }}>
+      <AnimatePresence>
+        {tasks.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {tasks.map((task) => (
+              <ChecklistItem
+                key={task.id}
+                id={task.id}
+                title={task.name}
+                tag={task.category}
+                status={task.status}
+                time={`${Math.floor(task.taskDuration / 3600)}:${String(
+                  Math.floor((task.taskDuration % 3600) / 60),
+                ).padStart(2, '0')}`}
+                profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
+                listType={listType}
+                moveTask={moveTask}
+              />
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{ color: '#888', textAlign: 'center' }}
+          >
+            No tasks in this list
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 
