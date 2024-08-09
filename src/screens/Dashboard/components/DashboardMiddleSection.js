@@ -11,6 +11,7 @@ const commonStyles = {
     marginBottom: '15px',
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   primaryColor: '#341dc0',
   secondaryColor: '#888',
@@ -236,148 +237,104 @@ export default function DashboardComponent() {
           borderBottom: '1px solid #eee',
         }}
       >
-        <input
-          type='checkbox'
-          style={{
-            marginRight: '15px',
-            width: '20px',
-            height: '20px',
-            borderRadius: '50%',
-            border: '2px solid #ddd',
-            appearance: 'none',
-            cursor: 'pointer',
-          }}
-        />
-        <span
-          style={{
-            flexGrow: 1,
-            fontSize: '16px',
-            fontWeight: '500',
-            color: '#333',
-          }}
-        >
-          Using Environment Variables
-        </span>
-        <Tag
-          backgroundColor='#FFD700'
-          color='#B8860B'
-          style={{
-            fontWeight: 'bold',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}
-        >
-          auth
-        </Tag>
-        <span
-          style={{
-            color: commonStyles.secondaryColor,
-            marginRight: '15px',
-            fontSize: '14px',
-          }}
-        >
-          in progress
-        </span>
-        <span
-          style={{
-            fontSize: '16px',
-            fontWeight: 'bold',
-            color: '#333',
-            marginRight: '10px',
-          }}
-        >
-          02:36
-        </span>
-        <IconButton
-          Icon={FaPlay}
-          color='#888'
-          style={{
-            backgroundColor: '#eee',
-            padding: '8px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <input
+            type='checkbox'
+            style={{
+              marginRight: '10px',
+              width: '20px',
+              height: '20px',
+              borderRadius: '50%',
+              border: '2px solid #ddd',
+              appearance: 'none',
+              cursor: 'pointer',
+            }}
+          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span
+              style={{
+                flexGrow: 1,
+                fontSize: '16px',
+                fontWeight: '500',
+                color: '#333',
+              }}
+            >
+              Using Environment Variables
+            </span>
+            <Tag
+              backgroundColor='#FFD700'
+              color='#B8860B'
+              style={{
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontSize: '8px',
+                padding: '4px 8px',
+              }}
+            >
+              auth
+            </Tag>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <span
+            style={{
+              color: commonStyles.secondaryColor,
+              fontSize: '14px',
+              marginRight: '10px',
+            }}
+          >
+            in progress
+          </span>
+          <span
+            style={{
+              fontSize: '18px',
+              fontWeight: 'bold',
+              color: '#ced2d8',
+            }}
+          >
+            02:36
+          </span>
+          <IconButton
+            Icon={FaPlay}
+            color='#888'
+            style={{
+              backgroundColor: '#eee',
+              padding: '10px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '30px',
+              height: '30px',
+              cursor: 'pointer',
+            }}
+          />
+          <div
+            style={{
+              width: '50px',
+              height: '50px',
+              borderRadius: '50%',
+              overflow: 'hidden',
+              marginLeft: '10px',
+            }}
+          >
+            {/* profile icon */}
+            <img
+              src='https://hips.hearstapps.com/hmg-prod/images/cute-cat-photos-1593441022.jpg?crop=0.670xw:1.00xh;0.167xw,0&resize=640:*'
+              alt='profile'
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          </div>
+        </div>
       </div>
 
       <h2 style={{ color: commonStyles.primaryColor, marginTop: '30px', marginBottom: '20px' }}>
         Things to do
       </h2>
 
-      <div
-        style={{
-          ...commonStyles.taskItem,
-          padding: '10px 0',
-          borderBottom: '1px solid #eee',
-        }}
-      >
-        <input
-          type='checkbox'
-          style={{
-            marginRight: '15px',
-            width: '20px',
-            height: '20px',
-            borderRadius: '50%',
-            border: '2px solid #ddd',
-            appearance: 'none',
-            cursor: 'pointer',
-          }}
-        />
-        <span
-          style={{
-            flexGrow: 1,
-            fontSize: '16px',
-            fontWeight: '500',
-            color: '#333',
-          }}
-        >
-          Using Environment Variables
-        </span>
-        <Tag
-          backgroundColor='#FFD700'
-          color='#B8860B'
-          style={{
-            fontWeight: 'bold',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}
-        >
-          auth
-        </Tag>
-        <span
-          style={{
-            color: commonStyles.secondaryColor,
-            marginRight: '15px',
-            fontSize: '14px',
-          }}
-        >
-          in progress
-        </span>
-        <span
-          style={{
-            fontSize: '16px',
-            fontWeight: 'bold',
-            color: '#333',
-            marginRight: '10px',
-          }}
-        >
-          02:36
-        </span>
-        <IconButton
-          Icon={FaPlay}
-          color='#888'
-          style={{
-            backgroundColor: '#eee',
-            padding: '8px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        />
-      </div>
+      {/* items */}
     </div>
   );
 }
