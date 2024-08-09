@@ -1,4 +1,5 @@
-import React from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useState } from 'react';
 import { FaPlay, FaPlus, FaSearch } from 'react-icons/fa';
 
 // Reusable styles
@@ -148,6 +149,19 @@ const ChecklistItem = ({ title, tag, status, time, profileImage, tagBackgroundCo
 );
 
 export default function DashboardComponent() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const handleSearch = () => {
+    if (isSearchOpen) {
+      // Close the search
+      setIsSearchOpen(false);
+      setSearchQuery('');
+    } else {
+      setIsSearchOpen(true);
+    }
+  };
+
   return (
     <div
       style={{
@@ -188,8 +202,34 @@ export default function DashboardComponent() {
           </h1>
         </div>
         <div style={commonStyles.flexContainer}>
+          <AnimatePresence>
+            {isSearchOpen && (
+              <motion.input
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: '200px', opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                type='text'
+                placeholder='Search...'
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  padding: '5px 10px',
+                  marginRight: '10px',
+                  borderRadius: '5px',
+                  border: '1px solid #ccc',
+                }}
+              />
+            )}
+          </AnimatePresence>
           <FaSearch
-            style={{ marginRight: '15px', fontSize: '20px', color: commonStyles.secondaryColor }}
+            style={{
+              marginRight: '15px',
+              fontSize: '20px',
+              color: commonStyles.secondaryColor,
+              cursor: 'pointer',
+            }}
+            onClick={handleSearch}
           />
           <div
             style={{
