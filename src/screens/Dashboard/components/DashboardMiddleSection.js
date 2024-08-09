@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaCheck, FaPause, FaPlay, FaPlus, FaSearch } from 'react-icons/fa';
+import { FaPlay, FaPlus, FaSearch } from 'react-icons/fa';
 
 // Reusable styles
 const commonStyles = {
@@ -17,7 +17,7 @@ const commonStyles = {
 };
 
 // Reusable components
-const Tag = ({ backgroundColor, color = 'white', children }) => (
+const Tag = ({ backgroundColor, color = 'white', children, style }) => (
   <span
     style={{
       backgroundColor,
@@ -26,13 +26,18 @@ const Tag = ({ backgroundColor, color = 'white', children }) => (
       borderRadius: '10px',
       fontSize: '12px',
       marginRight: '10px',
+      ...style,
     }}
   >
     {children}
   </span>
 );
 
-const IconButton = ({ Icon, color, marginLeft = '10px' }) => <Icon style={{ marginLeft, color }} />;
+const IconButton = ({ Icon, color, style, marginLeft = '10px' }) => (
+  <div style={{ marginLeft, ...style }}>
+    <Icon style={{ color }} />
+  </div>
+);
 
 export default function DashboardComponent() {
   return (
@@ -224,46 +229,154 @@ export default function DashboardComponent() {
         </div>
       </div>
 
-      <div style={commonStyles.taskItem}>
-        <input type='checkbox' style={{ marginRight: '10px' }} />
-        <span style={{ flexGrow: 1 }}>Using Environment Variables</span>
-        <Tag backgroundColor='#FFD700'>auth</Tag>
-        <span style={{ color: commonStyles.secondaryColor, marginRight: '10px' }}>in progress</span>
-        <span>02:36</span>
-        <IconButton Icon={FaPlay} color={commonStyles.secondaryColor} />
-      </div>
-
-      <div style={commonStyles.taskItem}>
-        <FaCheck style={{ color: commonStyles.primaryColor, marginRight: '10px' }} />
-        <span style={{ flexGrow: 1 }}>Setup server at Heroku</span>
-        <Tag backgroundColor={commonStyles.primaryColor}>Due to 28 Dec 2018</Tag>
-        <span style={{ color: commonStyles.secondaryColor, marginRight: '10px' }}>Done</span>
-        <span>03:28</span>
-        <IconButton Icon={FaPlay} color={commonStyles.secondaryColor} />
-      </div>
-
-      <div style={commonStyles.taskItem}>
-        <input type='checkbox' style={{ marginRight: '10px' }} />
-        <span style={{ flexGrow: 1 }}>Configure Vue Boilerplate</span>
-        <span style={{ color: commonStyles.secondaryColor, marginRight: '10px' }}>Running</span>
-        <span>00:36</span>
-        <IconButton Icon={FaPause} color={commonStyles.primaryColor} />
-      </div>
-
-      <div style={commonStyles.taskItem}>
-        <FaCheck style={{ color: commonStyles.primaryColor, marginRight: '10px' }} />
-        <span style={{ flexGrow: 1 }}>Automated Visual Testing</span>
-        <span style={{ color: commonStyles.secondaryColor, marginRight: '10px' }}>Done</span>
+      <div
+        style={{
+          ...commonStyles.taskItem,
+          padding: '10px 0',
+          borderBottom: '1px solid #eee',
+        }}
+      >
+        <input
+          type='checkbox'
+          style={{
+            marginRight: '15px',
+            width: '20px',
+            height: '20px',
+            borderRadius: '50%',
+            border: '2px solid #ddd',
+            appearance: 'none',
+            cursor: 'pointer',
+          }}
+        />
+        <span
+          style={{
+            flexGrow: 1,
+            fontSize: '16px',
+            fontWeight: '500',
+            color: '#333',
+          }}
+        >
+          Using Environment Variables
+        </span>
+        <Tag
+          backgroundColor='#FFD700'
+          color='#B8860B'
+          style={{
+            fontWeight: 'bold',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+          }}
+        >
+          auth
+        </Tag>
+        <span
+          style={{
+            color: commonStyles.secondaryColor,
+            marginRight: '15px',
+            fontSize: '14px',
+          }}
+        >
+          in progress
+        </span>
+        <span
+          style={{
+            fontSize: '16px',
+            fontWeight: 'bold',
+            color: '#333',
+            marginRight: '10px',
+          }}
+        >
+          02:36
+        </span>
+        <IconButton
+          Icon={FaPlay}
+          color='#888'
+          style={{
+            backgroundColor: '#eee',
+            padding: '8px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        />
       </div>
 
       <h2 style={{ color: commonStyles.primaryColor, marginTop: '30px', marginBottom: '20px' }}>
         Things to do
       </h2>
 
-      <div style={commonStyles.flexContainer}>
-        <input type='checkbox' style={{ marginRight: '10px' }} />
-        <span style={{ flexGrow: 1 }}>Exporting Storybook as a Static App</span>
-        <span style={{ color: commonStyles.secondaryColor }}>in progress</span>
+      <div
+        style={{
+          ...commonStyles.taskItem,
+          padding: '10px 0',
+          borderBottom: '1px solid #eee',
+        }}
+      >
+        <input
+          type='checkbox'
+          style={{
+            marginRight: '15px',
+            width: '20px',
+            height: '20px',
+            borderRadius: '50%',
+            border: '2px solid #ddd',
+            appearance: 'none',
+            cursor: 'pointer',
+          }}
+        />
+        <span
+          style={{
+            flexGrow: 1,
+            fontSize: '16px',
+            fontWeight: '500',
+            color: '#333',
+          }}
+        >
+          Using Environment Variables
+        </span>
+        <Tag
+          backgroundColor='#FFD700'
+          color='#B8860B'
+          style={{
+            fontWeight: 'bold',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+          }}
+        >
+          auth
+        </Tag>
+        <span
+          style={{
+            color: commonStyles.secondaryColor,
+            marginRight: '15px',
+            fontSize: '14px',
+          }}
+        >
+          in progress
+        </span>
+        <span
+          style={{
+            fontSize: '16px',
+            fontWeight: 'bold',
+            color: '#333',
+            marginRight: '10px',
+          }}
+        >
+          02:36
+        </span>
+        <IconButton
+          Icon={FaPlay}
+          color='#888'
+          style={{
+            backgroundColor: '#eee',
+            padding: '8px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        />
       </div>
     </div>
   );
