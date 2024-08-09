@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaPause, FaPlay } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
 import { useTasksContext } from '../../../context/useTasksContext';
@@ -23,12 +23,12 @@ const parseStatus = (status) => {
   return status;
 };
 
-const ChecklistItem = ({
+const Checklist = ({
   id,
   title,
   tag,
   status,
-  time,
+  taskDuration,
   profileImage,
   tagBackgroundColor,
   moveTask,
@@ -36,7 +36,22 @@ const ChecklistItem = ({
   disabled,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { startTask, pauseTask, finishTask } = useTasksContext();
+  const { startTask, pauseTask, finishTask, getRemainingTime } = useTasksContext();
+  const [remainingTime, setRemainingTime] = useState(taskDuration * 1000); // Convert seconds to milliseconds
+
+  useEffect(() => {
+    let intervalId;
+    if (status === 'inProgress') {
+      intervalId = setInterval(() => {
+        const newRemainingTime = getRemainingTime(id);
+        setRemainingTime(newRemainingTime);
+        if (newRemainingTime <= 0) {
+          finishTask(id);
+        }
+      }, 1000);
+    }
+    return () => clearInterval(intervalId);
+  }, [status, id, getRemainingTime, finishTask]);
 
   const handlePlay = () => {
     if (status === 'inProgress') {
@@ -45,6 +60,21 @@ const ChecklistItem = ({
       startTask(id);
     }
   };
+
+  const formatTime = (ms) => {
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    return `${hours.toString().padStart(2, '0')}:${(minutes % 60).toString().padStart(2, '0')}:${(
+      seconds % 60
+    )
+      .toString()
+      .padStart(2, '0')}`;
+  };
+
+  if (!taskDuration) {
+    return null;
+  }
 
   return (
     <motion.div
@@ -63,7 +93,7 @@ const ChecklistItem = ({
       onMouseLeave={() => setIsHovered(false)}
       drag
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-      dragElastic={1} // This will make the drag follow the cursor exactly
+      dragElastic={1}
       onDragEnd={(_, info) => {
         if (Math.abs(info.offset.y) > 50) {
           moveTask(id, listType, listType === 'currentWeek' ? 'thingsToDo' : 'currentWeek');
@@ -145,7 +175,7 @@ const ChecklistItem = ({
             color: disabled ? '#ced2d8' : '#331db9',
           }}
         >
-          {time}
+          {formatTime(remainingTime)}
         </span>
         <IconButton
           onClick={handlePlay}
@@ -184,4 +214,4 @@ const ChecklistItem = ({
   );
 };
 
-export default ChecklistItem;
+export default Checklist;

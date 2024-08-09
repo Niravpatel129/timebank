@@ -11,10 +11,18 @@ export const TasksProvider = ({ children }) => {
     return storedTasks ? JSON.parse(storedTasks) : [];
   });
 
+  const [timers, setTimers] = useState(() => {
+    const storedTimers = localStorage.getItem('timers');
+    return storedTimers ? JSON.parse(storedTimers) : {};
+  });
+
   useEffect(() => {
-    // Save tasks to local storage whenever they change
     localStorage.setItem('tasks', JSON.stringify(tasks));
   }, [tasks]);
+
+  useEffect(() => {
+    localStorage.setItem('timers', JSON.stringify(timers));
+  }, [timers]);
 
   const addTask = (task) => {
     const newTask = { ...task, id: uuidv4() };
@@ -29,32 +37,76 @@ export const TasksProvider = ({ children }) => {
 
   const deleteTask = (taskId) => {
     setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+    setTimers((prevTimers) => {
+      const { [taskId]: deletedTimer, ...rest } = prevTimers;
+      return rest;
+    });
   };
 
   const startTask = (taskId) => {
-    console.log('🚀  taskId:', taskId);
+    const task = tasks.find((t) => t.id === taskId);
+    if (!task) return;
+
     setTasks((prevTasks) =>
-      prevTasks.map((task) => (task.id === taskId ? { ...task, status: 'inProgress' } : task)),
+      prevTasks.map((t) => (t.id === taskId ? { ...t, status: 'inProgress' } : t)),
     );
+    setTimers((prevTimers) => ({
+      ...prevTimers,
+      [taskId]: {
+        startTime: Date.now(),
+        remainingTime: prevTimers[taskId]?.remainingTime || task.taskDuration * 1000, // Convert seconds to milliseconds
+      },
+    }));
   };
 
   const pauseTask = (taskId) => {
     setTasks((prevTasks) =>
       prevTasks.map((task) => (task.id === taskId ? { ...task, status: 'paused' } : task)),
     );
+    setTimers((prevTimers) => ({
+      ...prevTimers,
+      [taskId]: {
+        ...prevTimers[taskId],
+        remainingTime: getRemainingTime(taskId),
+        startTime: null,
+      },
+    }));
   };
 
   const finishTask = (taskId) => {
     setTasks((prevTasks) =>
       prevTasks.map((task) => (task.id === taskId ? { ...task, status: 'completed' } : task)),
     );
+    setTimers((prevTimers) => {
+      const { [taskId]: finishedTimer, ...rest } = prevTimers;
+      return rest;
+    });
+  };
+
+  const getRemainingTime = (taskId) => {
+    const timer = timers[taskId];
+    if (!timer) return 0;
+
+    const elapsed = timer.startTime ? Date.now() - timer.startTime : 0;
+    return Math.max(0, timer.remainingTime - elapsed);
   };
 
   return (
     <TasksContext.Provider
-      value={{ tasks, addTask, updateTask, deleteTask, startTask, pauseTask, finishTask }}
+      value={{
+        tasks,
+        addTask,
+        updateTask,
+        deleteTask,
+        startTask,
+        pauseTask,
+        finishTask,
+        getRemainingTime,
+      }}
     >
       {children}
     </TasksContext.Provider>
   );
 };
+
+export default TasksProvider;
