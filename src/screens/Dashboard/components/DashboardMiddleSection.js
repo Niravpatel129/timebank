@@ -148,7 +148,7 @@ const ChecklistItem = ({ title, tag, status, time, profileImage, tagBackgroundCo
   </div>
 );
 
-export default function DashboardComponent({ handleAddTask }) {
+export default function DashboardComponent({ handleTriggerAddTaskButton }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -243,7 +243,7 @@ export default function DashboardComponent({ handleAddTask }) {
               alignItems: 'center',
               cursor: 'pointer',
             }}
-            onClick={handleAddTask}
+            onClick={handleTriggerAddTaskButton}
           >
             <FaPlus />
           </div>

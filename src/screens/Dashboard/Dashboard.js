@@ -13,11 +13,13 @@ import {
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 import Bubble from './components/Bubble';
+import DashboardAddTaskModal from './components/DashboardAddTaskModal';
 import DashboardMiddleSection from './components/DashboardMiddleSection';
 import TimerTrack from './components/TimerTrack';
 const { ipcRenderer } = window.require('electron');
 
 const Dashboard = () => {
+  const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
   const [data, setData] = useState(null);
   const navigate = useNavigate();
 
@@ -35,6 +37,10 @@ const Dashboard = () => {
 
   const handleAddTask = () => {
     console.log('Add new task');
+  };
+
+  const handleModalClose = () => {
+    console.log('Modal closed');
   };
 
   const iconStyle = {
@@ -114,7 +120,7 @@ const Dashboard = () => {
         {/* Left part of main content - flexible width */}
         <div style={{ flex: 1, height: '100%' }}>
           {/* Content for main area */}
-          <DashboardMiddleSection handleAddTask={handleAddTask} />
+          <DashboardMiddleSection handleTriggerAddTaskButton={() => setAddTaskModalOpen(true)} />
         </div>
 
         {/* Right part of main content - 300px wide, full height */}
@@ -123,6 +129,13 @@ const Dashboard = () => {
           <TimerTrack />
         </div>
       </div>
+
+      {addTaskModalOpen && (
+        <DashboardAddTaskModal
+          onClose={() => setAddTaskModalOpen(false)}
+          onAddTask={handleAddTask}
+        />
+      )}
     </div>
   );
 };

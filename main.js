@@ -133,6 +133,8 @@ function createDashboardWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   const dashboardWidth = Math.round(width * 0.9); // Increased from 0.8 to 0.9
   const dashboardHeight = Math.round(dashboardWidth / dashboardAspectRatio);
+  const icon = nativeImage.createFromPath(path.join(__dirname, 'assets', 'docker-icon.png'));
+
   dashboardWindow = new BrowserWindow({
     width: dashboardWidth,
     height: dashboardHeight,
@@ -144,8 +146,11 @@ function createDashboardWindow() {
       nodeIntegration: true,
       contextIsolation: false,
     },
-    icon: path.join(__dirname, 'assets', 'docker-icon.png'),
+    icon,
   });
+
+  icon.setTemplateImage(true);
+  app.dock.setIcon(icon);
 
   const dashboardUrl =
     process.env.NODE_ENV === 'development'
@@ -260,9 +265,16 @@ app.whenReady().then(() => {
       });
     }
   }, 1000);
+
+  // Add event listener for dock icon click
+  app.on('activate', () => {
+    if (dashboardWindow) {
+      dashboardWindow.show();
+    }
+  });
 });
 
-app.dock.hide();
+// app.dock.hide();
 
 app.on('before-quit', cleanup);
 
