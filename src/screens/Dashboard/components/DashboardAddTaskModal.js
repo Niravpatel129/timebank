@@ -2,17 +2,19 @@ import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import Select from 'react-select';
+import { useTasksContext } from '../../../context/useTasksContext';
 
-export default function DashboardAddTaskModal({ onClose, onAddTask }) {
+export default function DashboardAddTaskModal({ onClose }) {
   const [taskName, setTaskName] = useState('');
   const [duration, setDuration] = useState('30m');
   const [showCustomDuration, setShowCustomDuration] = useState(false);
   const [customHours, setCustomHours] = useState(0);
   const [customMinutes, setCustomMinutes] = useState(0);
   const [category, setCategory] = useState('');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [assignee, setAssignee] = useState(null);
   const modalRef = useRef(null);
+  const { addTask } = useTasksContext();
 
   // Mock data for assignees, replace with actual data in your implementation
   const assignees = [
@@ -40,7 +42,6 @@ export default function DashboardAddTaskModal({ onClose, onAddTask }) {
     e.preventDefault();
     const taskDurationInSeconds = calculateDurationInSeconds(duration);
     const newTask = {
-      id: Date.now(),
       name: taskName,
       status: 'not-started',
       taskDuration: taskDurationInSeconds,
@@ -50,7 +51,7 @@ export default function DashboardAddTaskModal({ onClose, onAddTask }) {
       dateCreated: new Date().toISOString(),
       assignee: assignee ? assignee.value : null,
     };
-    onAddTask(newTask);
+    addTask(newTask);
     onClose();
   };
 

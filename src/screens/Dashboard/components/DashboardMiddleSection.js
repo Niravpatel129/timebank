@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { FaPlay, FaPlus, FaSearch } from 'react-icons/fa';
+import { useTasksContext } from '../../../context/useTasksContext';
 
 // Reusable styles
 const commonStyles = {
@@ -151,6 +152,7 @@ const ChecklistItem = ({ title, tag, status, time, profileImage, tagBackgroundCo
 export default function DashboardComponent({ handleTriggerAddTaskButton }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { tasks } = useTasksContext();
 
   const handleSearch = () => {
     if (isSearchOpen) {
@@ -162,9 +164,22 @@ export default function DashboardComponent({ handleTriggerAddTaskButton }) {
     }
   };
 
+  const isCurrentWeek = (date) => {
+    if (!date) return false;
+    const now = new Date();
+    const taskDate = new Date(date);
+    const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+    const weekEnd = new Date(now.setDate(now.getDate() - now.getDay() + 6));
+    return taskDate >= weekStart && taskDate <= weekEnd;
+  };
+
+  const currentWeekTasks = tasks.filter((task) => isCurrentWeek(task.date));
+  const thingsToDoTasks = tasks.filter((task) => !isCurrentWeek(task.date));
+
   return (
     <div
       style={{
+        backgroundColor: '#ffffff',
         fontFamily: 'Arial, sans-serif',
         padding: '20px',
         paddingBottom: '100px',
@@ -191,6 +206,8 @@ export default function DashboardComponent({ handleTriggerAddTaskButton }) {
                 borderRadius: '15px',
                 fontSize: '14px',
                 marginBottom: '10px',
+                fontWeight: 300,
+                color: '#341dc0',
               }}
             >
               design system
@@ -387,39 +404,18 @@ export default function DashboardComponent({ handleTriggerAddTaskButton }) {
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <ChecklistItem
-          title='Implement User Authentication'
-          tag='auth'
-          status='in progress'
-          time='01:45'
-          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
-        />
-        <ChecklistItem
-          title='Design Landing Page'
-          status='not started'
-          tag='design'
-          tagBackgroundColor='#ffba3b'
-          time='00:00'
-          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
-        />
-        <ChecklistItem
-          title='Optimize Database Queries'
-          status='completed'
-          time='03:20'
-          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
-        />
-        <ChecklistItem
-          title='Write Unit Tests'
-          status='in progress'
-          time='02:10'
-          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
-        />
-        <ChecklistItem
-          title='Integrate Payment Gateway'
-          status='not started'
-          time='00:00'
-          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
-        />
+        {currentWeekTasks.map((task) => (
+          <ChecklistItem
+            key={task.id}
+            title={task.name}
+            tag={task.category}
+            status={task.status}
+            time={`${Math.floor(task.taskDuration / 3600)}:${String(
+              Math.floor((task.taskDuration % 3600) / 60),
+            ).padStart(2, '0')}`}
+            profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
+          />
+        ))}
       </div>
 
       <h2 style={{ color: commonStyles.primaryColor, marginTop: '30px', marginBottom: '20px' }}>
@@ -428,38 +424,18 @@ export default function DashboardComponent({ handleTriggerAddTaskButton }) {
 
       {/* items */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '50px' }}>
-        <ChecklistItem
-          title='Implement User Authentication'
-          status='not started'
-          time='00:00'
-          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
-        />
-        <ChecklistItem
-          title='Optimize API Endpoints'
-          tag='backend'
-          tagBackgroundColor='#ffba3b'
-          status='in progress'
-          time='01:45'
-          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
-        />
-        <ChecklistItem
-          title='Create Mobile-Responsive Layout'
-          status='completed'
-          time='03:20'
-          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
-        />
-        <ChecklistItem
-          title='Set Up CI/CD Pipeline'
-          status='in progress'
-          time='02:10'
-          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
-        />
-        <ChecklistItem
-          title='Implement Data Analytics Dashboard'
-          status='not started'
-          time='00:00'
-          profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
-        />
+        {thingsToDoTasks.map((task) => (
+          <ChecklistItem
+            key={task.id}
+            title={task.name}
+            tag={task.category}
+            status={task.status}
+            time={`${Math.floor(task.taskDuration / 3600)}:${String(
+              Math.floor((task.taskDuration % 3600) / 60),
+            ).padStart(2, '0')}`}
+            profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
+          />
+        ))}
       </div>
     </div>
   );

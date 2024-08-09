@@ -30,6 +30,9 @@ autoUpdater.logger.transports.file.level = 'info';
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 
+// Set the app name
+app.name = 'Hour Block';
+
 function checkForUpdates() {
   console.log('Checking for updates...');
   autoUpdater.logger.info('Checking for updates...');
@@ -264,6 +267,9 @@ app.whenReady().then(() => {
         app.quit();
       });
     }
+
+    // Set the dock app title
+    app.dock.setMenu(Menu.buildFromTemplate([{ label: 'Hour Block' }]));
   }, 1000);
 
   // Add event listener for dock icon click
