@@ -10,7 +10,6 @@ export const TasksProvider = ({ children }) => {
     const storedTasks = localStorage.getItem('tasks');
     return storedTasks ? JSON.parse(storedTasks) : [];
   });
-  console.log('🚀  tasks:', tasks);
 
   useEffect(() => {
     // Save tasks to local storage whenever they change
@@ -32,8 +31,29 @@ export const TasksProvider = ({ children }) => {
     setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
   };
 
+  const startTask = (taskId) => {
+    console.log('🚀  taskId:', taskId);
+    setTasks((prevTasks) =>
+      prevTasks.map((task) => (task.id === taskId ? { ...task, status: 'inProgress' } : task)),
+    );
+  };
+
+  const pauseTask = (taskId) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) => (task.id === taskId ? { ...task, status: 'paused' } : task)),
+    );
+  };
+
+  const finishTask = (taskId) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) => (task.id === taskId ? { ...task, status: 'completed' } : task)),
+    );
+  };
+
   return (
-    <TasksContext.Provider value={{ tasks, addTask, updateTask, deleteTask }}>
+    <TasksContext.Provider
+      value={{ tasks, addTask, updateTask, deleteTask, startTask, pauseTask, finishTask }}
+    >
       {children}
     </TasksContext.Provider>
   );

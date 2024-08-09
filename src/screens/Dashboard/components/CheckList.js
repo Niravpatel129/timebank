@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
-import { FaPlay } from 'react-icons/fa';
+import { FaPause, FaPlay } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
+import { useTasksContext } from '../../../context/useTasksContext';
 import IconButton from './IconButton';
 import Tag from './Tag';
 import { commonStyles } from './sharedStyles/commonStyles';
@@ -19,9 +20,14 @@ const ChecklistItem = ({
   disabled,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const { startTask, pauseTask, finishTask } = useTasksContext();
 
   const handlePlay = () => {
-    console.log('Play');
+    if (status === 'inProgress') {
+      pauseTask(id);
+    } else {
+      startTask(id);
+    }
   };
 
   return (
@@ -48,12 +54,18 @@ const ChecklistItem = ({
         }
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        {isHovered && (
-          <div style={{ cursor: 'move', marginRight: '5px' }}>
-            <GrDrag />
-          </div>
-        )}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', position: 'relative' }}>
+        <div
+          style={{
+            width: '20px',
+            marginRight: '0px',
+            opacity: isHovered ? 1 : 0,
+            position: 'absolute',
+            left: '-16px',
+          }}
+        >
+          <GrDrag style={{ cursor: 'move' }} />
+        </div>
         <input
           type='checkbox'
           style={{
@@ -120,7 +132,7 @@ const ChecklistItem = ({
         </span>
         <IconButton
           onClick={handlePlay}
-          Icon={FaPlay}
+          Icon={status === 'inProgress' ? FaPause : FaPlay}
           color={!disabled ? '#ffffff' : '#331db9'}
           style={{
             backgroundColor: disabled ? '#eee' : '#331db9',

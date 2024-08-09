@@ -11,6 +11,7 @@ import {
   FaTrash,
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { useTasksContext } from '../../context/useTasksContext';
 import './Dashboard.css';
 import Bubble from './components/Bubble';
 import DashboardAddTaskModal from './components/DashboardAddTaskModal';
@@ -20,6 +21,7 @@ const { ipcRenderer } = window.require('electron');
 
 const Dashboard = () => {
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
+  const { startTask } = useTasksContext();
   const [data, setData] = useState(null);
   const navigate = useNavigate();
 

@@ -1,7 +1,7 @@
 import React from 'react';
 
-const IconButton = ({ Icon, color, style, marginLeft = '10px' }) => (
-  <div style={{ marginLeft, ...style }}>
+const IconButton = ({ Icon, color, style, marginLeft = '10px', ...props }) => (
+  <div style={{ marginLeft, ...style }} {...props}>
     <Icon style={{ color }} />
   </div>
 );
