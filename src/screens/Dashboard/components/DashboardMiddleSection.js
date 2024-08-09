@@ -26,6 +26,7 @@ const TaskList = ({ tasks, listType, moveTask }) => {
                 profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
                 listType={listType}
                 moveTask={moveTask}
+                disabled={listType === 'currentWeek' && task.status === 'done'}
               />
             ))}
           </div>

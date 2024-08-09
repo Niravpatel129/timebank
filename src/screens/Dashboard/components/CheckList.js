@@ -16,8 +16,13 @@ const ChecklistItem = ({
   tagBackgroundColor,
   moveTask,
   listType,
+  disabled,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+
+  const handlePlay = () => {
+    console.log('Play');
+  };
 
   return (
     <motion.div
@@ -108,16 +113,17 @@ const ChecklistItem = ({
           style={{
             fontSize: '18px',
             fontWeight: 'bold',
-            color: '#ced2d8',
+            color: disabled ? '#ced2d8' : '#331db9',
           }}
         >
           {time}
         </span>
         <IconButton
+          onClick={handlePlay}
           Icon={FaPlay}
-          color='#888'
+          color={!disabled ? '#ffffff' : '#331db9'}
           style={{
-            backgroundColor: '#eee',
+            backgroundColor: disabled ? '#eee' : '#331db9',
             padding: '10px',
             borderRadius: '50%',
             display: 'flex',
