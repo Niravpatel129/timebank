@@ -3,9 +3,12 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FaPlus, FaSearch } from 'react-icons/fa';
+import { Tooltip } from 'react-tooltip';
 import { useTasksContext } from '../../../context/useTasksContext';
 import Checklist from './CheckList';
 import { commonStyles } from './sharedStyles/commonStyles';
+
+const fakeProfiles = ['User1', 'User2', 'User3'];
 
 const TaskList = ({ tasks, listType, moveTask }) => {
   return (
@@ -50,6 +53,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [filterType, setFilterType] = useState('all'); // 'all' or 'my'
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const { tasks, updateTask } = useTasksContext();
   const username = 'user1'; // Assuming the current user's username is 'user1'
 
@@ -102,6 +106,10 @@ export default function DashboardComponent({ handleTriggerAddTaskButton }) {
     [tasks, updateTask],
   );
 
+  const toggleFilterDropdown = () => {
+    setIsFilterDropdownOpen(!isFilterDropdownOpen);
+  };
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div
@@ -140,12 +148,44 @@ export default function DashboardComponent({ handleTriggerAddTaskButton }) {
                 design system
               </div>
             </div>
-
-            <h1 style={{ color: commonStyles.primaryColor, fontSize: '28px', margin: '0' }}>
-              Storybook for Vue.js
-            </h1>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+              }}
+            >
+              <h1 style={{ color: commonStyles.primaryColor, fontSize: '28px', margin: '0' }}>
+                Storybook for Vue.js
+              </h1>
+            </div>
           </div>
           <div style={commonStyles.flexContainer}>
+            <div style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}>
+              {/* profiles of 3 users, stacking like overlapping chips */}
+              {fakeProfiles.map((user, index) => (
+                <div
+                  key={user}
+                  data-tooltip-id={`day-${index}`}
+                  data-tooltip-content={`${user} - Last active: 2 hours ago`}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <img
+                    src='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
+                    alt={`${user} profile`}
+                    style={{
+                      width: '30px',
+                      height: '30px',
+                      borderRadius: '50%',
+                      marginRight: index !== 2 ? '-10px' : '0',
+                      border: '2px solid white',
+                      zIndex: 3 - index,
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
             <AnimatePresence>
               {isSearchOpen && (
                 <motion.input
@@ -297,11 +337,18 @@ export default function DashboardComponent({ handleTriggerAddTaskButton }) {
           >
             <span>Current week</span>
           </h2>
-          <div>
+
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
             <div style={{ ...commonStyles.flexContainer, gap: '20px' }}>
               {['All Tasks', 'My Tasks'].map((text, index) => (
-                <div
+                <motion.div
                   key={index}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   style={{
                     color:
                       filterType === (index === 0 ? 'all' : 'my')
@@ -310,34 +357,21 @@ export default function DashboardComponent({ handleTriggerAddTaskButton }) {
                     fontSize: '15px',
                     cursor: 'pointer',
                     fontWeight: 'bold',
+                    padding: '8px 12px',
+                    borderRadius: '20px',
+                    backgroundColor:
+                      filterType === (index === 0 ? 'all' : 'my')
+                        ? 'rgba(52, 29, 192, 0.1)'
+                        : 'transparent',
+                    transition: 'background-color 0.3s ease',
                   }}
                   onClick={() => setFilterType(index === 0 ? 'all' : 'my')}
                 >
                   {text}
-                </div>
+                </motion.div>
               ))}
-              {/* Filter by tag */}
-              <div
-                style={{
-                  cursor: 'pointer',
-                  ...commonStyles.flexContainer,
-                }}
-              >
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M3 17V19H9V17H3ZM3 5V7H13V5H3ZM13 21V19H21V17H13V15H11V21H13ZM7 9V11H3V13H7V15H9V9H7ZM21 13V11H11V13H21ZM15 9H17V7H21V5H17V3H15V9Z'
-                    fill={commonStyles.secondaryColor}
-                  />
-                </svg>
-              </div>
             </div>
-          </div>
+          </motion.div>
         </div>
         <TaskList tasks={currentWeekTasks} listType='currentWeek' moveTask={moveTask} />
 
@@ -348,6 +382,9 @@ export default function DashboardComponent({ handleTriggerAddTaskButton }) {
         {/* items */}
         <TaskList tasks={thingsToDoTasks} listType='thingsToDo' moveTask={moveTask} />
       </div>
+      {fakeProfiles.map((profile, index) => (
+        <Tooltip key={`${profile}-${index}`} id={`day-${index}`} />
+      ))}
     </DndProvider>
   );
 }
