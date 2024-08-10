@@ -16,6 +16,8 @@ export const TasksProvider = ({ children }) => {
     return storedTimers ? JSON.parse(storedTimers) : {};
   });
 
+  const [activeTaskId, setActiveTaskId] = useState(null);
+
   useEffect(() => {
     localStorage.setItem('tasks', JSON.stringify(tasks));
   }, [tasks]);
@@ -41,11 +43,19 @@ export const TasksProvider = ({ children }) => {
       const { [taskId]: deletedTimer, ...rest } = prevTimers;
       return rest;
     });
+    if (activeTaskId === taskId) {
+      setActiveTaskId(null);
+    }
   };
 
   const startTask = (taskId) => {
     const task = tasks.find((t) => t.id === taskId);
     if (!task) return;
+
+    // Pause the currently active task if there is one
+    if (activeTaskId && activeTaskId !== taskId) {
+      pauseTask(activeTaskId);
+    }
 
     setTasks((prevTasks) =>
       prevTasks.map((t) => (t.id === taskId ? { ...t, status: 'inProgress' } : t)),
@@ -54,9 +64,10 @@ export const TasksProvider = ({ children }) => {
       ...prevTimers,
       [taskId]: {
         startTime: Date.now(),
-        remainingTime: prevTimers[taskId]?.remainingTime || task.taskDuration * 1000, // Convert seconds to milliseconds
+        remainingTime: prevTimers[taskId]?.remainingTime || task.taskDuration * 1000,
       },
     }));
+    setActiveTaskId(taskId);
   };
 
   const pauseTask = (taskId) => {
@@ -71,6 +82,7 @@ export const TasksProvider = ({ children }) => {
         startTime: null,
       },
     }));
+    setActiveTaskId(null);
   };
 
   const finishTask = (taskId) => {
@@ -81,6 +93,9 @@ export const TasksProvider = ({ children }) => {
       const { [taskId]: finishedTimer, ...rest } = prevTimers;
       return rest;
     });
+    if (activeTaskId === taskId) {
+      setActiveTaskId(null);
+    }
   };
 
   const getRemainingTime = (taskId) => {
@@ -102,6 +117,7 @@ export const TasksProvider = ({ children }) => {
         pauseTask,
         finishTask,
         getRemainingTime,
+        activeTaskId,
       }}
     >
       {children}

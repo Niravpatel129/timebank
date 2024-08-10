@@ -46,7 +46,7 @@ export default function DashboardAddTaskModal({ onClose }) {
       status: 'not-started',
       taskDuration: taskDurationInSeconds,
       hours: taskDurationInSeconds / 3600,
-      category: category || 'Other',
+      category: category || null,
       date: date,
       dateCreated: new Date().toISOString(),
       assignee: assignee ? assignee.value : null,

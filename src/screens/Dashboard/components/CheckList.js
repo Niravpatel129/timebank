@@ -33,11 +33,12 @@ const Checklist = ({
   tagBackgroundColor,
   moveTask,
   listType,
-  disabled,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { startTask, pauseTask, finishTask, getRemainingTime } = useTasksContext();
-  const [remainingTime, setRemainingTime] = useState(taskDuration * 1000); // Convert seconds to milliseconds
+  const { startTask, pauseTask, finishTask, getRemainingTime, activeTaskId } = useTasksContext();
+  const [remainingTime, setRemainingTime] = useState(taskDuration * 1000);
+
+  const isDisabled = activeTaskId !== null && activeTaskId !== id;
 
   useEffect(() => {
     let intervalId;
@@ -172,7 +173,7 @@ const Checklist = ({
           style={{
             fontSize: '18px',
             fontWeight: 'bold',
-            color: disabled ? '#ced2d8' : '#331db9',
+            color: status === 'inProgress' ? '#331db9' : '#d9dae3',
           }}
         >
           {formatTime(remainingTime)}
@@ -180,9 +181,9 @@ const Checklist = ({
         <IconButton
           onClick={handlePlay}
           Icon={status === 'inProgress' ? FaPause : FaPlay}
-          color={!disabled ? '#ffffff' : '#331db9'}
+          color={isDisabled ? '#ffffff' : '#ffffff'}
           style={{
-            backgroundColor: disabled ? '#eee' : '#331db9',
+            backgroundColor: status === 'inProgress' ? '#331db9' : '#d9dae3',
             padding: '10px',
             borderRadius: '50%',
             display: 'flex',
@@ -190,9 +191,10 @@ const Checklist = ({
             justifyContent: 'center',
             width: '10px',
             height: '10px',
-            cursor: 'pointer',
+            cursor: isDisabled ? 'not-allowed' : 'pointer',
             marginRight: '10px',
           }}
+          disabled={isDisabled}
         />
         <div
           style={{
