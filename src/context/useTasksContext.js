@@ -18,11 +18,10 @@ export const TasksProvider = ({ children }) => {
     const fetchInitialData = async () => {
       try {
         const response = await newRequest.get('/tasks');
-        console.log('🚀  response:', response);
-        setTasks(response.data.tasks);
-        setTimers(response.data.timers);
-        setTotalTimeSpent(response.data.totalTimeSpent);
-        setDailyTimeSpent(response.data.dailyTimeSpent);
+        setTasks(response.data);
+        setTimers(response.timers);
+        setTotalTimeSpent(response.totalTimeSpent);
+        setDailyTimeSpent(response.dailyTimeSpent);
       } catch (error) {
         console.error('Error fetching initial data:', error);
       }
@@ -44,11 +43,11 @@ export const TasksProvider = ({ children }) => {
   const pauseTask = useCallback(async (taskId) => {
     try {
       const response = await newRequest.post(`/tasks/${taskId}/pause`);
-      setTasks(response.data.tasks);
-      setTimers(response.data.timers);
+      setTasks(response.tasks);
+      setTimers(response.timers);
       setActiveTaskId(null);
-      setTotalTimeSpent(response.data.totalTimeSpent);
-      setDailyTimeSpent(response.data.dailyTimeSpent);
+      setTotalTimeSpent(response.totalTimeSpent);
+      setDailyTimeSpent(response.dailyTimeSpent);
     } catch (error) {
       console.error('Error pausing task:', error);
     }
@@ -58,7 +57,7 @@ export const TasksProvider = ({ children }) => {
     try {
       const response = await newRequest.put(`/tasks/${updatedTask.id}`, updatedTask);
       setTasks((prevTasks) =>
-        prevTasks.map((task) => (task.id === updatedTask.id ? response.data : task)),
+        prevTasks.map((task) => (task.id === updatedTask.id ? response : task)),
       );
     } catch (error) {
       console.error('Error updating task:', error);
@@ -68,7 +67,7 @@ export const TasksProvider = ({ children }) => {
   const updateTaskStatus = useCallback(async (taskId, status) => {
     try {
       const response = await newRequest.patch(`/tasks/${taskId}/status`, { status });
-      setTasks((prevTasks) => prevTasks.map((task) => (task.id === taskId ? response.data : task)));
+      setTasks((prevTasks) => prevTasks.map((task) => (task.id === taskId ? response : task)));
     } catch (error) {
       console.error('Error updating task status:', error);
     }
@@ -96,8 +95,8 @@ export const TasksProvider = ({ children }) => {
   const startTask = useCallback(async (taskId) => {
     try {
       const response = await newRequest.post(`/tasks/${taskId}/start`);
-      setTasks(response.data.tasks);
-      setTimers(response.data.timers);
+      setTasks(response.tasks);
+      setTimers(response.timers);
       setActiveTaskId(taskId);
     } catch (error) {
       console.error('Error starting task:', error);
@@ -107,11 +106,11 @@ export const TasksProvider = ({ children }) => {
   const finishTask = useCallback(async (taskId) => {
     try {
       const response = await newRequest.post(`/tasks/${taskId}/finish`);
-      setTasks(response.data.tasks);
-      setTimers(response.data.timers);
+      setTasks(response.tasks);
+      setTimers(response.timers);
       setActiveTaskId(null);
-      setTotalTimeSpent(response.data.totalTimeSpent);
-      setDailyTimeSpent(response.data.dailyTimeSpent);
+      setTotalTimeSpent(response.totalTimeSpent);
+      setDailyTimeSpent(response.dailyTimeSpent);
     } catch (error) {
       console.error('Error finishing task:', error);
     }
@@ -132,10 +131,10 @@ export const TasksProvider = ({ children }) => {
     try {
       const response = await newRequest.put(`/tasks/${editedTask.id}`, editedTask);
       setTasks((prevTasks) =>
-        prevTasks.map((task) => (task.id === editedTask.id ? response.data : task)),
+        prevTasks.map((task) => (task.id === editedTask.id ? response : task)),
       );
-      setTotalTimeSpent(response.data.totalTimeSpent);
-      setDailyTimeSpent(response.data.dailyTimeSpent);
+      setTotalTimeSpent(response.totalTimeSpent);
+      setDailyTimeSpent(response.dailyTimeSpent);
     } catch (error) {
       console.error('Error editing task:', error);
     }

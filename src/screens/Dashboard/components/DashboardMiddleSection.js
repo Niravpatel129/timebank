@@ -144,8 +144,6 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   }, [tasks]);
 
   const getContributionColor = (timeSpent) => {
-    const maxTimeSpent = Math.max(...Object.values(dailyTimeSpent));
-
     if (timeSpent === 0) return '#f0f0f0';
     if (timeSpent <= 1800) return '#d1c9f5'; // 30 minutes
     if (timeSpent <= 3600) return '#a799e8'; // 1 hour
@@ -318,7 +316,8 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
                 const date = new Date();
                 date.setDate(date.getDate() - (59 - i));
                 const dateString = date.toISOString().split('T')[0];
-                const timeSpent = dailyTimeSpent[dateString] || 0;
+                const timeSpent =
+                  dailyTimeSpent && dailyTimeSpent[dateString] ? dailyTimeSpent[dateString] : 0;
                 return (
                   <div
                     data-tooltip-id={`day-${59 - i}`}
@@ -347,9 +346,9 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
                     textWrap: 'nowrap',
                   }}
                 >
-                  {secondsToTimeObj(totalTimeSpent).hours}:
-                  {secondsToTimeObj(totalTimeSpent).minutes}:
-                  {secondsToTimeObj(totalTimeSpent).seconds}
+                  {secondsToTimeObj(totalTimeSpent || 0).hours}:
+                  {secondsToTimeObj(totalTimeSpent || 0).minutes}:
+                  {secondsToTimeObj(totalTimeSpent || 0).seconds}
                 </span>
                 <span
                   style={{
