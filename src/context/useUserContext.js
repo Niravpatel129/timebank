@@ -12,7 +12,10 @@ export const useUserContext = () => {
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    const token = localStorage.getItem('authToken');
+    return !!token;
+  });
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   const [registerUser, setRegisterUser] = useState(false);
 
