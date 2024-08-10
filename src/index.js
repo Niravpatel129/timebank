@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { Toaster } from 'react-hot-toast';
 import { HashRouter as Router } from 'react-router-dom';
 import 'react-tooltip/dist/react-tooltip.css';
 import App from './App';
@@ -10,6 +11,10 @@ import { UserProvider } from './context/useUserContext';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+    <div>
+      <Toaster />
+    </div>
+
     <Router>
       <ScreenProvider>
         <TasksProvider>

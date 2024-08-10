@@ -33,15 +33,41 @@ export const UserProvider = ({ children }) => {
     checkUserStatus();
   }, []);
 
-  const handleRegisterUser = async (data) => {
+  const checkVerificationStatus = async (email) => {
     try {
-      const response = await newRequest.post('/user/register', data);
-      setUser(response.data.user);
-      setIsLoggedIn(true);
-      setOnboardingCompleted(true);
+      const response = await newRequest.post('/user/is-verified', { email });
+      return response.data.isVerified;
     } catch (error) {
-      console.error('Error registering user:', error);
+      console.error('Error checking verification status:', error);
+      return false;
     }
+  };
+
+  const handleRegisterUser = async (data) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await newRequest.post('/user/send-verification', data);
+        setUser(response.data.user);
+
+        const checkInterval = setInterval(async () => {
+          const isVerified = await checkVerificationStatus(data.email);
+          if (isVerified) {
+            clearInterval(checkInterval);
+            setIsLoggedIn(true);
+            setOnboardingCompleted(true);
+            resolve(response.data);
+          }
+        }, 4000);
+
+        setTimeout(() => {
+          clearInterval(checkInterval);
+          reject(new Error('Verification timeout'));
+        }, 600000);
+      } catch (error) {
+        console.error('Error registering user:', error);
+        reject(error);
+      }
+    });
   };
 
   const updateUser = async (userData) => {

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import React, { useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import { FaCheck, FaSpinner } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useUserContext } from '../../context/useUserContext';
@@ -54,17 +55,24 @@ const Onboarding = () => {
     }
   };
 
-  const handleRegister = () => {
-    handleRegisterUser({
-      onboardingData: {
-        usageType,
-        selectedTools,
-      },
-      userData: {
-        name,
-        email,
-      },
-    });
+  const handleRegister = async () => {
+    try {
+      await handleRegisterUser({
+        onboardingData: {
+          usageType,
+          selectedTools,
+        },
+        userData: {
+          name,
+          email,
+        },
+      });
+
+      setStep(4);
+    } catch (error) {
+      console.error('Error registering user:', error);
+      toast.error('Error registering user:', error);
+    }
   };
 
   const handleToolSelect = (toolId) => {
