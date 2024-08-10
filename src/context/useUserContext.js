@@ -24,7 +24,7 @@ export const UserProvider = ({ children }) => {
         const response = await newRequest.get('/user/me', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        handleLoginAndSetUser(response.user);
+        handleLoginAndSetUser(response.user, response.authToken);
       } catch (error) {
         console.error('Auto-login failed:', error);
         logout();
