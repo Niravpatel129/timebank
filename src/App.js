@@ -10,7 +10,6 @@ import Results from './screens/Results';
 import Tasks from './screens/Tasks';
 
 function App() {
-  const isOnboarding = false;
   const { currentTask, setCurrentTask } = useScreenContext();
   const { isLoggedIn } = useUserContext();
 

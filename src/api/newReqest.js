@@ -9,9 +9,14 @@ const makeRequest = async (method, url, data = null, options = {}) => {
       ...options.headers,
     };
 
+    const baseUrl =
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:8004'
+        : 'https://timebank-305bb7cb7d96.herokuapp.com';
+
     const requestOptions = {
       method,
-      url: `https://timebank-305bb7cb7d96.herokuapp.com${url}`,
+      url: `${baseUrl}${url}`,
       ...(data && { data }),
       headers,
       timeout: 10000, // 10 seconds

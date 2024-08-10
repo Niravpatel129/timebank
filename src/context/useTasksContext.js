@@ -1,198 +1,121 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import newRequest from '../api/newReqest';
 
 const TasksContext = createContext();
 
 export const useTasksContext = () => useContext(TasksContext);
 
-// Custom hook to handle localStorage
-const useLocalStorage = (key, initialValue) => {
-  const [storedValue, setStoredValue] = useState(() => {
-    try {
-      const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
-    } catch (error) {
-      console.error(error);
-      return initialValue;
-    }
-  });
-
-  const setValue = (value) => {
-    try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      setStoredValue(valueToStore);
-      localStorage.setItem(key, JSON.stringify(valueToStore));
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  return [storedValue, setValue];
-};
-
 export const TasksProvider = ({ children }) => {
-  const [tasks, setTasks] = useLocalStorage('tasks', []);
-  const [timers, setTimers] = useLocalStorage('timers', {});
+  const [tasks, setTasks] = useState([]);
+  const [timers, setTimers] = useState({});
   const [activeTaskId, setActiveTaskId] = useState(null);
-  const [totalTimeSpent, setTotalTimeSpent] = useLocalStorage('totalTimeSpent', 0);
-  const [dailyTimeSpent, setDailyTimeSpent] = useLocalStorage('dailyTimeSpent', {});
+  const [totalTimeSpent, setTotalTimeSpent] = useState(0);
+  const [dailyTimeSpent, setDailyTimeSpent] = useState({});
 
   useEffect(() => {
-    // Calculate initial totalTimeSpent when component mounts
-    const initialTotalTimeSpent = tasks.reduce((total, task) => total + (task.timeSpent || 0), 0);
-    setTotalTimeSpent(Math.floor(initialTotalTimeSpent / 1000)); // Convert milliseconds to seconds
+    // Fetch initial data from the API
+    const fetchInitialData = async () => {
+      try {
+        const response = await newRequest.get('/tasks');
+        console.log('🚀  response:', response);
+        setTasks(response.data.tasks);
+        setTimers(response.data.timers);
+        setTotalTimeSpent(response.data.totalTimeSpent);
+        setDailyTimeSpent(response.data.dailyTimeSpent);
+      } catch (error) {
+        console.error('Error fetching initial data:', error);
+      }
+    };
+    fetchInitialData();
+  }, []);
 
-    // Initialize daily time spent
-    const today = new Date().toISOString().split('T')[0];
-    if (!dailyTimeSpent[today]) {
-      setDailyTimeSpent((prev) => ({ ...prev, [today]: 0 }));
+  const addTask = useCallback(async (task) => {
+    try {
+      const newTask = { ...task, id: uuidv4(), timeSpent: 0 };
+      const response = await newRequest.post('/tasks', newTask);
+      console.log('🚀  response:', response);
+      setTasks((prevTasks) => [...prevTasks, response.data]);
+    } catch (error) {
+      console.error('Error adding task:', error);
     }
   }, []);
 
-  const addTask = useCallback(
-    (task) => {
-      const newTask = { ...task, id: uuidv4(), timeSpent: 0 };
-      setTasks((prevTasks) => [...prevTasks, newTask]);
-    },
-    [setTasks],
-  );
-
-  const pauseTask = useCallback(
-    (taskId) => {
-      const elapsedTime = Date.now() - timers[taskId].startTime;
-      const remainingTime = Math.max(0, timers[taskId].remainingTime - elapsedTime);
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === taskId
-            ? {
-                ...task,
-                status: 'paused',
-                timeSpent: (task.timeSpent || 0) + elapsedTime,
-                taskDuration: Math.max(0, remainingTime / 1000),
-              }
-            : task,
-        ),
-      );
-      setTimers((prevTimers) => ({
-        ...prevTimers,
-        [taskId]: {
-          ...prevTimers[taskId],
-          remainingTime: remainingTime,
-          startTime: null,
-        },
-      }));
+  const pauseTask = useCallback(async (taskId) => {
+    try {
+      const response = await newRequest.post(`/tasks/${taskId}/pause`);
+      setTasks(response.data.tasks);
+      setTimers(response.data.timers);
       setActiveTaskId(null);
-      const elapsedSeconds = Math.floor(elapsedTime / 1000);
-      setTotalTimeSpent((prevTotal) => prevTotal + elapsedSeconds);
-      const today = new Date().toISOString().split('T')[0];
-      setDailyTimeSpent((prev) => ({
-        ...prev,
-        [today]: (prev[today] || 0) + elapsedSeconds,
-      }));
-    },
-    [setTasks, setTimers, setTotalTimeSpent, setDailyTimeSpent],
-  );
+      setTotalTimeSpent(response.data.totalTimeSpent);
+      setDailyTimeSpent(response.data.dailyTimeSpent);
+    } catch (error) {
+      console.error('Error pausing task:', error);
+    }
+  }, []);
 
-  const updateTask = useCallback(
-    (updatedTask) => {
+  const updateTask = useCallback(async (updatedTask) => {
+    try {
+      const response = await newRequest.put(`/tasks/${updatedTask.id}`, updatedTask);
       setTasks((prevTasks) =>
-        prevTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task)),
+        prevTasks.map((task) => (task.id === updatedTask.id ? response.data : task)),
       );
-    },
-    [setTasks],
-  );
+    } catch (error) {
+      console.error('Error updating task:', error);
+    }
+  }, []);
 
-  const updateTaskStatus = useCallback(
-    (taskId, status) => {
-      setTasks((prevTasks) =>
-        prevTasks.map((task) => (task.id === taskId ? { ...task, status } : task)),
-      );
-    },
-    [setTasks],
-  );
+  const updateTaskStatus = useCallback(async (taskId, status) => {
+    try {
+      const response = await newRequest.patch(`/tasks/${taskId}/status`, { status });
+      setTasks((prevTasks) => prevTasks.map((task) => (task.id === taskId ? response.data : task)));
+    } catch (error) {
+      console.error('Error updating task status:', error);
+    }
+  }, []);
 
   const deleteTask = useCallback(
-    (taskId) => {
-      setTasks((prevTasks) => {
-        const taskToDelete = prevTasks.find((task) => task.id === taskId);
-        if (taskToDelete) {
-          const timeSpentSeconds = Math.floor((taskToDelete.timeSpent || 0) / 1000);
-          setTotalTimeSpent((prevTotal) => Math.max(0, prevTotal - timeSpentSeconds));
-          const today = new Date().toISOString().split('T')[0];
-          setDailyTimeSpent((prev) => ({
-            ...prev,
-            [today]: Math.max(0, (prev[today] || 0) - timeSpentSeconds),
-          }));
+    async (taskId) => {
+      try {
+        await newRequest.delete(`/tasks/${taskId}`);
+        setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+        setTimers((prevTimers) => {
+          const { [taskId]: deletedTimer, ...rest } = prevTimers;
+          return rest;
+        });
+        if (activeTaskId === taskId) {
+          setActiveTaskId(null);
         }
-        return prevTasks.filter((task) => task.id !== taskId);
-      });
-      setTimers((prevTimers) => {
-        const { [taskId]: deletedTimer, ...rest } = prevTimers;
-        return rest;
-      });
-      if (activeTaskId === taskId) {
-        setActiveTaskId(null);
+      } catch (error) {
+        console.error('Error deleting task:', error);
       }
     },
-    [setTasks, setTimers, activeTaskId, setTotalTimeSpent, setDailyTimeSpent],
+    [activeTaskId],
   );
 
-  const startTask = useCallback(
-    (taskId) => {
-      const task = tasks.find((t) => t.id === taskId);
-      if (!task) return;
-
-      if (activeTaskId && activeTaskId !== taskId) {
-        pauseTask(activeTaskId);
-      }
-
-      setTasks((prevTasks) =>
-        prevTasks.map((t) => (t.id === taskId ? { ...t, status: 'inProgress' } : t)),
-      );
-      setTimers((prevTimers) => ({
-        ...prevTimers,
-        [taskId]: {
-          startTime: Date.now(),
-          remainingTime: task.taskDuration * 1000, // Reset to full duration when starting
-        },
-      }));
+  const startTask = useCallback(async (taskId) => {
+    try {
+      const response = await newRequest.post(`/tasks/${taskId}/start`);
+      setTasks(response.data.tasks);
+      setTimers(response.data.timers);
       setActiveTaskId(taskId);
-    },
-    [tasks, activeTaskId, setTasks, setTimers, pauseTask],
-  );
+    } catch (error) {
+      console.error('Error starting task:', error);
+    }
+  }, []);
 
-  const finishTask = useCallback(
-    (taskId) => {
-      const elapsedTime = timers[taskId]?.startTime ? Date.now() - timers[taskId].startTime : 0;
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === taskId
-            ? {
-                ...task,
-                status: 'completed',
-                timeSpent: (task.timeSpent || 0) + elapsedTime,
-                taskDuration: 0,
-              }
-            : task,
-        ),
-      );
-      setTimers((prevTimers) => {
-        const { [taskId]: finishedTimer, ...rest } = prevTimers;
-        return rest;
-      });
-      if (activeTaskId === taskId) {
-        setActiveTaskId(null);
-      }
-      const elapsedSeconds = Math.floor(elapsedTime / 1000);
-      setTotalTimeSpent((prevTotal) => prevTotal + elapsedSeconds);
-      const today = new Date().toISOString().split('T')[0];
-      setDailyTimeSpent((prev) => ({
-        ...prev,
-        [today]: (prev[today] || 0) + elapsedSeconds,
-      }));
-    },
-    [setTasks, setTimers, activeTaskId, setTotalTimeSpent, setDailyTimeSpent],
-  );
+  const finishTask = useCallback(async (taskId) => {
+    try {
+      const response = await newRequest.post(`/tasks/${taskId}/finish`);
+      setTasks(response.data.tasks);
+      setTimers(response.data.timers);
+      setActiveTaskId(null);
+      setTotalTimeSpent(response.data.totalTimeSpent);
+      setDailyTimeSpent(response.data.dailyTimeSpent);
+    } catch (error) {
+      console.error('Error finishing task:', error);
+    }
+  }, []);
 
   const getRemainingTime = useCallback(
     (taskId) => {
@@ -205,39 +128,17 @@ export const TasksProvider = ({ children }) => {
     [timers],
   );
 
-  // New function to edit a task
-  const editTask = useCallback(
-    (editedTask) => {
+  const editTask = useCallback(async (editedTask) => {
+    try {
+      const response = await newRequest.put(`/tasks/${editedTask.id}`, editedTask);
       setTasks((prevTasks) =>
-        prevTasks.map((task) => {
-          if (task.id === editedTask.id) {
-            const timeDifference = (editedTask.timeSpent || 0) - (task.timeSpent || 0);
-            const timeDifferenceSeconds = Math.floor(timeDifference / 1000);
-            setTotalTimeSpent((prevTotal) => prevTotal + timeDifferenceSeconds);
-            const today = new Date().toISOString().split('T')[0];
-            setDailyTimeSpent((prev) => ({
-              ...prev,
-              [today]: (prev[today] || 0) + timeDifferenceSeconds,
-            }));
-            return { ...task, ...editedTask };
-          }
-          return task;
-        }),
+        prevTasks.map((task) => (task.id === editedTask.id ? response.data : task)),
       );
-    },
-    [setTasks, setTotalTimeSpent, setDailyTimeSpent],
-  );
-
-  // Load data from localStorage on mount
-  useEffect(() => {
-    const storedTasks = localStorage.getItem('tasks');
-    const storedTimers = localStorage.getItem('timers');
-    const storedTotalTimeSpent = localStorage.getItem('totalTimeSpent');
-    const storedDailyTimeSpent = localStorage.getItem('dailyTimeSpent');
-    if (storedTasks) setTasks(JSON.parse(storedTasks));
-    if (storedTimers) setTimers(JSON.parse(storedTimers));
-    if (storedTotalTimeSpent) setTotalTimeSpent(parseInt(JSON.parse(storedTotalTimeSpent), 10));
-    if (storedDailyTimeSpent) setDailyTimeSpent(JSON.parse(storedDailyTimeSpent));
+      setTotalTimeSpent(response.data.totalTimeSpent);
+      setDailyTimeSpent(response.data.dailyTimeSpent);
+    } catch (error) {
+      console.error('Error editing task:', error);
+    }
   }, []);
 
   const contextValue = {

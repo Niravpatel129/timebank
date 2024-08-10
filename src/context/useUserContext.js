@@ -49,7 +49,6 @@ export const UserProvider = ({ children }) => {
       setIsLoggedIn(true);
       localStorage.setItem('authToken', authToken);
       Cookies.set('authToken', authToken, { expires: 7 }); // Set cookie to expire in 7 days
-      toast.success('Login successful');
     } catch (error) {
       toast.error('Sorry, we are unable to login you at this time. Please try again later.');
       console.error('Error logging in:', error);
