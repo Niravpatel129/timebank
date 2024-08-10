@@ -10,38 +10,33 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [onboardingCompleted, setOnboardingCompleted] = useState(false);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const checkUserStatus = async () => {
       try {
-        const response = await new Promise((resolve) => {
-          setTimeout(() => {
-            resolve({
-              id: '1',
-              name: 'John Doe',
-              email: 'john@example.com',
-            });
-          }, 1000); // Simulating a delay
-        });
-
-        setUser(response);
+        // Simulate checking user status
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        setLoading(false);
       } catch (error) {
-        console.error('Error fetching user:', error);
-        setUser(null);
-      } finally {
+        console.error('Error checking user status:', error);
         setLoading(false);
       }
     };
 
-    fetchUser();
+    checkUserStatus();
   }, []);
 
   const updateUser = (userData) => {
     setUser(userData);
+    setIsLoggedIn(true);
+    setOnboardingCompleted(true);
   };
 
   const logout = () => {
     setUser(null);
+    setIsLoggedIn(false);
+    setOnboardingCompleted(false);
   };
 
   const value = {
@@ -51,6 +46,8 @@ export const UserProvider = ({ children }) => {
     logout,
     isLoggedIn,
     setIsLoggedIn,
+    onboardingCompleted,
+    setOnboardingCompleted,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

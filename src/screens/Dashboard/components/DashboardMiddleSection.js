@@ -41,7 +41,7 @@ const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            style={{ color: '#888', textAlign: 'center' }}
+            style={{ color: '#888', textAlign: '' }}
           >
             No tasks in this list
           </motion.div>

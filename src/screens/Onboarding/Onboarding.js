@@ -5,14 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import { useUserContext } from '../../context/useUserContext';
 
 const Onboarding = () => {
-  const { user, loading, setIsLoggedIn } = useUserContext();
+  const { updateUser, setIsLoggedIn } = useUserContext();
   const [selectedTools, setSelectedTools] = useState([]);
   const [step, setStep] = useState(1);
   const [usageType, setUsageType] = useState('');
-  const [name, setName] = useState(user ? user.name : '');
-  const [email, setEmail] = useState(user ? user.email : '');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [verificationCode, setVerificationCode] = useState(['', '', '', '']);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const codeInputRefs = [useRef(), useRef(), useRef(), useRef()];
   const navigate = useNavigate();
 
@@ -25,11 +26,22 @@ const Onboarding = () => {
     { id: 'social', name: 'Social', icon: '🎉' },
   ];
 
-  const handleVerify = () => {
-    // send all the data to the backend
-    // backend will send a verification code to the email
-    // if the code is correct, set the step to 5
-    // if the code is incorrect, show an error message
+  const handleVerify = async () => {
+    setIsVerifying(true);
+    try {
+      // Simulate sending verification request to server
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Simulate successful verification
+      updateUser({ name, email });
+      setIsLoggedIn(true);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Verification failed:', error);
+      // Handle verification error (e.g., show error message)
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   const handleToolSelect = (toolId) => {
@@ -46,24 +58,42 @@ const Onboarding = () => {
     setUsageType(type);
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setIsLoggingIn(true);
-    // Simulating email sending process
-    setTimeout(() => {
-      alert('Check your email for the login link!');
+    try {
+      // Simulate sending login request to server
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Simulate successful login
+      alert('Check your email for the verification code!');
+      setStep(4); // Move to verification step
+    } catch (error) {
+      console.error('Login failed:', error);
+      // Handle login error (e.g., show error message)
+    } finally {
       setIsLoggingIn(false);
-      setStep(5); // Move to verification step
-    }, 2000);
+    }
   };
 
   const handleVerificationCodeChange = (index, value) => {
-    if (value.length <= 1) {
-      const newVerificationCode = [...verificationCode];
+    const newVerificationCode = [...verificationCode];
+
+    if (value.length === 4) {
+      // Handle pasting of 4 digits
+      for (let i = 0; i < 4; i++) {
+        newVerificationCode[i] = value[i];
+      }
+      setVerificationCode(newVerificationCode);
+      codeInputRefs[3].current.focus();
+    } else if (value.length <= 1) {
+      // Handle single digit input and backspace
       newVerificationCode[index] = value;
       setVerificationCode(newVerificationCode);
 
       if (value.length === 1 && index < 3) {
         codeInputRefs[index + 1].current.focus();
+      } else if (value.length === 0 && index > 0) {
+        codeInputRefs[index - 1].current.focus();
       }
     }
   };
@@ -290,7 +320,7 @@ const Onboarding = () => {
           WebkitBackgroundClip: 'text',
         }}
       >
-        {user ? 'Confirm your details' : "What's your name and email?"}
+        Finally, what should we call you?
       </h1>
       <div
         style={{
@@ -366,7 +396,8 @@ const Onboarding = () => {
         Verify Your Email
       </h1>
       <p style={{ fontSize: '16px', color: '#555', marginBottom: '20px' }}>
-        We've sent a verification code to your email. Please enter it below to login:
+        We've sent a verification code to your email. Please enter it below to complete the
+        onboarding process:
       </p>
       <div
         style={{
@@ -382,7 +413,7 @@ const Onboarding = () => {
             <input
               key={index}
               type='text'
-              maxLength={1}
+              maxLength={4}
               value={digit}
               onChange={(e) => handleVerificationCodeChange(index, e.target.value)}
               ref={codeInputRefs[index]}
@@ -414,18 +445,32 @@ const Onboarding = () => {
             boxShadow: '0 10px 20px rgba(83, 57, 206, 0.2)',
             transition: 'all 0.3s ease',
           }}
-          onClick={() => {
-            // route to /login
-            setIsLoggedIn(true);
-            navigate('/dashboard');
-            // setStep(5);
-          }}
+          onClick={handleVerify}
+          disabled={isVerifying}
         >
-          Verify
+          {isVerifying ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                style={{ marginRight: '10px' }}
+              >
+                <FaSpinner />
+              </motion.div>
+              Verifying...
+            </motion.div>
+          ) : (
+            'Verify'
+          )}
         </motion.button>
       </div>
       <p style={{ marginTop: '20px', fontSize: '14px', color: '#555' }}>
-        Are you facing any problems with receiving the code?{' '}
+        Didn't receive the code?{' '}
         <span style={{ color: '#4a47ff', cursor: 'pointer' }}>Resend code</span>
       </p>
     </>
@@ -443,93 +488,64 @@ const Onboarding = () => {
           WebkitBackgroundClip: 'text',
         }}
       >
-        {user ? 'Welcome back!' : 'Login to Your Account'}
+        Login to Your Account
       </h1>
-      {user ? (
-        <p>You are already logged in as {user.email}</p>
-      ) : (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '20px',
-            maxWidth: '400px',
-            width: '100%',
-          }}
-        >
-          <input
-            type='email'
-            placeholder='Your Email'
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{
-              padding: '15px',
-              fontSize: '18px',
-              border: '2px solid #e0e0e0',
-              borderRadius: '10px',
-              outline: 'none',
-            }}
-          />
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            style={{
-              marginTop: '30px',
-              padding: '15px 40px',
-              background: 'linear-gradient(45deg, #333, #333)',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '30px',
-              cursor: 'pointer',
-              fontSize: '20px',
-              fontWeight: '600',
-              boxShadow: '0 10px 20px rgba(83, 57, 206, 0.2)',
-              transition: 'all 0.3s ease',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            onClick={handleLogin}
-            disabled={isLoggingIn}
-          >
-            {isLoggingIn ? (
-              <>
-                <FaSpinner style={{ marginRight: '10px', animation: 'spin 1s linear infinite' }} />
-                Check your email
-              </>
-            ) : (
-              'Login'
-            )}
-          </motion.button>
-        </div>
-      )}
-    </>
-  );
-
-  if (loading) {
-    return (
-      <motion.div
-        transition={{ duration: 0.5 }}
+      <div
         style={{
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100vh',
-          background: '#fff',
-          fontFamily: "'Poppins', sans-serif",
+          flexDirection: 'column',
+          gap: '20px',
+          maxWidth: '400px',
+          width: '100%',
         }}
       >
-        <motion.div
-          animate={{
-            rotate: 360,
-            transition: { duration: 2, repeat: Infinity, ease: 'linear' },
+        <input
+          type='email'
+          placeholder='Your Email'
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={{
+            padding: '15px',
+            fontSize: '18px',
+            border: '2px solid #e0e0e0',
+            borderRadius: '10px',
+            outline: 'none',
           }}
+        />
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          style={{
+            marginTop: '30px',
+            padding: '15px 40px',
+            background: 'linear-gradient(45deg, #333, #333)',
+            color: '#ffffff',
+            border: 'none',
+            borderRadius: '30px',
+            cursor: 'pointer',
+            fontSize: '20px',
+            fontWeight: '600',
+            boxShadow: '0 10px 20px rgba(83, 57, 206, 0.2)',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onClick={handleLogin}
+          disabled={isLoggingIn}
         >
-          <FaSpinner size={40} color='#333' />
-        </motion.div>
-      </motion.div>
-    );
-  }
+          {isLoggingIn ? (
+            <>
+              <FaSpinner style={{ marginRight: '10px', animation: 'spin 1s linear infinite' }} />
+              Logging in...
+            </>
+          ) : (
+            'Login'
+          )}
+        </motion.button>
+      </div>
+    </>
+  );
 
   return (
     <div
@@ -551,9 +567,7 @@ const Onboarding = () => {
         ? renderStep3()
         : step === 4
         ? renderStep4()
-        : step === 5
-        ? renderLoginStep()
-        : null}
+        : renderLoginStep()}
 
       <motion.div
         whileHover={{
