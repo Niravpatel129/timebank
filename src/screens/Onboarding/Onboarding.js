@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { FaCheck, FaSpinner } from 'react-icons/fa';
 
 const Onboarding = () => {
@@ -8,8 +8,9 @@ const Onboarding = () => {
   const [usageType, setUsageType] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [verificationCode, setVerificationCode] = useState('');
+  const [verificationCode, setVerificationCode] = useState(['', '', '', '']);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const codeInputRefs = [useRef(), useRef(), useRef(), useRef()];
 
   const categories = [
     { id: 'work', name: 'Work', icon: '💼' },
@@ -40,7 +41,20 @@ const Onboarding = () => {
     setTimeout(() => {
       alert('Check your email for the login link!');
       setIsLoggingIn(false);
+      setStep(5); // Move to verification step
     }, 2000);
+  };
+
+  const handleVerificationCodeChange = (index, value) => {
+    if (value.length <= 1) {
+      const newVerificationCode = [...verificationCode];
+      newVerificationCode[index] = value;
+      setVerificationCode(newVerificationCode);
+
+      if (value.length === 1 && index < 3) {
+        codeInputRefs[index + 1].current.focus();
+      }
+    }
   };
 
   const renderStep1 = () => (
@@ -352,26 +366,34 @@ const Onboarding = () => {
           width: '100%',
         }}
       >
-        <input
-          type='text'
-          placeholder='Verification Code'
-          value={verificationCode}
-          onChange={(e) => setVerificationCode(e.target.value)}
-          style={{
-            padding: '15px',
-            fontSize: '18px',
-            border: '2px solid #e0e0e0',
-            borderRadius: '10px',
-            outline: 'none',
-          }}
-        />
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          {verificationCode.map((digit, index) => (
+            <input
+              key={index}
+              type='text'
+              maxLength={1}
+              value={digit}
+              onChange={(e) => handleVerificationCodeChange(index, e.target.value)}
+              ref={codeInputRefs[index]}
+              style={{
+                width: '60px',
+                height: '60px',
+                fontSize: '24px',
+                textAlign: 'center',
+                border: '2px solid #e0e0e0',
+                borderRadius: '10px',
+                outline: 'none',
+              }}
+            />
+          ))}
+        </div>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           style={{
             marginTop: '30px',
             padding: '15px 40px',
-            background: 'linear-gradient(45deg, #333, #333)',
+            background: 'linear-gradient(45deg, #4a47ff, #3230a6)',
             color: '#ffffff',
             border: 'none',
             borderRadius: '30px',
@@ -386,6 +408,10 @@ const Onboarding = () => {
           Verify
         </motion.button>
       </div>
+      <p style={{ marginTop: '20px', fontSize: '14px', color: '#555' }}>
+        Are you facing any problems with receiving the code?{' '}
+        <span style={{ color: '#4a47ff', cursor: 'pointer' }}>Resend code</span>
+      </p>
     </>
   );
 
