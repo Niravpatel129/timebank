@@ -40,7 +40,7 @@ const Dashboard = () => {
   const profileDropdownRef = useRef(null);
 
   const handleEditTask = (taskId) => {
-    const task = tasks.find((t) => t.id === taskId);
+    const task = tasks.find((t) => t._id === taskId);
     setTaskToEdit(task);
     setIsEditModalOpen(true);
   };
