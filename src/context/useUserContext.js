@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import toast from 'react-hot-toast';
 import newRequest from '../api/newReqest';
 
 const UserContext = createContext();
@@ -14,28 +15,23 @@ export const UserProvider = ({ children }) => {
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   const [registerUser, setRegisterUser] = useState(false);
 
-  useEffect(() => {
-    const checkUserStatus = async () => {
-      try {
-        const response = await newRequest.get('/user/status');
-        if (response.data.isLoggedIn) {
-          setUser(response.data.user);
-          setIsLoggedIn(true);
-          setOnboardingCompleted(response.data.onboardingCompleted);
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error('Error checking user status:', error);
-        setLoading(false);
-      }
-    };
+  const handleLoginAndSetUser = async (userData) => {
+    if (!userData) return;
 
-    checkUserStatus();
-  }, []);
+    try {
+      setUser(userData);
+      setIsLoggedIn(true);
+    } catch (error) {
+      console.error('Error logging in:', error);
+    }
+  };
 
   const checkVerificationStatus = async (email) => {
     try {
-      const response = await newRequest.post('/user/is-verified', { email });
+      const response = await newRequest.get(`/user/check-verification/${email}`);
+      console.log(response.data.isVerified);
+
+      handleLoginAndSetUser(response.data.user);
       return response.data.isVerified;
     } catch (error) {
       console.error('Error checking verification status:', error);
@@ -43,19 +39,35 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+  const handleAddVerificationCode = async ({ email, code }) => {
+    try {
+      const response = await newRequest.post('/user/add-verification-code', { email, code });
+      //   login the user
+      return response.data;
+    } catch (error) {
+      console.error('Error adding verification code:', error);
+      return null;
+    }
+  };
+
   const handleRegisterUser = async (data) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await newRequest.post('/user/send-verification', data);
+        const response = await newRequest.post('/user/send-verification', {
+          name: data.userData.name,
+          email: data.userData.email,
+          onboardingData: data.onboardingData,
+        });
         setUser(response.data.user);
+        resolve(response.data);
 
         const checkInterval = setInterval(async () => {
-          const isVerified = await checkVerificationStatus(data.email);
+          const isVerified = await checkVerificationStatus(data.userData.email);
           if (isVerified) {
+            toast.success('Verification successful');
             clearInterval(checkInterval);
             setIsLoggedIn(true);
             setOnboardingCompleted(true);
-            resolve(response.data);
           }
         }, 4000);
 
@@ -103,6 +115,7 @@ export const UserProvider = ({ children }) => {
     setOnboardingCompleted,
     registerUser,
     handleRegisterUser,
+    handleAddVerificationCode,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

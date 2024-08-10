@@ -6,7 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { useUserContext } from '../../context/useUserContext';
 
 const Onboarding = () => {
-  const { updateUser, setIsLoggedIn, handleRegisterUser } = useUserContext();
+  const { updateUser, setIsLoggedIn, handleRegisterUser, handleAddVerificationCode } =
+    useUserContext();
   const [selectedTools, setSelectedTools] = useState([]);
   const [step, setStep] = useState(1);
   const [usageType, setUsageType] = useState('');
@@ -41,12 +42,13 @@ const Onboarding = () => {
         },
       });
 
-      // Simulate sending verification request to server
-      //   await new Promise((resolve) => setTimeout(resolve, 1500));
-      // Simulate successful verification
-      //   updateUser({ name, email });
-      //   setIsLoggedIn(true);
-      //   navigate('/dashboard');
+      await handleAddVerificationCode({
+        email,
+        code: verificationCode,
+      });
+
+      setIsLoggedIn(true);
+      navigate('/dashboard');
     } catch (error) {
       console.error('Verification failed:', error);
       // Handle verification error (e.g., show error message)
