@@ -1,9 +1,55 @@
+// TimerTrack.js
 import { motion } from 'framer-motion';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { CiClock1 } from 'react-icons/ci';
 import { IoSettingsOutline, IoTimerOutline } from 'react-icons/io5';
+import { useTasksContext } from '../../../context/useTasksContext';
 
 export default function TimerTrack() {
+  const { tasks, activeTaskId, getRemainingTime, pauseTask, finishTask } = useTasksContext();
+
+  const [remainingTime, setRemainingTime] = useState(0);
+  const activeTask = tasks.find((task) => task.id === activeTaskId);
+  console.log('🚀  activeTask:', activeTask);
+
+  useEffect(() => {
+    let interval;
+    if (activeTaskId) {
+      setRemainingTime(getRemainingTime(activeTaskId));
+      interval = setInterval(() => {
+        const newRemainingTime = getRemainingTime(activeTaskId);
+        setRemainingTime(newRemainingTime);
+        if (newRemainingTime <= 0) {
+          clearInterval(interval);
+          finishTask(activeTaskId);
+        }
+      }, 1000);
+    } else {
+      setRemainingTime(0);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [activeTaskId, getRemainingTime, finishTask]);
+
+  const formatTime = (ms) => {
+    const seconds = Math.floor((ms / 1000) % 60);
+    const minutes = Math.floor((ms / (1000 * 60)) % 60);
+    const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds
+      .toString()
+      .padStart(2, '0')}`;
+  };
+
+  const handleStop = () => {
+    if (activeTaskId) {
+      pauseTask(activeTaskId);
+    }
+  };
+
   return (
     <div
       style={{
@@ -32,7 +78,6 @@ export default function TimerTrack() {
           }}
         >
           <div></div>
-          {/* <IoChevronBackOutline style={{ fontSize: '20px', color: '#bebfca', cursor: 'pointer' }} /> */}
           <IoSettingsOutline style={{ fontSize: '20px', color: '#bebfca', cursor: 'pointer' }} />
         </div>
         <div
@@ -54,7 +99,7 @@ export default function TimerTrack() {
             <span>
               <IoTimerOutline style={{ fontSize: '16px', color: '#3a23c4', marginRight: '7px' }} />
             </span>
-            <span>Timer Running</span>
+            <span>{activeTask ? 'Timer Running' : 'No Active Task'}</span>
           </h2>
           <div
             style={{
@@ -65,7 +110,7 @@ export default function TimerTrack() {
               padding: '0px',
             }}
           >
-            00:36
+            {formatTime(remainingTime)}
           </div>
           <p
             style={{
@@ -76,12 +121,13 @@ export default function TimerTrack() {
               fontWeight: 200,
             }}
           >
-            Tracking time today: 3:45
+            {activeTask ? `Task: ${activeTask.name}` : 'Start a task to begin tracking'}
           </p>
           <div>
             <motion.div
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
+              onClick={handleStop}
               style={{
                 width: '70px',
                 height: '70px',
@@ -116,60 +162,65 @@ export default function TimerTrack() {
           }}
         />
         <div style={{ paddingRight: '20px', paddingLeft: '20px', height: '100%' }}>
-          {/* line top */}
-
-          {/* Details */}
-          <div style={{}}>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: '100%',
-                marginBottom: '20px',
-              }}
-            >
+          {activeTask && (
+            <div style={{}}>
               <div
                 style={{
                   display: 'flex',
-                  justifyContent: 'space-between',
-                  gap: '10px',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                  marginBottom: '20px',
                 }}
               >
-                <div style={{ color: '#8f8f9d', fontSize: '14px', fontWeight: 400 }}>Job Type</div>
-                <div style={{ color: '#000000', fontSize: '15px', fontWeight: 500 }}>
-                  Developing
+                {activeTask.category && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      gap: '10px',
+                    }}
+                  >
+                    <div style={{ color: '#8f8f9d', fontSize: '14px', fontWeight: 400 }}>
+                      Category
+                    </div>
+                    <div style={{ color: '#000000', fontSize: '15px', fontWeight: 500 }}>
+                      {activeTask.category}
+                    </div>
+                  </div>
+                )}
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginTop: '20px',
+                    gap: '10px',
+                  }}
+                >
+                  <div style={{ color: '#8f8f9d', fontSize: '14px', fontWeight: 400 }}>Project</div>
+                  <div style={{ color: '#000000', fontSize: '15px', fontWeight: 500 }}>
+                    {activeTask.projectName || 'N/A'}
+                  </div>
                 </div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginTop: '20px',
-                  gap: '10px',
-                }}
-              >
-                <div style={{ color: '#8f8f9d', fontSize: '14px', fontWeight: 400 }}>Project</div>
-                <div style={{ color: '#000000', fontSize: '15px', fontWeight: 500 }}>
-                  Design system
-                </div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginTop: '20px',
-                  gap: '10px',
-                }}
-              >
-                <div style={{ color: '#8f8f9d', fontSize: '14px', fontWeight: 400 }}>Task</div>
-                <div style={{ color: '#000000', fontSize: '15px', fontWeight: 500 }}>
-                  Configure Vue Boilerplate
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginTop: '20px',
+                    gap: '10px',
+                  }}
+                >
+                  <div style={{ color: '#8f8f9d', fontSize: '14px', fontWeight: 400 }}>
+                    Duration
+                  </div>
+                  <div style={{ color: '#000000', fontSize: '15px', fontWeight: 500 }}>
+                    {Math.floor(activeTask.taskDuration / 60)} minutes
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
       {/* Bottom */}
