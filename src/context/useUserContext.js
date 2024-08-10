@@ -103,7 +103,6 @@ export const UserProvider = ({ children }) => {
   const value = {
     user,
     loading,
-    updateUser,
     logout,
     isLoggedIn,
     setIsLoggedIn,
