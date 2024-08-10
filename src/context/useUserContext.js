@@ -22,6 +22,7 @@ export const UserProvider = ({ children }) => {
       setUser(userData);
       setIsLoggedIn(true);
     } catch (error) {
+      toast.error('Sorry, we are unable to login you at this time. Please try again later.');
       console.error('Error logging in:', error);
     }
   };
@@ -34,6 +35,7 @@ export const UserProvider = ({ children }) => {
       handleLoginAndSetUser(response.data.user);
       return response.data.isVerified;
     } catch (error) {
+      toast.error('Error checking verification status');
       console.error('Error checking verification status:', error);
       return false;
     }
