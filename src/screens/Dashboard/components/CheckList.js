@@ -46,6 +46,10 @@ const Checklist = ({
   const isDisabled = activeTaskId !== null && activeTaskId !== id;
 
   useEffect(() => {
+    setRemainingTime(taskDuration * 1000);
+  }, [taskDuration]);
+
+  useEffect(() => {
     let intervalId;
     if (status === 'inProgress') {
       intervalId = setInterval(() => {

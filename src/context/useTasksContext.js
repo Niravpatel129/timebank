@@ -43,6 +43,35 @@ export const TasksProvider = ({ children }) => {
     [setTasks],
   );
 
+  const pauseTask = useCallback(
+    (taskId) => {
+      const elapsedTime = Date.now() - timers[taskId].startTime;
+      const remainingTime = Math.max(0, timers[taskId].remainingTime - elapsedTime);
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === taskId
+            ? {
+                ...task,
+                status: 'paused',
+                timeSpent: (task.timeSpent || 0) + elapsedTime,
+                taskDuration: Math.max(0, remainingTime / 1000),
+              }
+            : task,
+        ),
+      );
+      setTimers((prevTimers) => ({
+        ...prevTimers,
+        [taskId]: {
+          ...prevTimers[taskId],
+          remainingTime: remainingTime,
+          startTime: null,
+        },
+      }));
+      setActiveTaskId(null);
+    },
+    [setTasks, setTimers],
+  );
+
   const updateTask = useCallback(
     (updatedTask) => {
       setTasks((prevTasks) =>
@@ -82,40 +111,12 @@ export const TasksProvider = ({ children }) => {
         ...prevTimers,
         [taskId]: {
           startTime: Date.now(),
-          remainingTime: prevTimers[taskId]?.remainingTime || task.taskDuration * 1000,
+          remainingTime: task.taskDuration * 1000, // Reset to full duration when starting
         },
       }));
       setActiveTaskId(taskId);
     },
-    [tasks, activeTaskId, setTasks, setTimers],
-  );
-
-  const pauseTask = useCallback(
-    (taskId) => {
-      const elapsedTime = Date.now() - timers[taskId].startTime;
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === taskId
-            ? {
-                ...task,
-                status: 'paused',
-                timeSpent: (task.timeSpent || 0) + elapsedTime,
-                taskDuration: Math.max(0, task.taskDuration - elapsedTime / 1000),
-              }
-            : task,
-        ),
-      );
-      setTimers((prevTimers) => ({
-        ...prevTimers,
-        [taskId]: {
-          ...prevTimers[taskId],
-          remainingTime: getRemainingTime(taskId),
-          startTime: null,
-        },
-      }));
-      setActiveTaskId(null);
-    },
-    [setTasks, setTimers],
+    [tasks, activeTaskId, setTasks, setTimers, pauseTask],
   );
 
   const finishTask = useCallback(

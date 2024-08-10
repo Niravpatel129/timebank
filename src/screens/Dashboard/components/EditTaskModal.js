@@ -14,28 +14,38 @@ export default function EditTaskModal({ onClose, task, onSave }) {
   const [assignee, setAssignee] = useState(task.assignee || null);
   const modalRef = useRef(null);
 
-  useEffect(() => {
-    if (task.duration === 'custom') {
-      setShowCustomDuration(true);
-      const [hours, minutes] = task.customDuration.split(':').map(Number);
-      setCustomHours(hours);
-      setCustomMinutes(minutes);
-    }
-  }, [task]);
+  //   useEffect(() => {
+  //     if (task.duration === 'custom') {
+  //       setShowCustomDuration(true);
+  //       const [hours, minutes] = task.customDuration?.split(':').map(Number);
+  //       setCustomHours(hours);
+  //       setCustomMinutes(minutes);
+  //     }
+  //   }, [task]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    let taskDuration;
+    if (duration === 'custom') {
+      taskDuration = customHours * 3600 + customMinutes * 60;
+    } else {
+      const match = duration.match(/(\d+)([mh])/);
+      if (match) {
+        const [, value, unit] = match;
+        taskDuration = unit === 'h' ? parseInt(value) * 3600 : parseInt(value) * 60;
+      }
+    }
     const updatedTask = {
       ...task,
       name: taskName,
       duration: duration,
+      taskDuration: taskDuration,
+      timeSpent: 0,
       category: category,
       date: date,
       assignee: assignee,
     };
-    if (duration === 'custom') {
-      updatedTask.customDuration = `${customHours}:${customMinutes}`;
-    }
+
     onSave(updatedTask);
   };
 
