@@ -5,6 +5,7 @@ import 'react-tooltip/dist/react-tooltip.css';
 import App from './App';
 import { ScreenProvider } from './context/useScreenContext';
 import { TasksProvider } from './context/useTasksContext';
+import { UserProvider } from './context/useUserContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -12,7 +13,9 @@ root.render(
     <Router>
       <ScreenProvider>
         <TasksProvider>
-          <App />
+          <UserProvider>
+            <App />
+          </UserProvider>
         </TasksProvider>
       </ScreenProvider>
     </Router>

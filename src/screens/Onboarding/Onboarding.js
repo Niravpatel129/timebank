@@ -1,16 +1,20 @@
 import { motion } from 'framer-motion';
 import React, { useRef, useState } from 'react';
 import { FaCheck, FaSpinner } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { useUserContext } from '../../context/useUserContext';
 
 const Onboarding = () => {
+  const { user, loading, setIsLoggedIn } = useUserContext();
   const [selectedTools, setSelectedTools] = useState([]);
   const [step, setStep] = useState(1);
   const [usageType, setUsageType] = useState('');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState(user ? user.name : '');
+  const [email, setEmail] = useState(user ? user.email : '');
   const [verificationCode, setVerificationCode] = useState(['', '', '', '']);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const codeInputRefs = [useRef(), useRef(), useRef(), useRef()];
+  const navigate = useNavigate();
 
   const categories = [
     { id: 'work', name: 'Work', icon: '💼' },
@@ -286,7 +290,7 @@ const Onboarding = () => {
           WebkitBackgroundClip: 'text',
         }}
       >
-        What's your name and email?
+        {user ? 'Confirm your details' : "What's your name and email?"}
       </h1>
       <div
         style={{
@@ -410,7 +414,12 @@ const Onboarding = () => {
             boxShadow: '0 10px 20px rgba(83, 57, 206, 0.2)',
             transition: 'all 0.3s ease',
           }}
-          onClick={handleContinue}
+          onClick={() => {
+            // route to /login
+            setIsLoggedIn(true);
+            navigate('/dashboard');
+            // setStep(5);
+          }}
         >
           Verify
         </motion.button>
@@ -434,64 +443,93 @@ const Onboarding = () => {
           WebkitBackgroundClip: 'text',
         }}
       >
-        Login to Your Account
+        {user ? 'Welcome back!' : 'Login to Your Account'}
       </h1>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px',
-          maxWidth: '400px',
-          width: '100%',
-        }}
-      >
-        <input
-          type='email'
-          placeholder='Your Email'
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+      {user ? (
+        <p>You are already logged in as {user.email}</p>
+      ) : (
+        <div
           style={{
-            padding: '15px',
-            fontSize: '18px',
-            border: '2px solid #e0e0e0',
-            borderRadius: '10px',
-            outline: 'none',
-          }}
-        />
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          style={{
-            marginTop: '30px',
-            padding: '15px 40px',
-            background: 'linear-gradient(45deg, #333, #333)',
-            color: '#ffffff',
-            border: 'none',
-            borderRadius: '30px',
-            cursor: 'pointer',
-            fontSize: '20px',
-            fontWeight: '600',
-            boxShadow: '0 10px 20px rgba(83, 57, 206, 0.2)',
-            transition: 'all 0.3s ease',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            flexDirection: 'column',
+            gap: '20px',
+            maxWidth: '400px',
+            width: '100%',
           }}
-          onClick={handleLogin}
-          disabled={isLoggingIn}
         >
-          {isLoggingIn ? (
-            <>
-              <FaSpinner style={{ marginRight: '10px', animation: 'spin 1s linear infinite' }} />
-              Check your email
-            </>
-          ) : (
-            'Login'
-          )}
-        </motion.button>
-      </div>
+          <input
+            type='email'
+            placeholder='Your Email'
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{
+              padding: '15px',
+              fontSize: '18px',
+              border: '2px solid #e0e0e0',
+              borderRadius: '10px',
+              outline: 'none',
+            }}
+          />
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            style={{
+              marginTop: '30px',
+              padding: '15px 40px',
+              background: 'linear-gradient(45deg, #333, #333)',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '30px',
+              cursor: 'pointer',
+              fontSize: '20px',
+              fontWeight: '600',
+              boxShadow: '0 10px 20px rgba(83, 57, 206, 0.2)',
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            onClick={handleLogin}
+            disabled={isLoggingIn}
+          >
+            {isLoggingIn ? (
+              <>
+                <FaSpinner style={{ marginRight: '10px', animation: 'spin 1s linear infinite' }} />
+                Check your email
+              </>
+            ) : (
+              'Login'
+            )}
+          </motion.button>
+        </div>
+      )}
     </>
   );
+
+  if (loading) {
+    return (
+      <motion.div
+        transition={{ duration: 0.5 }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+          background: '#fff',
+          fontFamily: "'Poppins', sans-serif",
+        }}
+      >
+        <motion.div
+          animate={{
+            rotate: 360,
+            transition: { duration: 2, repeat: Infinity, ease: 'linear' },
+          }}
+        >
+          <FaSpinner size={40} color='#333' />
+        </motion.div>
+      </motion.div>
+    );
+  }
 
   return (
     <div

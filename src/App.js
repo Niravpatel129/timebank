@@ -2,6 +2,7 @@ import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
 import { useScreenContext } from './context/useScreenContext';
+import { useUserContext } from './context/useUserContext.js';
 import Dashboard from './screens/Dashboard/Dashboard.js';
 import Home from './screens/Home';
 import Onboarding from './screens/Onboarding/Onboarding.js';
@@ -9,9 +10,9 @@ import Results from './screens/Results';
 import Tasks from './screens/Tasks';
 
 function App() {
-  const isLoggedIn = false;
   const isOnboarding = false;
   const { currentTask, setCurrentTask } = useScreenContext();
+  const { isLoggedIn } = useUserContext();
 
   return (
     <div
