@@ -29,8 +29,8 @@ export const UserProvider = ({ children }) => {
   const checkVerificationStatus = async (email) => {
     try {
       const response = await newRequest.get(`/user/check-verification/${email}`);
-      console.log(response.data.isVerified);
 
+      //   login the user
       handleLoginAndSetUser(response.data.user);
       return response.data.isVerified;
     } catch (error) {
@@ -42,7 +42,11 @@ export const UserProvider = ({ children }) => {
   const handleAddVerificationCode = async ({ email, code }) => {
     try {
       const response = await newRequest.post('/user/add-verification-code', { email, code });
-      //   login the user
+      if (response.data.user) {
+        // login the user
+        handleLoginAndSetUser(response.data.user);
+      }
+
       return response.data;
     } catch (error) {
       console.error('Error adding verification code:', error);
@@ -51,6 +55,7 @@ export const UserProvider = ({ children }) => {
   };
 
   const handleRegisterUser = async (data) => {
+    // step 1: send verification code
     return new Promise(async (resolve, reject) => {
       try {
         const response = await newRequest.post('/user/send-verification', {
@@ -80,17 +85,6 @@ export const UserProvider = ({ children }) => {
         reject(error);
       }
     });
-  };
-
-  const updateUser = async (userData) => {
-    try {
-      const response = await newRequest.put('/user/update', userData);
-      setUser(response.data.user);
-      setIsLoggedIn(true);
-      setOnboardingCompleted(true);
-    } catch (error) {
-      console.error('Error updating user:', error);
-    }
   };
 
   const logout = async () => {

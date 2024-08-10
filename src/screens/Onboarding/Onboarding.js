@@ -16,6 +16,7 @@ const Onboarding = () => {
   const [verificationCode, setVerificationCode] = useState(['', '', '', '']);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
   const codeInputRefs = [useRef(), useRef(), useRef(), useRef()];
   const navigate = useNavigate();
 
@@ -29,6 +30,7 @@ const Onboarding = () => {
   ];
 
   const handleVerify = async () => {
+    if (isVerifying) return;
     setIsVerifying(true);
     try {
       handleRegisterUser({
@@ -46,9 +48,6 @@ const Onboarding = () => {
         email,
         code: verificationCode,
       });
-
-      setIsLoggedIn(true);
-      navigate('/dashboard');
     } catch (error) {
       console.error('Verification failed:', error);
       // Handle verification error (e.g., show error message)
@@ -58,6 +57,8 @@ const Onboarding = () => {
   };
 
   const handleRegister = async () => {
+    if (isRegistering) return;
+    setIsRegistering(true);
     try {
       await handleRegisterUser({
         onboardingData: {
@@ -74,6 +75,8 @@ const Onboarding = () => {
     } catch (error) {
       console.error('Error registering user:', error);
       toast.error('Error registering user:', error);
+    } finally {
+      setIsRegistering(false);
     }
   };
 
@@ -92,6 +95,7 @@ const Onboarding = () => {
   };
 
   const handleLogin = async () => {
+    if (isLoggingIn) return;
     setIsLoggingIn(true);
     try {
       // Simulate sending login request to server
@@ -406,11 +410,28 @@ const Onboarding = () => {
             boxShadow: '0 10px 20px rgba(83, 57, 206, 0.2)',
             transition: 'all 0.3s ease',
           }}
-          onClick={() => {
-            handleRegister();
-          }}
+          onClick={handleRegister}
+          disabled={isRegistering}
         >
-          Continue
+          {isRegistering ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                style={{ marginRight: '10px' }}
+              >
+                <FaSpinner />
+              </motion.div>
+              Registering...
+            </motion.div>
+          ) : (
+            'Continue'
+          )}
         </motion.button>
       </div>
     </>
