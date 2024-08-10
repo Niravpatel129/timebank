@@ -35,11 +35,18 @@ export const TasksProvider = ({ children }) => {
   const [timers, setTimers] = useLocalStorage('timers', {});
   const [activeTaskId, setActiveTaskId] = useState(null);
   const [totalTimeSpent, setTotalTimeSpent] = useLocalStorage('totalTimeSpent', 0);
+  const [dailyTimeSpent, setDailyTimeSpent] = useLocalStorage('dailyTimeSpent', {});
 
   useEffect(() => {
     // Calculate initial totalTimeSpent when component mounts
     const initialTotalTimeSpent = tasks.reduce((total, task) => total + (task.timeSpent || 0), 0);
     setTotalTimeSpent(Math.floor(initialTotalTimeSpent / 1000)); // Convert milliseconds to seconds
+
+    // Initialize daily time spent
+    const today = new Date().toISOString().split('T')[0];
+    if (!dailyTimeSpent[today]) {
+      setDailyTimeSpent((prev) => ({ ...prev, [today]: 0 }));
+    }
   }, []);
 
   const addTask = useCallback(
@@ -75,9 +82,15 @@ export const TasksProvider = ({ children }) => {
         },
       }));
       setActiveTaskId(null);
-      setTotalTimeSpent((prevTotal) => Math.floor((prevTotal * 1000 + elapsedTime) / 1000)); // Convert to seconds
+      const elapsedSeconds = Math.floor(elapsedTime / 1000);
+      setTotalTimeSpent((prevTotal) => prevTotal + elapsedSeconds);
+      const today = new Date().toISOString().split('T')[0];
+      setDailyTimeSpent((prev) => ({
+        ...prev,
+        [today]: (prev[today] || 0) + elapsedSeconds,
+      }));
     },
-    [setTasks, setTimers, setTotalTimeSpent],
+    [setTasks, setTimers, setTotalTimeSpent, setDailyTimeSpent],
   );
 
   const updateTask = useCallback(
@@ -94,9 +107,13 @@ export const TasksProvider = ({ children }) => {
       setTasks((prevTasks) => {
         const taskToDelete = prevTasks.find((task) => task.id === taskId);
         if (taskToDelete) {
-          setTotalTimeSpent((prevTotal) =>
-            Math.max(0, prevTotal - Math.floor((taskToDelete.timeSpent || 0) / 1000)),
-          ); // Convert to seconds
+          const timeSpentSeconds = Math.floor((taskToDelete.timeSpent || 0) / 1000);
+          setTotalTimeSpent((prevTotal) => Math.max(0, prevTotal - timeSpentSeconds));
+          const today = new Date().toISOString().split('T')[0];
+          setDailyTimeSpent((prev) => ({
+            ...prev,
+            [today]: Math.max(0, (prev[today] || 0) - timeSpentSeconds),
+          }));
         }
         return prevTasks.filter((task) => task.id !== taskId);
       });
@@ -108,7 +125,7 @@ export const TasksProvider = ({ children }) => {
         setActiveTaskId(null);
       }
     },
-    [setTasks, setTimers, activeTaskId, setTotalTimeSpent],
+    [setTasks, setTimers, activeTaskId, setTotalTimeSpent, setDailyTimeSpent],
   );
 
   const startTask = useCallback(
@@ -157,9 +174,15 @@ export const TasksProvider = ({ children }) => {
       if (activeTaskId === taskId) {
         setActiveTaskId(null);
       }
-      setTotalTimeSpent((prevTotal) => Math.floor((prevTotal * 1000 + elapsedTime) / 1000)); // Convert to seconds
+      const elapsedSeconds = Math.floor(elapsedTime / 1000);
+      setTotalTimeSpent((prevTotal) => prevTotal + elapsedSeconds);
+      const today = new Date().toISOString().split('T')[0];
+      setDailyTimeSpent((prev) => ({
+        ...prev,
+        [today]: (prev[today] || 0) + elapsedSeconds,
+      }));
     },
-    [setTasks, setTimers, activeTaskId, setTotalTimeSpent],
+    [setTasks, setTimers, activeTaskId, setTotalTimeSpent, setDailyTimeSpent],
   );
 
   const getRemainingTime = useCallback(
@@ -180,16 +203,20 @@ export const TasksProvider = ({ children }) => {
         prevTasks.map((task) => {
           if (task.id === editedTask.id) {
             const timeDifference = (editedTask.timeSpent || 0) - (task.timeSpent || 0);
-            setTotalTimeSpent((prevTotal) =>
-              Math.floor((prevTotal * 1000 + timeDifference) / 1000),
-            ); // Convert to seconds
+            const timeDifferenceSeconds = Math.floor(timeDifference / 1000);
+            setTotalTimeSpent((prevTotal) => prevTotal + timeDifferenceSeconds);
+            const today = new Date().toISOString().split('T')[0];
+            setDailyTimeSpent((prev) => ({
+              ...prev,
+              [today]: (prev[today] || 0) + timeDifferenceSeconds,
+            }));
             return { ...task, ...editedTask };
           }
           return task;
         }),
       );
     },
-    [setTasks, setTotalTimeSpent],
+    [setTasks, setTotalTimeSpent, setDailyTimeSpent],
   );
 
   // Load data from localStorage on mount
@@ -197,9 +224,11 @@ export const TasksProvider = ({ children }) => {
     const storedTasks = localStorage.getItem('tasks');
     const storedTimers = localStorage.getItem('timers');
     const storedTotalTimeSpent = localStorage.getItem('totalTimeSpent');
+    const storedDailyTimeSpent = localStorage.getItem('dailyTimeSpent');
     if (storedTasks) setTasks(JSON.parse(storedTasks));
     if (storedTimers) setTimers(JSON.parse(storedTimers));
     if (storedTotalTimeSpent) setTotalTimeSpent(parseInt(JSON.parse(storedTotalTimeSpent), 10));
+    if (storedDailyTimeSpent) setDailyTimeSpent(JSON.parse(storedDailyTimeSpent));
   }, []);
 
   const contextValue = {
@@ -214,6 +243,7 @@ export const TasksProvider = ({ children }) => {
     activeTaskId,
     editTask,
     totalTimeSpent,
+    dailyTimeSpent,
   };
 
   return <TasksContext.Provider value={contextValue}>{children}</TasksContext.Provider>;
