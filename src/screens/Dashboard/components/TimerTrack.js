@@ -10,7 +10,6 @@ export default function TimerTrack() {
 
   const [remainingTime, setRemainingTime] = useState(0);
   const activeTask = tasks.find((task) => task.id === activeTaskId);
-  console.log('🚀  activeTask:', activeTask);
 
   useEffect(() => {
     let interval;

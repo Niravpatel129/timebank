@@ -35,8 +35,10 @@ const Checklist = ({
   listType,
   onEditTask,
 }) => {
+  console.log('🚀  status:', status);
   const [isHovered, setIsHovered] = useState(false);
-  const { startTask, pauseTask, finishTask, getRemainingTime, activeTaskId } = useTasksContext();
+  const { startTask, pauseTask, finishTask, getRemainingTime, activeTaskId, updateTaskStatus } =
+    useTasksContext();
   const [remainingTime, setRemainingTime] = useState(taskDuration * 1000);
   const [isAssigneeSelectOpen, setIsAssigneeSelectOpen] = useState(false);
   const assigneeSelectRef = useRef(null);
@@ -75,6 +77,11 @@ const Checklist = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  const handleCheckboxChange = (e) => {
+    e.stopPropagation();
+    updateTaskStatus(id, 'completed');
+  };
 
   const handlePlay = (e) => {
     e.stopPropagation();
@@ -164,6 +171,8 @@ const Checklist = ({
         </div>
         <input
           type='checkbox'
+          checked={status === 'completed'}
+          onChange={() => updateTaskStatus(id, 'completed')}
           style={{
             marginRight: '10px',
             width: '20px',

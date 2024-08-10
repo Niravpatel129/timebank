@@ -102,6 +102,15 @@ export const TasksProvider = ({ children }) => {
     [setTasks],
   );
 
+  const updateTaskStatus = useCallback(
+    (taskId, status) => {
+      setTasks((prevTasks) =>
+        prevTasks.map((task) => (task.id === taskId ? { ...task, status } : task)),
+      );
+    },
+    [setTasks],
+  );
+
   const deleteTask = useCallback(
     (taskId) => {
       setTasks((prevTasks) => {
@@ -244,6 +253,7 @@ export const TasksProvider = ({ children }) => {
     editTask,
     totalTimeSpent,
     dailyTimeSpent,
+    updateTaskStatus,
   };
 
   return <TasksContext.Provider value={contextValue}>{children}</TasksContext.Provider>;
