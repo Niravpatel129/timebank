@@ -10,7 +10,7 @@ import { commonStyles } from './sharedStyles/commonStyles';
 
 const fakeProfiles = ['User1', 'User2', 'User3'];
 
-const TaskList = ({ tasks, listType, moveTask }) => {
+const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
   return (
     <motion.div style={{ minHeight: '50px', padding: '10px 0' }}>
       <AnimatePresence>
@@ -18,6 +18,7 @@ const TaskList = ({ tasks, listType, moveTask }) => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {tasks.map((task) => (
               <Checklist
+                onEditTask={onEditTask}
                 key={task.id}
                 id={task.id}
                 title={task.name}
@@ -49,7 +50,7 @@ const TaskList = ({ tasks, listType, moveTask }) => {
   );
 };
 
-export default function DashboardComponent({ handleTriggerAddTaskButton }) {
+export default function DashboardComponent({ handleTriggerAddTaskButton, onEditTask }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [filterType, setFilterType] = useState('all'); // 'all' or 'my'
@@ -413,14 +414,24 @@ export default function DashboardComponent({ handleTriggerAddTaskButton }) {
             </div>
           </motion.div>
         </div>
-        <TaskList tasks={currentWeekTasks} listType='currentWeek' moveTask={moveTask} />
+        <TaskList
+          tasks={currentWeekTasks}
+          listType='currentWeek'
+          moveTask={moveTask}
+          onEditTask={onEditTask}
+        />
 
         <h2 style={{ color: commonStyles.primaryColor, marginTop: '30px', marginBottom: '20px' }}>
           Things to do
         </h2>
 
         {/* items */}
-        <TaskList tasks={thingsToDoTasks} listType='thingsToDo' moveTask={moveTask} />
+        <TaskList
+          tasks={thingsToDoTasks}
+          listType='thingsToDo'
+          moveTask={moveTask}
+          onEditTask={onEditTask}
+        />
       </div>
       {fakeProfiles.map((profile, index) => (
         <Tooltip key={`${profile}-${index}`} id={`day-${index}`} />

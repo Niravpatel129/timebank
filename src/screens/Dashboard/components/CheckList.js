@@ -33,6 +33,7 @@ const Checklist = ({
   tagBackgroundColor,
   moveTask,
   listType,
+  onEditTask,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { startTask, pauseTask, finishTask, getRemainingTime, activeTaskId } = useTasksContext();
@@ -40,6 +41,7 @@ const Checklist = ({
   const [isAssigneeSelectOpen, setIsAssigneeSelectOpen] = useState(false);
   const assigneeSelectRef = useRef(null);
   const [isPlayButtonHovered, setIsPlayButtonHovered] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const isDisabled = activeTaskId !== null && activeTaskId !== id;
 
@@ -70,7 +72,8 @@ const Checklist = ({
     };
   }, []);
 
-  const handlePlay = () => {
+  const handlePlay = (e) => {
+    e.stopPropagation();
     if (status === 'inProgress') {
       pauseTask(id);
     } else {
@@ -109,6 +112,13 @@ const Checklist = ({
     },
   ];
 
+  const handleTaskClick = (e) => {
+    // Only trigger onEditTask if the click is on the main task area and not dragging
+    if ((e.target === e.currentTarget || e.target.tagName === 'SPAN') && !isDragging) {
+      onEditTask(id);
+    }
+  };
+
   return (
     <motion.div
       layout
@@ -127,11 +137,14 @@ const Checklist = ({
       drag
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       dragElastic={1}
+      onDragStart={() => setIsDragging(true)}
       onDragEnd={(_, info) => {
+        setIsDragging(false);
         if (Math.abs(info.offset.y) > 50) {
           moveTask(id, listType, listType === 'currentWeek' ? 'thingsToDo' : 'currentWeek');
         }
       }}
+      onClick={handleTaskClick}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', position: 'relative' }}>
         <div
@@ -160,6 +173,7 @@ const Checklist = ({
               borderColor: '#341dc0',
             },
           }}
+          onClick={(e) => e.stopPropagation()}
         />
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <span
@@ -168,10 +182,12 @@ const Checklist = ({
               fontSize: '16px',
               fontWeight: '500',
               color: '#333',
+              cursor: 'pointer',
             }}
           >
             {title}
           </span>
+          {taskDuration}
           {tag && (
             <Tag
               backgroundColor={tagBackgroundColor || commonStyles.primaryColor}
@@ -247,7 +263,10 @@ const Checklist = ({
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => setIsAssigneeSelectOpen(!isAssigneeSelectOpen)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsAssigneeSelectOpen(!isAssigneeSelectOpen);
+            }}
             style={{
               width: '30px',
               height: '30px',
@@ -300,7 +319,8 @@ const Checklist = ({
                     padding: '12px',
                     cursor: 'pointer',
                   }}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     // Handle assignee selection here
                     setIsAssigneeSelectOpen(false);
                   }}

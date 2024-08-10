@@ -16,14 +16,33 @@ import './Dashboard.css';
 import Bubble from './components/Bubble';
 import DashboardAddTaskModal from './components/DashboardAddTaskModal';
 import DashboardMiddleSection from './components/DashboardMiddleSection';
+import EditTaskModal from './components/EditTaskModal';
 import TimerTrack from './components/TimerTrack';
 const { ipcRenderer } = window.require('electron');
 
 const Dashboard = () => {
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
-  const { startTask } = useTasksContext();
+  const { tasks, editTask } = useTasksContext();
   const [data, setData] = useState(null);
   const navigate = useNavigate();
+  const [taskToEdit, setTaskToEdit] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const handleEditTask = (taskId) => {
+    const task = tasks.find((t) => t.id === taskId);
+    setTaskToEdit(task);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setTaskToEdit(null);
+  };
+
+  const handleSaveEditedTask = (editedTask) => {
+    editTask(editedTask);
+    handleCloseEditModal();
+  };
 
   useEffect(() => {
     ipcRenderer.send('get-dashboard-data');
@@ -122,7 +141,10 @@ const Dashboard = () => {
         {/* Left part of main content - flexible width */}
         <div style={{ flex: 1, height: '100%' }}>
           {/* Content for main area */}
-          <DashboardMiddleSection handleTriggerAddTaskButton={() => setAddTaskModalOpen(true)} />
+          <DashboardMiddleSection
+            handleTriggerAddTaskButton={() => setAddTaskModalOpen(true)}
+            onEditTask={handleEditTask}
+          />
         </div>
 
         {/* Right part of main content - 300px wide, full height */}
@@ -136,6 +158,13 @@ const Dashboard = () => {
         <DashboardAddTaskModal
           onClose={() => setAddTaskModalOpen(false)}
           onAddTask={handleAddTask}
+        />
+      )}
+      {isEditModalOpen && taskToEdit && (
+        <EditTaskModal
+          task={taskToEdit}
+          onClose={handleCloseEditModal}
+          onSave={handleSaveEditedTask}
         />
       )}
     </div>

@@ -135,6 +135,16 @@ export const TasksProvider = ({ children }) => {
     [timers],
   );
 
+  // New function to edit a task
+  const editTask = useCallback(
+    (editedTask) => {
+      setTasks((prevTasks) =>
+        prevTasks.map((task) => (task.id === editedTask.id ? { ...task, ...editedTask } : task)),
+      );
+    },
+    [setTasks],
+  );
+
   // Load data from localStorage on mount
   useEffect(() => {
     const storedTasks = localStorage.getItem('tasks');
@@ -153,6 +163,7 @@ export const TasksProvider = ({ children }) => {
     finishTask,
     getRemainingTime,
     activeTaskId,
+    editTask, // Add the new editTask function to the context
   };
 
   return <TasksContext.Provider value={contextValue}>{children}</TasksContext.Provider>;
