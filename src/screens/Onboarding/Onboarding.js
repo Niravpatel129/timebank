@@ -6,6 +6,9 @@ const Onboarding = () => {
   const [selectedTools, setSelectedTools] = useState([]);
   const [step, setStep] = useState(1);
   const [usageType, setUsageType] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
 
   const categories = [
     { id: 'work', name: 'Work', icon: '💼' },
@@ -23,7 +26,7 @@ const Onboarding = () => {
   };
 
   const handleContinue = () => {
-    setStep(2);
+    setStep((prevStep) => prevStep + 1);
   };
 
   const handleUsageTypeSelect = (type) => {
@@ -217,6 +220,162 @@ const Onboarding = () => {
           </motion.div>
         ))}
       </div>
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        style={{
+          marginTop: '50px',
+          padding: '15px 40px',
+          background: 'linear-gradient(45deg, #333, #333)',
+          color: '#ffffff',
+          border: 'none',
+          borderRadius: '30px',
+          cursor: 'pointer',
+          fontSize: '20px',
+          fontWeight: '600',
+          boxShadow: '0 10px 20px rgba(83, 57, 206, 0.2)',
+          transition: 'all 0.3s ease',
+        }}
+        onClick={handleContinue}
+      >
+        Continue
+      </motion.button>
+    </>
+  );
+
+  const renderStep3 = () => (
+    <>
+      <h1
+        style={{
+          marginBottom: '20px',
+          color: '#333',
+          fontSize: '2.5rem',
+          fontWeight: '700',
+          background: '#fff',
+          WebkitBackgroundClip: 'text',
+        }}
+      >
+        What's your name and email?
+      </h1>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px',
+          maxWidth: '400px',
+          width: '100%',
+        }}
+      >
+        <input
+          type='text'
+          placeholder='Your Name'
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          style={{
+            padding: '15px',
+            fontSize: '18px',
+            border: '2px solid #e0e0e0',
+            borderRadius: '10px',
+            outline: 'none',
+          }}
+        />
+        <input
+          type='email'
+          placeholder='Your Email'
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={{
+            padding: '15px',
+            fontSize: '18px',
+            border: '2px solid #e0e0e0',
+            borderRadius: '10px',
+            outline: 'none',
+          }}
+        />
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          style={{
+            marginTop: '30px',
+            padding: '15px 40px',
+            background: 'linear-gradient(45deg, #333, #333)',
+            color: '#ffffff',
+            border: 'none',
+            borderRadius: '30px',
+            cursor: 'pointer',
+            fontSize: '20px',
+            fontWeight: '600',
+            boxShadow: '0 10px 20px rgba(83, 57, 206, 0.2)',
+            transition: 'all 0.3s ease',
+          }}
+          onClick={handleContinue}
+        >
+          Continue
+        </motion.button>
+      </div>
+    </>
+  );
+
+  const renderStep4 = () => (
+    <>
+      <h1
+        style={{
+          marginBottom: '20px',
+          color: '#333',
+          fontSize: '2.5rem',
+          fontWeight: '700',
+          background: '#fff',
+          WebkitBackgroundClip: 'text',
+        }}
+      >
+        Verify Your Email
+      </h1>
+      <p style={{ fontSize: '16px', color: '#555', marginBottom: '20px' }}>
+        We've sent a verification code to your email. Please enter it below to login:
+      </p>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px',
+          maxWidth: '400px',
+          width: '100%',
+        }}
+      >
+        <input
+          type='text'
+          placeholder='Verification Code'
+          value={verificationCode}
+          onChange={(e) => setVerificationCode(e.target.value)}
+          style={{
+            padding: '15px',
+            fontSize: '18px',
+            border: '2px solid #e0e0e0',
+            borderRadius: '10px',
+            outline: 'none',
+          }}
+        />
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          style={{
+            marginTop: '30px',
+            padding: '15px 40px',
+            background: 'linear-gradient(45deg, #333, #333)',
+            color: '#ffffff',
+            border: 'none',
+            borderRadius: '30px',
+            cursor: 'pointer',
+            fontSize: '20px',
+            fontWeight: '600',
+            boxShadow: '0 10px 20px rgba(83, 57, 206, 0.2)',
+            transition: 'all 0.3s ease',
+          }}
+          onClick={handleContinue}
+        >
+          Verify
+        </motion.button>
+      </div>
     </>
   );
 
@@ -232,7 +391,13 @@ const Onboarding = () => {
         fontFamily: "'Poppins', sans-serif",
       }}
     >
-      {step === 1 ? renderStep1() : renderStep2()}
+      {step === 1
+        ? renderStep1()
+        : step === 2
+        ? renderStep2()
+        : step === 3
+        ? renderStep3()
+        : renderStep4()}
     </div>
   );
 };
