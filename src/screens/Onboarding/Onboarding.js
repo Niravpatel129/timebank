@@ -21,6 +21,13 @@ const Onboarding = () => {
     { id: 'social', name: 'Social', icon: '🎉' },
   ];
 
+  const handleVerify = () => {
+    // send all the data to the backend
+    // backend will send a verification code to the email
+    // if the code is correct, set the step to 5
+    // if the code is incorrect, show an error message
+  };
+
   const handleToolSelect = (toolId) => {
     setSelectedTools((prev) =>
       prev.includes(toolId) ? prev.filter((id) => id !== toolId) : [...prev, toolId],
@@ -504,7 +511,11 @@ const Onboarding = () => {
         ? renderStep2()
         : step === 3
         ? renderStep3()
-        : renderStep4()}
+        : step === 4
+        ? renderStep4()
+        : step === 5
+        ? renderLoginStep()
+        : null}
 
       <motion.div
         whileHover={{
@@ -518,7 +529,7 @@ const Onboarding = () => {
           fontSize: '13px',
           cursor: 'pointer',
         }}
-        onClick={() => setStep(step === 4 ? 1 : 4)}
+        onClick={() => setStep(step === 5 ? 1 : 5)}
       >
         <motion.span
           key={step}
@@ -527,7 +538,7 @@ const Onboarding = () => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {step === 4 ? 'Back to onboarding' : 'Already have an account?'}
+          {step === 5 ? 'Back to onboarding' : 'Already have an account?'}
         </motion.span>
       </motion.div>
     </div>
