@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FaPause, FaPlay } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
 import { useTasksContext } from '../../../context/useTasksContext';
@@ -37,6 +37,9 @@ const Checklist = ({
   const [isHovered, setIsHovered] = useState(false);
   const { startTask, pauseTask, finishTask, getRemainingTime, activeTaskId } = useTasksContext();
   const [remainingTime, setRemainingTime] = useState(taskDuration * 1000);
+  const [isAssigneeSelectOpen, setIsAssigneeSelectOpen] = useState(false);
+  const assigneeSelectRef = useRef(null);
+  const [isPlayButtonHovered, setIsPlayButtonHovered] = useState(false);
 
   const isDisabled = activeTaskId !== null && activeTaskId !== id;
 
@@ -53,6 +56,19 @@ const Checklist = ({
     }
     return () => clearInterval(intervalId);
   }, [status, id, getRemainingTime, finishTask]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (assigneeSelectRef.current && !assigneeSelectRef.current.contains(event.target)) {
+        setIsAssigneeSelectOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handlePlay = () => {
     if (status === 'inProgress') {
@@ -76,6 +92,22 @@ const Checklist = ({
   if (!taskDuration) {
     return null;
   }
+
+  const assignees = [
+    { value: 'unassigned', label: 'Unassigned', image: 'https://via.placeholder.com/150' },
+    {
+      value: 'user1',
+      label: 'User 1',
+      image:
+        'https://img.freepik.com/free-photo/cute-domestic-kitten-sits-window-staring-outside-generative-ai_188544-12519.jpg',
+    },
+    {
+      value: 'user2',
+      label: 'User 2',
+      image:
+        'https://images.pexels.com/photos/1170986/pexels-photo-1170986.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
+    },
+  ];
 
   return (
     <motion.div
@@ -183,7 +215,14 @@ const Checklist = ({
           Icon={status === 'inProgress' ? FaPause : FaPlay}
           color={isDisabled ? '#ffffff' : '#ffffff'}
           style={{
-            backgroundColor: status === 'inProgress' ? '#331db9' : '#d9dae3',
+            backgroundColor:
+              status === 'inProgress'
+                ? isPlayButtonHovered
+                  ? '#4a34d3'
+                  : '#331db9'
+                : isPlayButtonHovered
+                ? '#c3c4cc'
+                : '#d9dae3',
             padding: '10px',
             borderRadius: '50%',
             display: 'flex',
@@ -193,23 +232,95 @@ const Checklist = ({
             height: '10px',
             cursor: isDisabled ? 'not-allowed' : 'pointer',
             marginRight: '10px',
+            transition: 'background-color 0.3s ease',
           }}
           disabled={isDisabled}
+          onMouseEnter={() => setIsPlayButtonHovered(true)}
+          onMouseLeave={() => setIsPlayButtonHovered(false)}
         />
         <div
+          ref={assigneeSelectRef}
           style={{
-            width: '28px',
-            height: '28px',
-            borderRadius: '50%',
-            overflow: 'hidden',
-            marginLeft: '10px',
+            position: 'relative',
           }}
         >
-          <img
-            src={profileImage}
-            alt='profile'
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setIsAssigneeSelectOpen(!isAssigneeSelectOpen)}
+            style={{
+              width: '30px',
+              height: '30px',
+              borderRadius: '50%',
+              cursor: 'pointer',
+              overflow: 'hidden',
+              boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+            }}
+          >
+            <img
+              src={profileImage}
+              alt='profile'
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          </motion.div>
+          {isAssigneeSelectOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              style={{
+                position: 'absolute',
+                right: 0,
+                top: '120%',
+                zIndex: 1000,
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                overflow: 'hidden',
+                width: '200px',
+              }}
+            >
+              {assignees.map((assignee) => (
+                <motion.div
+                  key={assignee.value}
+                  whileHover={{
+                    // backgroundColor: '#f0f0f0',
+                    textDecoration: 'underline',
+                    textUnderlineOffset: '4px',
+                    scale: 1.05,
+                    transition: { duration: 0.2 },
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  layout
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '12px',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => {
+                    // Handle assignee selection here
+                    setIsAssigneeSelectOpen(false);
+                  }}
+                >
+                  <img
+                    src={assignee.image}
+                    alt={assignee.label}
+                    style={{
+                      width: '30px',
+                      height: '30px',
+                      borderRadius: '50%',
+                      marginRight: '12px',
+                      objectFit: 'cover',
+                    }}
+                  />
+                  <span style={{ fontSize: '14px' }}>{assignee.label}</span>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
         </div>
       </div>
     </motion.div>
