@@ -17,24 +17,27 @@ const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
       <AnimatePresence>
         {tasks.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {tasks.map((task) => (
-              <Checklist
-                onEditTask={onEditTask}
-                key={task.id}
-                id={task.id}
-                title={task.name}
-                tag={task.category}
-                status={task.status}
-                time={`${Math.floor(task.taskDuration / 3600)}:${String(
-                  Math.floor((task.taskDuration % 3600) / 60),
-                ).padStart(2, '0')}`}
-                taskDuration={task.taskDuration}
-                profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
-                listType={listType}
-                moveTask={moveTask}
-                disabled={listType === 'currentWeek' && task.status === 'done'}
-              />
-            ))}
+            {tasks.map((task) => {
+              if (!task) return null;
+              return (
+                <Checklist
+                  onEditTask={onEditTask}
+                  key={task?._id}
+                  id={task?._id}
+                  title={task?.name}
+                  tag={task.category}
+                  status={task.status}
+                  time={`${Math.floor(task.taskDuration / 3600)}:${String(
+                    Math.floor((task.taskDuration % 3600) / 60),
+                  ).padStart(2, '0')}`}
+                  taskDuration={task.taskDuration}
+                  profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
+                  listType={listType}
+                  moveTask={moveTask}
+                  disabled={listType === 'currentWeek' && task.status === 'done'}
+                />
+              );
+            })}
           </div>
         ) : (
           <motion.div
@@ -56,7 +59,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [filterType, setFilterType] = useState('all'); // 'all' or 'my'
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
-  const { tasks, updateTask, totalTimeSpent, dailyTimeSpent } = useTasksContext();
+  const { tasks, updateTask, totalTimeSpent, dailyTimeSpent, setTasks } = useTasksContext();
   const username = 'user1'; // Assuming the current user's username is 'user1'
   const [title, setTitle] = useState('Storybook for Vue.js');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -81,31 +84,33 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
     return taskDate >= weekStart && taskDate <= weekEnd;
   };
 
-  const filteredTasks = useMemo(() => {
-    return tasks.filter(
-      (task) => filterType === 'all' || (filterType === 'my' && task.assignee === username),
-    );
-  }, [tasks, filterType, username]);
+  // const filteredTasks = useMemo(() => {
+  //   return tasks;
+  // }, [tasks, filterType, username]);
 
   const currentWeekTasks = useMemo(
-    () => filteredTasks.filter((task) => isCurrentWeek(task.date)),
-    [filteredTasks],
+    () => tasks.filter((task) => task?.listType === 'currentWeek'),
+    [tasks],
   );
 
   const thingsToDoTasks = useMemo(
-    () => filteredTasks.filter((task) => !isCurrentWeek(task.date)),
-    [filteredTasks],
+    () => tasks.filter((task) => task?.listType === 'thingsToDo'),
+    [tasks],
   );
 
+  // const currentWeekTasks = tasks;
+  // const thingsToDoTasks = tasks;
+
   const moveTask = useCallback(
-    (id, sourceList, targetList) => {
-      const task = tasks.find((t) => t.id === id);
+    (id, targetList) => {
+      console.log(`Moving task ${id} to ${targetList}`);
+      const task = tasks.find((t) => t?._id === id);
       if (task) {
-        const newDate =
-          targetList === 'currentWeek'
-            ? new Date().toISOString().split('T')[0]
-            : new Date(new Date().setDate(new Date().getDate() + 7)).toISOString().split('T')[0];
-        updateTask({ ...task, date: newDate });
+        const updatedTask = { ...task, listType: targetList };
+        updateTask(updatedTask);
+
+        // Immediately update local state
+        setTasks((prevTasks) => prevTasks.map((t) => (t?._id === id ? updatedTask : t)));
       }
     },
     [tasks, updateTask],
@@ -132,7 +137,8 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
     twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
 
     const totalSeconds = tasks.reduce((total, task) => {
-      const taskDate = new Date(task.date);
+      if (!task?.date) return total;
+      const taskDate = new Date(task?.date);
       if (taskDate >= twoMonthsAgo && task.status === 'completed') {
         return total + (task.timeSpent || 0);
       }

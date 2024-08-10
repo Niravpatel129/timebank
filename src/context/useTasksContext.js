@@ -31,7 +31,7 @@ export const TasksProvider = ({ children }) => {
 
   const addTask = useCallback(async (task) => {
     try {
-      const newTask = { ...task, id: uuidv4(), timeSpent: 0 };
+      const newTask = { ...task, _id: uuidv4(), timeSpent: 0 };
       const response = await newRequest.post('/tasks', newTask);
       console.log('🚀  response:', response);
       setTasks((prevTasks) => [...prevTasks, response.data]);
@@ -55,10 +55,16 @@ export const TasksProvider = ({ children }) => {
 
   const updateTask = useCallback(async (updatedTask) => {
     try {
-      const response = await newRequest.put(`/tasks/${updatedTask.id}`, updatedTask);
+      console.log('Updating task:', updatedTask);
+      const response = await newRequest.put(`/tasks/${updatedTask._id}`, updatedTask);
+      console.log('API response:', response);
+
       setTasks((prevTasks) =>
-        prevTasks.map((task) => (task.id === updatedTask.id ? response : task)),
+        prevTasks.map((task) => (task?._id === updatedTask._id ? response : task)),
       );
+
+      // Log the updated tasks
+      console.log('Updated tasks:', tasks);
     } catch (error) {
       console.error('Error updating task:', error);
     }
@@ -67,7 +73,7 @@ export const TasksProvider = ({ children }) => {
   const updateTaskStatus = useCallback(async (taskId, status) => {
     try {
       const response = await newRequest.patch(`/tasks/${taskId}/status`, { status });
-      setTasks((prevTasks) => prevTasks.map((task) => (task.id === taskId ? response : task)));
+      setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
     } catch (error) {
       console.error('Error updating task status:', error);
     }
@@ -77,7 +83,7 @@ export const TasksProvider = ({ children }) => {
     async (taskId) => {
       try {
         await newRequest.delete(`/tasks/${taskId}`);
-        setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+        setTasks((prevTasks) => prevTasks.filter((task) => task?._id !== taskId));
         setTimers((prevTimers) => {
           const { [taskId]: deletedTimer, ...rest } = prevTimers;
           return rest;
@@ -129,9 +135,9 @@ export const TasksProvider = ({ children }) => {
 
   const editTask = useCallback(async (editedTask) => {
     try {
-      const response = await newRequest.put(`/tasks/${editedTask.id}`, editedTask);
+      const response = await newRequest.put(`/tasks/${editedTask._id}`, editedTask);
       setTasks((prevTasks) =>
-        prevTasks.map((task) => (task.id === editedTask.id ? response : task)),
+        prevTasks.map((task) => (task?._id === editedTask._id ? response : task)),
       );
       setTotalTimeSpent(response.totalTimeSpent);
       setDailyTimeSpent(response.dailyTimeSpent);
@@ -154,6 +160,7 @@ export const TasksProvider = ({ children }) => {
     totalTimeSpent,
     dailyTimeSpent,
     updateTaskStatus,
+    setTasks,
   };
 
   return <TasksContext.Provider value={contextValue}>{children}</TasksContext.Provider>;

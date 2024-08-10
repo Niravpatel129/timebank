@@ -35,7 +35,7 @@ const Checklist = ({
   listType,
   onEditTask,
 }) => {
-  console.log('🚀  status:', status);
+  console.log('🚀  title:', title);
   const [isHovered, setIsHovered] = useState(false);
   const { startTask, pauseTask, finishTask, getRemainingTime, activeTaskId, updateTaskStatus } =
     useTasksContext();
@@ -104,7 +104,7 @@ const Checklist = ({
   };
 
   if (!taskDuration) {
-    return null;
+    return <>no task duration</>;
   }
 
   const assignees = [
@@ -151,8 +151,10 @@ const Checklist = ({
       onDragStart={() => setIsDragging(true)}
       onDragEnd={(_, info) => {
         setIsDragging(false);
-        if (Math.abs(info.offset.y) > 50) {
-          moveTask(id, listType, listType === 'currentWeek' ? 'thingsToDo' : 'currentWeek');
+        const threshold = 100; // Adjust this value as needed
+        if (Math.abs(info.offset.y) > threshold) {
+          const newListType = listType === 'currentWeek' ? 'thingsToDo' : 'currentWeek';
+          moveTask(id, newListType);
         }
       }}
       onClick={handleTaskClick}
