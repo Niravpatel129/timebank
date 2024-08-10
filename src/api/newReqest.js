@@ -1,48 +1,39 @@
-import axios from 'axios';
+const { ipcRenderer } = window.require('electron');
 
-const newRequest = axios.create({
-  baseURL: 'https://timebank-305bb7cb7d96.herokuapp.com',
-  timeout: 10000, // 10 seconds
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Request interceptor
-newRequest.interceptors.request.use(
-  (config) => {
+const makeRequest = async (method, url, data = null, options = {}) => {
+  try {
     const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...options.headers,
+    };
 
-// Response interceptor
-newRequest.interceptors.response.use(
-  (response) => {
+    const requestOptions = {
+      method,
+      url: `https://timebank-305bb7cb7d96.herokuapp.com${url}`,
+      ...(data && { data }),
+      headers,
+      timeout: 10000, // 10 seconds
+      withCredentials: true,
+      ...options,
+    };
+
+    const response = await ipcRenderer.invoke('make-request', requestOptions);
+    console.log('🚀  response:', response);
     return response;
-  },
-  (error) => {
-    // Handle errors globally
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      console.error('Response error:', error.response.data);
-    } else if (error.request) {
-      // The request was made but no response was received
-      console.error('Request error:', error.request);
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      console.error('Error:', error.message);
-    }
-    return Promise.reject(error);
-  },
-);
+  } catch (error) {
+    console.error('Request failed:', error);
+    throw error;
+  }
+};
+
+const newRequest = {
+  get: (url, options) => makeRequest('GET', url, null, options),
+  post: (url, data, options) => makeRequest('POST', url, data, options),
+  put: (url, data, options) => makeRequest('PUT', url, data, options),
+  delete: (url, options) => makeRequest('DELETE', url, null, options),
+  // Add other methods as needed
+};
 
 export default newRequest;

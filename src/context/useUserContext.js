@@ -23,7 +23,7 @@ export const UserProvider = ({ children }) => {
         const response = await newRequest.get('/user/me', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        handleLoginAndSetUser(response.data.user);
+        handleLoginAndSetUser(response.user);
       } catch (error) {
         console.error('Auto-login failed:', error);
         logout();
@@ -32,14 +32,19 @@ export const UserProvider = ({ children }) => {
     setLoading(false);
   };
 
-  const handleLoginAndSetUser = async (userData) => {
+  const handleLoginAndSetUser = async (userData, authToken) => {
     if (!userData) return;
+
+    if (!userData.token) {
+      toast.error('No token found');
+      return;
+    }
 
     try {
       setUser(userData);
       setIsLoggedIn(true);
-      localStorage.setItem('authToken', userData.token);
-      Cookies.set('authToken', userData.token, { expires: 7 }); // Set cookie to expire in 7 days
+      localStorage.setItem('authToken', authToken);
+      Cookies.set('authToken', authToken, { expires: 7 }); // Set cookie to expire in 7 days
       toast.success('Login successful');
     } catch (error) {
       toast.error('Sorry, we are unable to login you at this time. Please try again later.');
@@ -50,8 +55,8 @@ export const UserProvider = ({ children }) => {
   const checkVerificationStatus = async (email) => {
     try {
       const response = await newRequest.get(`/user/check-verification/${email}`);
-      handleLoginAndSetUser(response.data.user);
-      return response.data.isVerified;
+      handleLoginAndSetUser(response.user, response.authToken);
+      return response.isVerified;
     } catch (error) {
       toast.error('Error checking verification status');
       console.error('Error checking verification status:', error);
@@ -61,11 +66,14 @@ export const UserProvider = ({ children }) => {
 
   const handleAddVerificationCode = async ({ email, code }) => {
     try {
-      const response = await newRequest.post('/user/add-verification-code', { email, code });
-      if (response.data.user) {
-        handleLoginAndSetUser(response.data.user);
+      const response = await newRequest.post('/user/add-verification-code', {
+        email,
+        verificationCode: code,
+      });
+      if (response.user) {
+        handleLoginAndSetUser(response.user, response.token);
       }
-      return response.data;
+      return response;
     } catch (error) {
       toast.error('Error adding verification code');
       console.error('Error adding verification code:', error);
@@ -81,8 +89,8 @@ export const UserProvider = ({ children }) => {
           email: data.userData.email,
           onboardingData: data.onboardingData,
         });
-        setUser(response.data.user);
-        resolve(response.data);
+        setUser(response.user);
+        resolve(response);
 
         const checkInterval = setInterval(async () => {
           const isVerified = await checkVerificationStatus(data.userData.email);

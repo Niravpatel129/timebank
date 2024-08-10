@@ -13,6 +13,7 @@ const path = require('path');
 const url = require('url');
 const { ipcMain, screen } = require('electron');
 const TimerManager = require('./utils/timerManager');
+const axios = require('axios');
 
 let tray = null;
 let mainWindow = null;
@@ -148,6 +149,7 @@ function createDashboardWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
+      webSecurity: false,
     },
     icon,
   });
@@ -305,6 +307,15 @@ ipcMain.on('show-settings', () => {
 
 ipcMain.on('show-dashboard', () => {
   dashboardWindow.show();
+});
+
+ipcMain.handle('make-request', async (event, options) => {
+  try {
+    const response = await axios(options);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 });
 
 ipcMain.handle('check-for-updates', async () => {
