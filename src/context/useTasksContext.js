@@ -37,7 +37,7 @@ export const TasksProvider = ({ children }) => {
 
   const addTask = useCallback(
     (task) => {
-      const newTask = { ...task, id: uuidv4() };
+      const newTask = { ...task, id: uuidv4(), timeSpent: 0 };
       setTasks((prevTasks) => [...prevTasks, newTask]);
     },
     [setTasks],
@@ -92,8 +92,18 @@ export const TasksProvider = ({ children }) => {
 
   const pauseTask = useCallback(
     (taskId) => {
+      const elapsedTime = Date.now() - timers[taskId].startTime;
       setTasks((prevTasks) =>
-        prevTasks.map((task) => (task.id === taskId ? { ...task, status: 'paused' } : task)),
+        prevTasks.map((task) =>
+          task.id === taskId
+            ? {
+                ...task,
+                status: 'paused',
+                timeSpent: (task.timeSpent || 0) + elapsedTime,
+                taskDuration: Math.max(0, task.taskDuration - elapsedTime / 1000),
+              }
+            : task,
+        ),
       );
       setTimers((prevTimers) => ({
         ...prevTimers,
@@ -110,8 +120,18 @@ export const TasksProvider = ({ children }) => {
 
   const finishTask = useCallback(
     (taskId) => {
+      const elapsedTime = timers[taskId]?.startTime ? Date.now() - timers[taskId].startTime : 0;
       setTasks((prevTasks) =>
-        prevTasks.map((task) => (task.id === taskId ? { ...task, status: 'completed' } : task)),
+        prevTasks.map((task) =>
+          task.id === taskId
+            ? {
+                ...task,
+                status: 'completed',
+                timeSpent: (task.timeSpent || 0) + elapsedTime,
+                taskDuration: 0,
+              }
+            : task,
+        ),
       );
       setTimers((prevTimers) => {
         const { [taskId]: finishedTimer, ...rest } = prevTimers;
