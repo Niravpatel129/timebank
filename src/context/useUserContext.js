@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
+import Cookies from 'js-cookie';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import newRequest from '../api/newReqest';
 
@@ -15,14 +16,31 @@ export const UserProvider = ({ children }) => {
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   const [registerUser, setRegisterUser] = useState(false);
 
+  const checkAuthStatus = async () => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      try {
+        const response = await newRequest.get('/user/me', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        handleLoginAndSetUser(response.data.user);
+      } catch (error) {
+        console.error('Auto-login failed:', error);
+        logout();
+      }
+    }
+    setLoading(false);
+  };
+
   const handleLoginAndSetUser = async (userData) => {
     if (!userData) return;
 
     try {
       setUser(userData);
       setIsLoggedIn(true);
-
-      toast.success('Verification successful');
+      localStorage.setItem('authToken', userData.token);
+      Cookies.set('authToken', userData.token, { expires: 7 }); // Set cookie to expire in 7 days
+      toast.success('Login successful');
     } catch (error) {
       toast.error('Sorry, we are unable to login you at this time. Please try again later.');
       console.error('Error logging in:', error);
@@ -32,8 +50,6 @@ export const UserProvider = ({ children }) => {
   const checkVerificationStatus = async (email) => {
     try {
       const response = await newRequest.get(`/user/check-verification/${email}`);
-
-      //   login the user
       handleLoginAndSetUser(response.data.user);
       return response.data.isVerified;
     } catch (error) {
@@ -47,10 +63,8 @@ export const UserProvider = ({ children }) => {
     try {
       const response = await newRequest.post('/user/add-verification-code', { email, code });
       if (response.data.user) {
-        // login the user
         handleLoginAndSetUser(response.data.user);
       }
-
       return response.data;
     } catch (error) {
       toast.error('Error adding verification code');
@@ -60,7 +74,6 @@ export const UserProvider = ({ children }) => {
   };
 
   const handleRegisterUser = async (data) => {
-    // step 1: send verification code
     return new Promise(async (resolve, reject) => {
       try {
         const response = await newRequest.post('/user/send-verification', {
@@ -92,6 +105,8 @@ export const UserProvider = ({ children }) => {
   const logout = async () => {
     try {
       await newRequest.post('/user/logout');
+      localStorage.removeItem('authToken');
+      Cookies.remove('authToken');
       setUser(null);
       setIsLoggedIn(false);
       setOnboardingCompleted(false);
@@ -99,6 +114,10 @@ export const UserProvider = ({ children }) => {
       console.error('Error logging out:', error);
     }
   };
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
 
   const value = {
     user,

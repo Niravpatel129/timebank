@@ -3,6 +3,7 @@ import axios from 'axios';
 const newRequest = axios.create({
   baseURL: 'https://timebank-305bb7cb7d96.herokuapp.com',
   timeout: 10000, // 10 seconds
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
