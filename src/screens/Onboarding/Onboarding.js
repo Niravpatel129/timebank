@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
+import { FaCheck } from 'react-icons/fa';
 
 const Onboarding = () => {
   const [selectedTools, setSelectedTools] = useState([]);
@@ -69,8 +70,8 @@ const Onboarding = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             style={{
-              padding: '30px',
-              border: `2px solid ${selectedTools.includes(tool.id) ? '#341dc0' : '#e0e0e0'}`,
+              padding: '40px 70px',
+              border: `2px solid ${selectedTools.includes(tool.id) ? '#4a4cff' : '#e0e0e0'}`,
               borderRadius: '15px',
               cursor: 'pointer',
               display: 'flex',
@@ -79,9 +80,29 @@ const Onboarding = () => {
               background: 'linear-gradient(to bottom, #ffffff, #f8f9ff)',
               boxShadow: '0 10px 20px rgba(0, 0, 0, 0.05)',
               transition: 'all 0.3s ease',
+              position: 'relative',
             }}
             onClick={() => handleToolSelect(tool.id)}
           >
+            <div
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                width: '20px',
+                height: '20px',
+                border: `2px solid ${selectedTools.includes(tool.id) ? '#4a4cff' : '#e0e0e0'}`,
+                borderRadius: '50%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: selectedTools.includes(tool.id) ? '#4a4cff' : 'transparent',
+              }}
+            >
+              {selectedTools.includes(tool.id) && (
+                <FaCheck style={{ color: '#fff', fontSize: '12px' }} />
+              )}
+            </div>
             <span style={{ fontSize: '48px', marginBottom: '15px' }}>{tool.icon}</span>
             <span
               style={{
@@ -102,7 +123,7 @@ const Onboarding = () => {
         style={{
           marginTop: '50px',
           padding: '15px 40px',
-          background: 'linear-gradient(45deg, #341dc0, #5339ce)',
+          background: 'linear-gradient(45deg, #333, #333)',
           color: '#ffffff',
           border: 'none',
           borderRadius: '30px',
