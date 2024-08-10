@@ -165,6 +165,7 @@ const Checklist = ({
             opacity: isHovered ? 1 : 0,
             position: 'absolute',
             left: '-16px',
+            zIndex: 1,
           }}
         >
           <GrDrag style={{ cursor: 'move' }} />
@@ -307,7 +308,7 @@ const Checklist = ({
                 position: 'absolute',
                 right: 0,
                 top: '120%',
-                zIndex: 1000,
+                zIndex: 1,
                 backgroundColor: 'white',
                 borderRadius: '8px',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.15)',

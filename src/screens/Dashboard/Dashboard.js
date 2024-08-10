@@ -1,14 +1,23 @@
 import { motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
+  FaBook,
   FaCalendarAlt,
+  FaChartLine,
   FaCheck,
   FaChevronRight,
   FaClipboardList,
+  FaCog,
+  FaGift,
   FaListAlt,
   FaPlus,
+  FaPrint,
+  FaSignOutAlt,
+  FaStar,
+  FaSync,
   FaTags,
   FaTrash,
+  FaUserPlus,
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useTasksContext } from '../../context/useTasksContext';
@@ -27,6 +36,8 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [taskToEdit, setTaskToEdit] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef(null);
 
   const handleEditTask = (taskId) => {
     const task = tasks.find((t) => t.id === taskId);
@@ -51,8 +62,17 @@ const Dashboard = () => {
       setData(receivedData);
     });
 
+    const handleClickOutside = (event) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
     return () => {
       ipcRenderer.removeAllListeners('dashboard-data');
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -70,6 +90,18 @@ const Dashboard = () => {
     opacity: 0.7,
     cursor: 'pointer',
   };
+
+  const profileDropdownItems = [
+    { icon: FaCog, text: 'Settings', shortcut: '⌘,' },
+    { icon: FaUserPlus, text: 'Add a team', shortcut: '⌘T' },
+    { icon: FaChartLine, text: 'Activity log', shortcut: 'G then A' },
+    { icon: FaPrint, text: 'Print', shortcut: '⌘P' },
+    { icon: FaBook, text: 'Resources' },
+    { icon: FaGift, text: "What's new" },
+    { icon: FaStar, text: 'Upgrade to Pro' },
+    { icon: FaSync, text: 'Sync', subtext: '7 seconds ago' },
+    { icon: FaSignOutAlt, text: 'Log out' },
+  ];
 
   return (
     <div
@@ -89,28 +121,115 @@ const Dashboard = () => {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '20px',
+          justifyContent: 'space-between',
           paddingTop: '20px',
+          paddingBottom: '20px',
         }}
       >
-        {/* Bubbles */}
-        <Bubble gradientColors={['#ffcc00', '#ff9900']} />
-        <Bubble gradientColors={['#9933ff', '#6600cc']} />
+        {/* Top section */}
+        <div
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}
+        >
+          {/* Bubbles */}
+          <Bubble gradientColors={['#ffcc00', '#ff9900']} />
+          <Bubble gradientColors={['#9933ff', '#6600cc']} />
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              background: 'linear-gradient(to bottom, #ccccff, #9999cc)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
+            <FaPlus style={{ color: '#666666', fontSize: '20px' }} />
+          </motion.div>
+        </div>
+
+        {/* Avatar at the bottom */}
         <motion.div
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
+          ref={profileDropdownRef}
           style={{
             width: '60px',
             height: '60px',
             borderRadius: '50%',
-            background: 'linear-gradient(to bottom, #ccccff, #9999cc)',
+            background: '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
+            marginBottom: '40px',
+            position: 'relative',
           }}
+          onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
         >
-          <FaPlus style={{ color: '#666666', fontSize: '20px' }} />
+          <img
+            src={'https://i.chzbgr.com/full/9836262144/h2E0CB29F'}
+            alt='Avatar'
+            style={{
+              width: '100%',
+              height: '100%',
+              borderRadius: '50%',
+              border: '2px solid #ffffff',
+            }}
+          />
+          {isProfileDropdownOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              style={{
+                position: 'absolute',
+                bottom: '100%',
+                left: '100%',
+                width: '250px',
+                backgroundColor: '#ffffff',
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                padding: '10px',
+                zIndex: 1000,
+              }}
+            >
+              <div style={{ padding: '10px', borderBottom: '1px solid #eee' }}>
+                <div style={{ fontWeight: 'bold' }}>Nirav</div>
+                <div style={{ color: '#888', fontSize: '0.9em' }}>0/5 tasks</div>
+              </div>
+              {profileDropdownItems.map((item, index) => (
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  key={index}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '10px',
+                    cursor: 'pointer',
+                    borderBottom:
+                      index === profileDropdownItems.length - 2 ? '1px solid #eee' : 'none',
+                  }}
+                >
+                  <item.icon style={{ marginRight: '10px', color: '#666' }} />
+                  <div style={{ flex: 1 }}>
+                    <div>{item.text}</div>
+                    {item.subtext && (
+                      <div style={{ fontSize: '0.8em', color: '#888' }}>{item.subtext}</div>
+                    )}
+                  </div>
+                  {item.shortcut && (
+                    <div style={{ fontSize: '0.8em', color: '#888' }}>{item.shortcut}</div>
+                  )}
+                </motion.div>
+              ))}
+              <div style={{ padding: '10px', color: '#888', fontSize: '0.9em' }}>
+                v6494 · Changelog
+              </div>
+            </motion.div>
+          )}
         </motion.div>
       </motion.div>
 
