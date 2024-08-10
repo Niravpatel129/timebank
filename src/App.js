@@ -4,10 +4,13 @@ import './App.css';
 import { useScreenContext } from './context/useScreenContext';
 import Dashboard from './screens/Dashboard/Dashboard.js';
 import Home from './screens/Home';
+import Onboarding from './screens/Onboarding/Onboarding.js';
 import Results from './screens/Results';
 import Tasks from './screens/Tasks';
 
 function App() {
+  const isLoggedIn = false;
+  const isOnboarding = false;
   const { currentTask, setCurrentTask } = useScreenContext();
 
   return (
@@ -32,7 +35,7 @@ function App() {
         />
         <Route path='/tasks' element={<Tasks currentTask={currentTask} />} />
         <Route path='/results' element={<Results currentTask={currentTask} />} />
-        <Route path='/dashboard' element={<Dashboard />} />
+        <Route path='/dashboard' element={isLoggedIn ? <Dashboard /> : <Onboarding />} />
       </Routes>
     </div>
   );
