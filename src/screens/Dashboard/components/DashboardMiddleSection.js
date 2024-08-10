@@ -56,6 +56,8 @@ export default function DashboardComponent({ handleTriggerAddTaskButton }) {
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const { tasks, updateTask } = useTasksContext();
   const username = 'user1'; // Assuming the current user's username is 'user1'
+  const [title, setTitle] = useState('Storybook for Vue.js');
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
 
   const handleSearch = () => {
     if (isSearchOpen) {
@@ -110,6 +112,18 @@ export default function DashboardComponent({ handleTriggerAddTaskButton }) {
     setIsFilterDropdownOpen(!isFilterDropdownOpen);
   };
 
+  const handleTitleClick = () => {
+    setIsEditingTitle(true);
+  };
+
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value);
+  };
+
+  const handleTitleBlur = () => {
+    setIsEditingTitle(false);
+  };
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div
@@ -156,9 +170,35 @@ export default function DashboardComponent({ handleTriggerAddTaskButton }) {
                 width: '100%',
               }}
             >
-              <h1 style={{ color: commonStyles.primaryColor, fontSize: '28px', margin: '0' }}>
-                Storybook for Vue.js
-              </h1>
+              {isEditingTitle ? (
+                <input
+                  type='text'
+                  value={title}
+                  onChange={handleTitleChange}
+                  onBlur={handleTitleBlur}
+                  style={{
+                    color: commonStyles.primaryColor,
+                    fontSize: '28px',
+                    margin: '0',
+                    border: 'none',
+                    background: 'transparent',
+                    outline: 'none',
+                  }}
+                  autoFocus
+                />
+              ) : (
+                <h1
+                  style={{
+                    color: commonStyles.primaryColor,
+                    fontSize: '28px',
+                    margin: '0',
+                    cursor: 'pointer',
+                  }}
+                  onClick={handleTitleClick}
+                >
+                  {title}
+                </h1>
+              )}
             </div>
           </div>
           <div style={commonStyles.flexContainer}>
