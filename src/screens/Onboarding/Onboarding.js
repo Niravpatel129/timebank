@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserContext } from '../../context/useUserContext';
 
 const Onboarding = () => {
-  const { updateUser, setIsLoggedIn } = useUserContext();
+  const { updateUser, setIsLoggedIn, handleRegisterUser } = useUserContext();
   const [selectedTools, setSelectedTools] = useState([]);
   const [step, setStep] = useState(1);
   const [usageType, setUsageType] = useState('');
@@ -29,19 +29,42 @@ const Onboarding = () => {
   const handleVerify = async () => {
     setIsVerifying(true);
     try {
-      // Simulate sending verification request to server
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      handleRegisterUser({
+        onboardingData: {
+          usageType,
+          selectedTools,
+        },
+        userData: {
+          name,
+          email,
+        },
+      });
 
+      // Simulate sending verification request to server
+      //   await new Promise((resolve) => setTimeout(resolve, 1500));
       // Simulate successful verification
-      updateUser({ name, email });
-      setIsLoggedIn(true);
-      navigate('/dashboard');
+      //   updateUser({ name, email });
+      //   setIsLoggedIn(true);
+      //   navigate('/dashboard');
     } catch (error) {
       console.error('Verification failed:', error);
       // Handle verification error (e.g., show error message)
     } finally {
       setIsVerifying(false);
     }
+  };
+
+  const handleRegister = () => {
+    handleRegisterUser({
+      onboardingData: {
+        usageType,
+        selectedTools,
+      },
+      userData: {
+        name,
+        email,
+      },
+    });
   };
 
   const handleToolSelect = (toolId) => {
@@ -373,7 +396,9 @@ const Onboarding = () => {
             boxShadow: '0 10px 20px rgba(83, 57, 206, 0.2)',
             transition: 'all 0.3s ease',
           }}
-          onClick={handleContinue}
+          onClick={() => {
+            handleRegister();
+          }}
         >
           Continue
         </motion.button>
