@@ -34,7 +34,8 @@ const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
                   profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
                   listType={listType}
                   moveTask={moveTask}
-                  disabled={listType === 'currentWeek' && task.status === 'done'}
+                  disabled={listType === 'currentWeek' && task.status === 'completed'}
+                  timerState={task.timerState}
                 />
               );
             })}
@@ -75,35 +76,18 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
     }
   };
 
-  const isCurrentWeek = (date) => {
-    if (!date) return false;
-    const now = new Date();
-    const taskDate = new Date(date);
-    const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
-    const weekEnd = new Date(now.setDate(now.getDate() - now.getDay() + 6));
-    return taskDate >= weekStart && taskDate <= weekEnd;
-  };
-
-  // const filteredTasks = useMemo(() => {
-  //   return tasks;
-  // }, [tasks, filterType, username]);
-
   const currentWeekTasks = useMemo(
-    () => tasks.filter((task) => task?.listType === 'currentWeek'),
+    () => tasks?.filter((task) => task?.listType === 'currentWeek'),
     [tasks],
   );
 
   const thingsToDoTasks = useMemo(
-    () => tasks.filter((task) => task?.listType === 'thingsToDo'),
+    () => tasks?.filter((task) => task?.listType === 'thingsToDo'),
     [tasks],
   );
 
-  // const currentWeekTasks = tasks;
-  // const thingsToDoTasks = tasks;
-
   const moveTask = useCallback(
     (id, targetList) => {
-      console.log(`Moving task ${id} to ${targetList}`);
       const task = tasks.find((t) => t?._id === id);
       if (task) {
         const updatedTask = { ...task, listType: targetList };

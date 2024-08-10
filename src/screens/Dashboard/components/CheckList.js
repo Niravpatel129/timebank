@@ -7,22 +7,6 @@ import IconButton from './IconButton';
 import Tag from './Tag';
 import { commonStyles } from './sharedStyles/commonStyles';
 
-const parseStatus = (status) => {
-  if (status === 'inProgress') {
-    return 'in progress';
-  }
-
-  if (status === 'completed') {
-    return 'completed';
-  }
-
-  if (status === 'paused') {
-    return 'paused';
-  }
-
-  return status;
-};
-
 const Checklist = ({
   id,
   title,
@@ -34,28 +18,25 @@ const Checklist = ({
   moveTask,
   listType,
   onEditTask,
+  timerState,
 }) => {
-  console.log('🚀  title:', title);
   const [isHovered, setIsHovered] = useState(false);
-  const { startTask, pauseTask, finishTask, getRemainingTime, activeTaskId, updateTaskStatus } =
-    useTasksContext();
-  const [remainingTime, setRemainingTime] = useState(taskDuration * 1000);
+  const { startTask, pauseTask, finishTask, activeTaskId, updateTaskStatus } = useTasksContext();
+  const [remainingTime, setRemainingTime] = useState(timerState.remainingTime);
   const [isAssigneeSelectOpen, setIsAssigneeSelectOpen] = useState(false);
   const assigneeSelectRef = useRef(null);
   const [isPlayButtonHovered, setIsPlayButtonHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
   const isDisabled = activeTaskId !== null && activeTaskId !== id;
-
-  useEffect(() => {
-    setRemainingTime(taskDuration * 1000);
-  }, [taskDuration]);
+  console.log('🚀  timerState:', timerState);
 
   useEffect(() => {
     let intervalId;
-    if (status === 'inProgress') {
+    if (timerState.isActive) {
       intervalId = setInterval(() => {
-        const newRemainingTime = getRemainingTime(id);
+        const elapsed = Date.now() - new Date(timerState.startTime).getTime();
+        const newRemainingTime = Math.max(0, timerState.remainingTime - elapsed);
         setRemainingTime(newRemainingTime);
         if (newRemainingTime <= 0) {
           finishTask(id);
@@ -63,7 +44,7 @@ const Checklist = ({
       }, 1000);
     }
     return () => clearInterval(intervalId);
-  }, [status, id, getRemainingTime, finishTask]);
+  }, [timerState, id, finishTask]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -85,7 +66,7 @@ const Checklist = ({
 
   const handlePlay = (e) => {
     e.stopPropagation();
-    if (status === 'inProgress') {
+    if (timerState.isActive) {
       pauseTask(id);
     } else {
       startTask(id);
@@ -233,30 +214,29 @@ const Checklist = ({
             textTransform: 'capitalize',
           }}
         >
-          {parseStatus(status)}
+          {status.replace('-', ' ')}
         </span>
         <span
           style={{
             fontSize: '18px',
             fontWeight: 'bold',
-            color: status === 'inProgress' ? '#331db9' : '#d9dae3',
+            color: timerState.isActive ? '#331db9' : '#d9dae3',
           }}
         >
           {formatTime(remainingTime)}
         </span>
         <IconButton
           onClick={handlePlay}
-          Icon={status === 'inProgress' ? FaPause : FaPlay}
+          Icon={timerState.isActive ? FaPause : FaPlay}
           color={isDisabled ? '#ffffff' : '#ffffff'}
           style={{
-            backgroundColor:
-              status === 'inProgress'
-                ? isPlayButtonHovered
-                  ? '#4a34d3'
-                  : '#331db9'
-                : isPlayButtonHovered
-                ? '#c3c4cc'
-                : '#d9dae3',
+            backgroundColor: timerState.isActive
+              ? isPlayButtonHovered
+                ? '#4a34d3'
+                : '#331db9'
+              : isPlayButtonHovered
+              ? '#c3c4cc'
+              : '#d9dae3',
             padding: '10px',
             borderRadius: '50%',
             display: 'flex',
