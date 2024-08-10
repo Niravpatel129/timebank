@@ -56,7 +56,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [filterType, setFilterType] = useState('all'); // 'all' or 'my'
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
-  const { tasks, updateTask, totalTimeSpent } = useTasksContext();
+  const { tasks, updateTask, totalTimeSpent, dailyTimeSpent } = useTasksContext();
   const username = 'user1'; // Assuming the current user's username is 'user1'
   const [title, setTitle] = useState('Storybook for Vue.js');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -142,6 +142,17 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
     const totalHours = totalSeconds / 3600;
     setTotalHoursLastTwoMonths(totalHours.toFixed(2));
   }, [tasks]);
+
+  const getContributionColor = (timeSpent) => {
+    const maxTimeSpent = Math.max(...Object.values(dailyTimeSpent));
+
+    if (timeSpent === 0) return '#f0f0f0';
+    if (timeSpent <= 1800) return '#d1c9f5'; // 30 minutes
+    if (timeSpent <= 3600) return '#a799e8'; // 1 hour
+    if (timeSpent <= 7200) return '#7d69db'; // 2 hours
+    if (timeSpent <= 14400) return '#5339ce'; // 4 hours
+    return commonStyles.primaryColor;
+  };
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -303,18 +314,27 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
           <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
             {Array(60)
               .fill()
-              .map((_, i) => (
-                <div
-                  key={i}
-                  style={{
-                    width: '16px',
-                    height: '16px',
-                    backgroundColor:
-                      i % 5 === 0 ? commonStyles.primaryColor : i % 3 === 0 ? '#5a47d1' : '#d1c9f5',
-                    borderRadius: '4px',
-                  }}
-                />
-              ))}
+              .map((_, i) => {
+                const date = new Date();
+                date.setDate(date.getDate() - (59 - i));
+                const dateString = date.toISOString().split('T')[0];
+                const timeSpent = dailyTimeSpent[dateString] || 0;
+                return (
+                  <div
+                    data-tooltip-id={`day-${59 - i}`}
+                    data-tooltip-content={`${dateString} - ${secondsToTimeObj(timeSpent).hours}:${
+                      secondsToTimeObj(timeSpent).minutes
+                    }:${secondsToTimeObj(timeSpent).seconds} hours`}
+                    key={59 - i}
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      backgroundColor: getContributionColor(timeSpent),
+                      borderRadius: '4px',
+                    }}
+                  />
+                );
+              })}
           </div>
           <div>
             <div style={{ fontSize: '20px', fontWeight: 'normal', width: '100%' }}>
@@ -457,6 +477,12 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
       {fakeProfiles.map((profile, index) => (
         <Tooltip key={`${profile}-${index}`} id={`day-${index}`} />
       ))}
+
+      {Array(60)
+        .fill()
+        .map((_, i) => {
+          return <Tooltip key={i} id={`day-${i}`} />;
+        })}
     </DndProvider>
   );
 }
