@@ -17,6 +17,7 @@ export const UserProvider = ({ children }) => {
   const [registerUser, setRegisterUser] = useState(false);
 
   const checkAuthStatus = async () => {
+    console.log('Checking auth status');
     const token = localStorage.getItem('authToken');
     if (token) {
       try {
@@ -35,7 +36,7 @@ export const UserProvider = ({ children }) => {
   const handleLoginAndSetUser = async (userData, authToken) => {
     if (!userData) return;
 
-    if (!userData.token) {
+    if (!authToken) {
       toast.error('No token found');
       return;
     }
