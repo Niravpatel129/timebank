@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
-import { FaPause, FaPlay } from 'react-icons/fa';
+import { FaCheck, FaPause, FaPlay } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
 import { useTasksContext } from '../../../context/useTasksContext';
 import IconButton from './IconButton';
@@ -80,7 +80,7 @@ const Checklist = ({
 
   const handleCheckboxChange = (e) => {
     e.stopPropagation();
-    updateTaskStatus(id, 'completed');
+    updateTaskStatus(id, status === 'completed' ? 'notStarted' : 'completed');
   };
 
   const handlePlay = (e) => {
@@ -169,25 +169,26 @@ const Checklist = ({
         >
           <GrDrag style={{ cursor: 'move' }} />
         </div>
-        <input
-          type='checkbox'
-          checked={status === 'completed'}
-          onChange={() => updateTaskStatus(id, 'completed')}
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            handleCheckboxChange(e);
+          }}
           style={{
-            marginRight: '10px',
+            marginRight: '5px',
             width: '20px',
             height: '20px',
             borderRadius: '50%',
             border: '2px solid #ddd',
-            appearance: 'none',
             cursor: 'pointer',
-            ':checked': {
-              backgroundColor: '#341dc0',
-              borderColor: '#341dc0',
-            },
+            backgroundColor: status === 'completed' ? '#341dc0' : 'transparent',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
-          onClick={(e) => e.stopPropagation()}
-        />
+        >
+          {status === 'completed' && <FaCheck color='white' size={12} />}
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <span
             style={{
@@ -196,6 +197,8 @@ const Checklist = ({
               fontWeight: '500',
               color: '#333',
               cursor: 'pointer',
+              textDecoration: status === 'completed' ? 'line-through' : 'none',
+              marginRight: '5px',
             }}
           >
             {title}
