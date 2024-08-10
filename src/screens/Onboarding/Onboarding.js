@@ -6,8 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserContext } from '../../context/useUserContext';
 
 const Onboarding = () => {
-  const { updateUser, setIsLoggedIn, handleRegisterUser, handleAddVerificationCode } =
-    useUserContext();
+  const { handleRegisterUser, handleAddVerificationCode } = useUserContext();
   const [selectedTools, setSelectedTools] = useState([]);
   const [step, setStep] = useState(1);
   const [usageType, setUsageType] = useState('');
@@ -33,20 +32,9 @@ const Onboarding = () => {
     if (isVerifying) return;
     setIsVerifying(true);
     try {
-      handleRegisterUser({
-        onboardingData: {
-          usageType,
-          selectedTools,
-        },
-        userData: {
-          name,
-          email,
-        },
-      });
-
       await handleAddVerificationCode({
         email,
-        code: verificationCode,
+        code: verificationCode.join(''),
       });
     } catch (error) {
       console.error('Verification failed:', error);

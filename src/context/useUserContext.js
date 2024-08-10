@@ -21,6 +21,8 @@ export const UserProvider = ({ children }) => {
     try {
       setUser(userData);
       setIsLoggedIn(true);
+
+      toast.success('Verification successful');
     } catch (error) {
       toast.error('Sorry, we are unable to login you at this time. Please try again later.');
       console.error('Error logging in:', error);
@@ -51,6 +53,7 @@ export const UserProvider = ({ children }) => {
 
       return response.data;
     } catch (error) {
+      toast.error('Error adding verification code');
       console.error('Error adding verification code:', error);
       return null;
     }
@@ -71,10 +74,7 @@ export const UserProvider = ({ children }) => {
         const checkInterval = setInterval(async () => {
           const isVerified = await checkVerificationStatus(data.userData.email);
           if (isVerified) {
-            toast.success('Verification successful');
             clearInterval(checkInterval);
-            setIsLoggedIn(true);
-            setOnboardingCompleted(true);
           }
         }, 4000);
 
