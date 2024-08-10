@@ -1,10 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FaPlus, FaSearch } from 'react-icons/fa';
 import { Tooltip } from 'react-tooltip';
 import { useTasksContext } from '../../../context/useTasksContext';
+import secondsToTimeObj from '../../../helpers/secondsToTimeObj';
 import Checklist from './CheckList';
 import { commonStyles } from './sharedStyles/commonStyles';
 
@@ -55,10 +56,11 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [filterType, setFilterType] = useState('all'); // 'all' or 'my'
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
-  const { tasks, updateTask } = useTasksContext();
+  const { tasks, updateTask, totalTimeSpent } = useTasksContext();
   const username = 'user1'; // Assuming the current user's username is 'user1'
   const [title, setTitle] = useState('Storybook for Vue.js');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [totalHoursLastTwoMonths, setTotalHoursLastTwoMonths] = useState(0);
 
   const handleSearch = () => {
     if (isSearchOpen) {
@@ -124,6 +126,22 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   const handleTitleBlur = () => {
     setIsEditingTitle(false);
   };
+
+  useEffect(() => {
+    const twoMonthsAgo = new Date();
+    twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+
+    const totalSeconds = tasks.reduce((total, task) => {
+      const taskDate = new Date(task.date);
+      if (taskDate >= twoMonthsAgo && task.status === 'completed') {
+        return total + (task.timeSpent || 0);
+      }
+      return total;
+    }, 0);
+
+    const totalHours = totalSeconds / 3600;
+    setTotalHoursLastTwoMonths(totalHours.toFixed(2));
+  }, [tasks]);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -306,9 +324,12 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
                     color: commonStyles.primaryColor,
                     fontSize: '18px',
                     fontWeight: 'bold',
+                    textWrap: 'nowrap',
                   }}
                 >
-                  67:30{' '}
+                  {secondsToTimeObj(totalTimeSpent).hours}:
+                  {secondsToTimeObj(totalTimeSpent).minutes}:
+                  {secondsToTimeObj(totalTimeSpent).seconds}
                 </span>
                 <span
                   style={{
@@ -317,7 +338,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
                     textWrap: 'nowrap',
                   }}
                 >
-                  hours in the last 2 month
+                  hours in the last 2 months
                 </span>
               </div>
             </div>

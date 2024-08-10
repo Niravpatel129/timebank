@@ -34,6 +34,13 @@ export const TasksProvider = ({ children }) => {
   const [tasks, setTasks] = useLocalStorage('tasks', []);
   const [timers, setTimers] = useLocalStorage('timers', {});
   const [activeTaskId, setActiveTaskId] = useState(null);
+  const [totalTimeSpent, setTotalTimeSpent] = useLocalStorage('totalTimeSpent', 0);
+
+  useEffect(() => {
+    // Calculate initial totalTimeSpent when component mounts
+    const initialTotalTimeSpent = tasks.reduce((total, task) => total + (task.timeSpent || 0), 0);
+    setTotalTimeSpent(Math.floor(initialTotalTimeSpent / 1000)); // Convert milliseconds to seconds
+  }, []);
 
   const addTask = useCallback(
     (task) => {
@@ -68,8 +75,9 @@ export const TasksProvider = ({ children }) => {
         },
       }));
       setActiveTaskId(null);
+      setTotalTimeSpent((prevTotal) => Math.floor((prevTotal * 1000 + elapsedTime) / 1000)); // Convert to seconds
     },
-    [setTasks, setTimers],
+    [setTasks, setTimers, setTotalTimeSpent],
   );
 
   const updateTask = useCallback(
@@ -83,7 +91,15 @@ export const TasksProvider = ({ children }) => {
 
   const deleteTask = useCallback(
     (taskId) => {
-      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+      setTasks((prevTasks) => {
+        const taskToDelete = prevTasks.find((task) => task.id === taskId);
+        if (taskToDelete) {
+          setTotalTimeSpent((prevTotal) =>
+            Math.max(0, prevTotal - Math.floor((taskToDelete.timeSpent || 0) / 1000)),
+          ); // Convert to seconds
+        }
+        return prevTasks.filter((task) => task.id !== taskId);
+      });
       setTimers((prevTimers) => {
         const { [taskId]: deletedTimer, ...rest } = prevTimers;
         return rest;
@@ -92,7 +108,7 @@ export const TasksProvider = ({ children }) => {
         setActiveTaskId(null);
       }
     },
-    [setTasks, setTimers, activeTaskId],
+    [setTasks, setTimers, activeTaskId, setTotalTimeSpent],
   );
 
   const startTask = useCallback(
@@ -141,8 +157,9 @@ export const TasksProvider = ({ children }) => {
       if (activeTaskId === taskId) {
         setActiveTaskId(null);
       }
+      setTotalTimeSpent((prevTotal) => Math.floor((prevTotal * 1000 + elapsedTime) / 1000)); // Convert to seconds
     },
-    [setTasks, setTimers, activeTaskId],
+    [setTasks, setTimers, activeTaskId, setTotalTimeSpent],
   );
 
   const getRemainingTime = useCallback(
@@ -160,18 +177,29 @@ export const TasksProvider = ({ children }) => {
   const editTask = useCallback(
     (editedTask) => {
       setTasks((prevTasks) =>
-        prevTasks.map((task) => (task.id === editedTask.id ? { ...task, ...editedTask } : task)),
+        prevTasks.map((task) => {
+          if (task.id === editedTask.id) {
+            const timeDifference = (editedTask.timeSpent || 0) - (task.timeSpent || 0);
+            setTotalTimeSpent((prevTotal) =>
+              Math.floor((prevTotal * 1000 + timeDifference) / 1000),
+            ); // Convert to seconds
+            return { ...task, ...editedTask };
+          }
+          return task;
+        }),
       );
     },
-    [setTasks],
+    [setTasks, setTotalTimeSpent],
   );
 
   // Load data from localStorage on mount
   useEffect(() => {
     const storedTasks = localStorage.getItem('tasks');
     const storedTimers = localStorage.getItem('timers');
+    const storedTotalTimeSpent = localStorage.getItem('totalTimeSpent');
     if (storedTasks) setTasks(JSON.parse(storedTasks));
     if (storedTimers) setTimers(JSON.parse(storedTimers));
+    if (storedTotalTimeSpent) setTotalTimeSpent(parseInt(JSON.parse(storedTotalTimeSpent), 10));
   }, []);
 
   const contextValue = {
@@ -184,7 +212,8 @@ export const TasksProvider = ({ children }) => {
     finishTask,
     getRemainingTime,
     activeTaskId,
-    editTask, // Add the new editTask function to the context
+    editTask,
+    totalTimeSpent,
   };
 
   return <TasksContext.Provider value={contextValue}>{children}</TasksContext.Provider>;
