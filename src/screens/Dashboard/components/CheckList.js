@@ -187,7 +187,6 @@ const Checklist = ({
           >
             {title}
           </span>
-          {taskDuration}
           {tag && (
             <Tag
               backgroundColor={tagBackgroundColor || commonStyles.primaryColor}
