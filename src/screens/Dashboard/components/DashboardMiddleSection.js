@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FaPlus, FaSearch } from 'react-icons/fa';
@@ -49,7 +49,9 @@ const TaskList = ({ tasks, listType, moveTask }) => {
 export default function DashboardComponent({ handleTriggerAddTaskButton }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [filterType, setFilterType] = useState('all'); // 'all' or 'my'
   const { tasks, updateTask } = useTasksContext();
+  const username = 'user1'; // Assuming the current user's username is 'user1'
 
   const handleSearch = () => {
     if (isSearchOpen) {
@@ -70,8 +72,21 @@ export default function DashboardComponent({ handleTriggerAddTaskButton }) {
     return taskDate >= weekStart && taskDate <= weekEnd;
   };
 
-  const currentWeekTasks = tasks.filter((task) => isCurrentWeek(task.date));
-  const thingsToDoTasks = tasks.filter((task) => !isCurrentWeek(task.date));
+  const filteredTasks = useMemo(() => {
+    return tasks.filter(
+      (task) => filterType === 'all' || (filterType === 'my' && task.assignee === username),
+    );
+  }, [tasks, filterType, username]);
+
+  const currentWeekTasks = useMemo(
+    () => filteredTasks.filter((task) => isCurrentWeek(task.date)),
+    [filteredTasks],
+  );
+
+  const thingsToDoTasks = useMemo(
+    () => filteredTasks.filter((task) => !isCurrentWeek(task.date)),
+    [filteredTasks],
+  );
 
   const moveTask = useCallback(
     (id, sourceList, targetList) => {
@@ -288,15 +303,20 @@ export default function DashboardComponent({ handleTriggerAddTaskButton }) {
                 <div
                   key={index}
                   style={{
-                    color: index === 0 ? commonStyles.primaryColor : commonStyles.secondaryColor,
+                    color:
+                      filterType === (index === 0 ? 'all' : 'my')
+                        ? commonStyles.primaryColor
+                        : commonStyles.secondaryColor,
                     fontSize: '15px',
                     cursor: 'pointer',
                     fontWeight: 'bold',
                   }}
+                  onClick={() => setFilterType(index === 0 ? 'all' : 'my')}
                 >
                   {text}
                 </div>
               ))}
+              {/* Filter by tag */}
               <div
                 style={{
                   cursor: 'pointer',
