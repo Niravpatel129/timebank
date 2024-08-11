@@ -249,11 +249,10 @@ const Checklist = ({
             justifyContent: 'center',
             width: '10px',
             height: '10px',
-            cursor: isDisabled ? 'not-allowed' : 'pointer',
+            cursor: 'pointer',
             marginRight: '10px',
             transition: 'background-color 0.3s ease',
           }}
-          disabled={isDisabled}
           onMouseEnter={() => setIsPlayButtonHovered(true)}
           onMouseLeave={() => setIsPlayButtonHovered(false)}
         />

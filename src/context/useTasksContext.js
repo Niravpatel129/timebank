@@ -19,6 +19,12 @@ export const TasksProvider = ({ children }) => {
         setTasks(response.data);
         setTotalTimeSpent(response.totalTimeSpent);
         setDailyTimeSpent(response.dailyTimeSpent);
+
+        // if any task is active, set it as active
+        const activeTask = response.data.find((task) => task.timerState.isActive);
+        if (activeTask) {
+          setActiveTaskId(activeTask._id);
+        }
       } catch (error) {
         console.error('Error fetching initial data:', error);
       }
@@ -95,7 +101,7 @@ export const TasksProvider = ({ children }) => {
       });
       console.log('🚀  response:', response);
       setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
-      setActiveTaskId(null);
+      // setActiveTaskId(null);
       setTotalTimeSpent(response.totalTimeSpent);
       setDailyTimeSpent(response.dailyTimeSpent);
     } catch (error) {

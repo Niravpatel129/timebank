@@ -12,35 +12,33 @@ export default function TimerTrack() {
   const activeTask = tasks.find((task) => task?._id === activeTaskId);
 
   useEffect(() => {
-    let interval;
-    if (activeTaskId) {
-      setRemainingTime(getRemainingTime(activeTaskId));
-      interval = setInterval(() => {
-        const newRemainingTime = getRemainingTime(activeTaskId);
+    if (!activeTask?.timerState.remainingTime) {
+      return;
+    }
+
+    let intervalId;
+    if (activeTask.timerState.isActive) {
+      intervalId = setInterval(() => {
+        const elapsedSeconds = Math.floor(
+          (Date.now() - new Date(activeTask.timerState.startTime).getTime()) / 1000,
+        );
+        const newRemainingTime = Math.max(0, activeTask.timerState.remainingTime - elapsedSeconds);
         setRemainingTime(newRemainingTime);
         if (newRemainingTime <= 0) {
-          clearInterval(interval);
           finishTask(activeTaskId);
         }
       }, 1000);
-    } else {
-      setRemainingTime(0);
     }
+    return () => clearInterval(intervalId);
+  }, [activeTask, activeTaskId, finishTask]);
 
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, [activeTaskId, getRemainingTime, finishTask]);
-
-  const formatTime = (ms) => {
-    const seconds = Math.floor((ms / 1000) % 60);
-    const minutes = Math.floor((ms / (1000 * 60)) % 60);
-    const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes
       .toString()
-      .padStart(2, '0')}`;
+      .padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
   const handleStop = () => {
@@ -199,7 +197,7 @@ export default function TimerTrack() {
                 >
                   <div style={{ color: '#8f8f9d', fontSize: '14px', fontWeight: 400 }}>Project</div>
                   <div style={{ color: '#000000', fontSize: '15px', fontWeight: 500 }}>
-                    {activeTask.projectName || 'N/A'}
+                    {activeTask.projectName || 'User'}
                   </div>
                 </div>
                 <div
