@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import Select from 'react-select';
 import { useProjectContext } from '../../../../context/useProjectContext';
@@ -26,7 +26,8 @@ const DashboardCreateProjectModal = () => {
     },
   ]);
   const [selectedColor, setSelectedColor] = useState('#6941C6');
-  const [newMember, setNewMember] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
   const { addProject, closeModal } = useProjectContext();
 
   const colors = [
@@ -46,6 +47,24 @@ const DashboardCreateProjectModal = () => {
     { value: 'Editor', label: 'Editor' },
   ];
 
+  useEffect(() => {
+    // Simulating a search function
+    const searchMembers = () => {
+      const results = members.filter(
+        (member) =>
+          member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          member.email.toLowerCase().includes(searchTerm.toLowerCase()),
+      );
+      setSearchResults(results);
+    };
+
+    if (searchTerm) {
+      searchMembers();
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchTerm, members]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (projectName.trim()) {
@@ -54,21 +73,25 @@ const DashboardCreateProjectModal = () => {
     }
   };
 
-  const handleAddMember = (e) => {
-    e.preventDefault();
-    if (newMember.trim()) {
-      setMembers([
-        ...members,
-        {
-          name: newMember,
-          email: newMember,
-          role: { value: 'Editor', label: 'Editor' },
-          status: 'Invited',
-        },
-      ]);
-      setNewMember('');
+  const handleAddMember = (selectedOption) => {
+    if (selectedOption) {
+      const newMember = {
+        name: selectedOption.label,
+        email: selectedOption.value,
+        role: { value: 'Editor', label: 'Editor' },
+        status: 'Invite pending',
+      };
+      setMembers([...members, newMember]);
+      setSearchTerm('');
     }
   };
+
+  const isValidEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
+  const emailOptions = isValidEmail(searchTerm) ? [{ value: searchTerm, label: searchTerm }] : [];
 
   return (
     <motion.div
@@ -214,23 +237,22 @@ const DashboardCreateProjectModal = () => {
               Members
             </label>
             <div>
-              <form onSubmit={handleAddMember}>
-                <input
-                  type='text'
-                  value={newMember}
-                  onChange={(e) => setNewMember(e.target.value)}
-                  placeholder='Add members by name or email'
-                  style={{
-                    width: '100%',
-                    padding: '10px',
+              <Select
+                value={null}
+                onChange={handleAddMember}
+                options={emailOptions}
+                onInputChange={(inputValue) => setSearchTerm(inputValue)}
+                inputValue={searchTerm}
+                isValidNewOption={(inputValue) => isValidEmail(inputValue)}
+                placeholder="Enter member's email"
+                noOptionsMessage={() => 'Enter a valid email to add a member'}
+                styles={{
+                  control: (provided) => ({
+                    ...provided,
                     marginBottom: '8px',
-                    border: '1px solid #ccc',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box',
-                  }}
-                />
-              </form>
+                  }),
+                }}
+              />
               <div style={{ marginTop: '10px' }}>
                 {members.map((member, index) => (
                   <div
