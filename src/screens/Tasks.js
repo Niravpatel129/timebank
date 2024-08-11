@@ -138,7 +138,7 @@ export default function Tasks() {
               }}
               onClick={() => setFilter(filterOption)}
             >
-              {filterOption.charAt(0).toUpperCase() + filterOption.slice(1)}
+              {filterOption?.charAt(0)?.toUpperCase() + filterOption?.slice(1)}
             </motion.div>
           ))}
         </div>

@@ -73,6 +73,7 @@ export const TasksProvider = ({ children }) => {
   const editTask = useCallback(async (editedTask) => {
     try {
       const response = await newRequest.put(`/tasks/${editedTask._id}`, editedTask);
+      console.log('🚀  response:', response);
       setTasks((prevTasks) =>
         prevTasks.map((task) => (task?._id === editedTask._id ? response : task)),
       );

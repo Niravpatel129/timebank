@@ -4,6 +4,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FaPlus, FaSearch } from 'react-icons/fa';
 import { Tooltip } from 'react-tooltip';
+import newRequest from '../../../api/newReqest';
 import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
 import secondsToTimeObj from '../../../helpers/secondsToTimeObj';
@@ -13,7 +14,6 @@ import { commonStyles } from './sharedStyles/commonStyles';
 const fakeProfiles = ['User1', 'User2', 'User3'];
 
 const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
-  console.log('🚀  tasks:', tasks);
   return (
     <motion.div style={{ minHeight: '50px', padding: '10px 0' }}>
       <AnimatePresence>
@@ -62,14 +62,28 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { selectedProject, updateProject } = useProjectContext();
-  console.log('🚀  selectedProject:', selectedProject);
   const [filterType, setFilterType] = useState('all'); // 'all' or 'my'
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const { tasks, updateTask, totalTimeSpent, dailyTimeSpent, setTasks } = useTasksContext();
-  const username = 'user1'; // Assuming the current user's username is 'user1'
   const [title, setTitle] = useState(selectedProject?.name);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [totalHoursLastTwoMonths, setTotalHoursLastTwoMonths] = useState(0);
+  const [lastTwoMonthsTimeSpent, setLastTwoMonthsTimeSpent] = useState(0);
+
+  useEffect(() => {
+    const fetchTwoMonthsAgo = async () => {
+      try {
+        const twoMonthsAgo = await newRequest.get(
+          `/timeTrack/last-two-months/${selectedProject?._id}`,
+        );
+        setLastTwoMonthsTimeSpent(twoMonthsAgo);
+      } catch (error) {
+        console.log('🚀  error:', error);
+      }
+    };
+
+    fetchTwoMonthsAgo();
+  }, [tasks, selectedProject]);
 
   const members = useMemo(() => {
     return selectedProject?.members?.map((member) => member.user.name);
@@ -287,7 +301,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
                         color: '#fff',
                       }}
                     >
-                      {user.charAt(0).toUpperCase()}
+                      {user?.charAt(0)?.toUpperCase()}
                     </div>
                   )}
                 </div>
@@ -355,8 +369,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
                 const date = new Date();
                 date.setDate(date.getDate() - (59 - i));
                 const dateString = date.toISOString().split('T')[0];
-                const timeSpent =
-                  dailyTimeSpent && dailyTimeSpent[dateString] ? dailyTimeSpent[dateString] : 0;
+                const timeSpent = lastTwoMonthsTimeSpent[i]?.timeSpent || 0;
                 return (
                   <div
                     data-tooltip-id={`day-${59 - i}`}

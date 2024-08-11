@@ -141,7 +141,7 @@ const Dashboard = () => {
         <div
           style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}
         >
-          {/* Project Bubbles */}
+          {/* Project  Bubbles */}
           {projects.map((project, index) => {
             return (
               <div key={index}>
