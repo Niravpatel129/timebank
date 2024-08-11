@@ -23,6 +23,7 @@ const Checklist = ({
   const [isHovered, setIsHovered] = useState(false);
   const { startTask, pauseTask, finishTask, activeTaskId, updateTaskStatus } = useTasksContext();
   const [remainingTime, setRemainingTime] = useState(timerState.remainingTime);
+  console.log('🚀  remainingTime:', remainingTime);
   const [isAssigneeSelectOpen, setIsAssigneeSelectOpen] = useState(false);
   const assigneeSelectRef = useRef(null);
   const [isPlayButtonHovered, setIsPlayButtonHovered] = useState(false);
@@ -32,11 +33,17 @@ const Checklist = ({
   console.log('🚀  timerState:', timerState);
 
   useEffect(() => {
+    if (!timerState.remainingTime) {
+      return;
+    }
+
     let intervalId;
     if (timerState.isActive) {
       intervalId = setInterval(() => {
-        const elapsed = Date.now() - new Date(timerState.startTime).getTime();
-        const newRemainingTime = Math.max(0, timerState.remainingTime - elapsed);
+        const elapsedSeconds = Math.floor(
+          (Date.now() - new Date(timerState.startTime).getTime()) / 1000,
+        );
+        const newRemainingTime = Math.max(0, timerState.remainingTime - elapsedSeconds);
         setRemainingTime(newRemainingTime);
         if (newRemainingTime <= 0) {
           finishTask(id);
@@ -67,21 +74,19 @@ const Checklist = ({
   const handlePlay = (e) => {
     e.stopPropagation();
     if (timerState.isActive) {
-      pauseTask(id);
+      pauseTask(id, remainingTime);
     } else {
-      startTask(id);
+      startTask(id, remainingTime);
     }
   };
 
-  const formatTime = (ms) => {
-    const seconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    return `${hours.toString().padStart(2, '0')}:${(minutes % 60).toString().padStart(2, '0')}:${(
-      seconds % 60
-    )
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes
       .toString()
-      .padStart(2, '0')}`;
+      .padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
   if (!taskDuration) {

@@ -88,9 +88,11 @@ export const TasksProvider = ({ children }) => {
     }
   }, []);
 
-  const pauseTask = useCallback(async (taskId) => {
+  const pauseTask = useCallback(async (taskId, remainingTime) => {
     try {
-      const response = await newRequest.post(`/tasks/${taskId}/pause`);
+      const response = await newRequest.post(`/tasks/${taskId}/pause`, {
+        remainingTime,
+      });
       console.log('🚀  response:', response);
       setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
       setActiveTaskId(null);
@@ -114,6 +116,8 @@ export const TasksProvider = ({ children }) => {
   }, []);
 
   const finishTask = useCallback(async (taskId) => {
+    console.log('🚀  taskId:', taskId);
+    return;
     try {
       const response = await newRequest.post(`/tasks/${taskId}/finish`);
       setTasks((prevTasks) =>
