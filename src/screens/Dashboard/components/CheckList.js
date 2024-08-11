@@ -21,6 +21,7 @@ const Checklist = ({
   timerState,
   user,
 }) => {
+  console.log('🚀  timerState:', timerState);
   const [isHovered, setIsHovered] = useState(false);
   const { startTask, pauseTask, finishTask, activeTaskId, updateTaskStatus, tasks } =
     useTasksContext();
@@ -31,6 +32,10 @@ const Checklist = ({
   const [isDragging, setIsDragging] = useState(false);
 
   const isDisabled = activeTaskId !== null && activeTaskId !== id;
+
+  useEffect(() => {
+    setRemainingTime(timerState.remainingTime);
+  }, [timerState]);
 
   useEffect(() => {
     if (!timerState.remainingTime) {

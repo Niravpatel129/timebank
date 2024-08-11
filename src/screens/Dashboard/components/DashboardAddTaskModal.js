@@ -49,7 +49,7 @@ export default function DashboardAddTaskModal({ onClose }) {
       taskDuration: taskDurationInSeconds,
       hours: taskDurationInSeconds / 3600,
       category: category || null,
-      date: date,
+      dateDue: date,
       dateCreated: new Date().toISOString(),
       assignee: assignee ? assignee.value : null,
     };

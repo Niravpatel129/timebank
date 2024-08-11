@@ -5,23 +5,34 @@ import Select from 'react-select';
 
 export default function EditTaskModal({ onClose, task, onSave }) {
   const [taskName, setTaskName] = useState(task.name || '');
-  const [duration, setDuration] = useState(task.duration || '30m');
+  const [duration, setDuration] = useState('');
   const [showCustomDuration, setShowCustomDuration] = useState(false);
   const [customHours, setCustomHours] = useState(0);
   const [customMinutes, setCustomMinutes] = useState(0);
   const [category, setCategory] = useState(task.category || '');
-  const [date, setDate] = useState(task.date || new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(task.dateDue || new Date().toISOString().split('T')[0]);
   const [assignee, setAssignee] = useState(task.assignee || null);
   const modalRef = useRef(null);
 
-  //   useEffect(() => {
-  //     if (task.duration === 'custom') {
-  //       setShowCustomDuration(true);
-  //       const [hours, minutes] = task.customDuration?.split(':').map(Number);
-  //       setCustomHours(hours);
-  //       setCustomMinutes(minutes);
-  //     }
-  //   }, [task]);
+  useEffect(() => {
+    if (task.taskDuration) {
+      const hours = Math.floor(task.taskDuration / 3600);
+      const minutes = Math.floor((task.taskDuration % 3600) / 60);
+      if (hours === 0 && minutes === 5) setDuration('5m');
+      else if (hours === 0 && minutes === 15) setDuration('15m');
+      else if (hours === 0 && minutes === 30) setDuration('30m');
+      else if (hours === 0 && minutes === 45) setDuration('45m');
+      else if (hours === 1 && minutes === 0) setDuration('1h');
+      else {
+        setDuration('custom');
+        setShowCustomDuration(true);
+        setCustomHours(hours);
+        setCustomMinutes(minutes);
+      }
+    } else {
+      setDuration('45m');
+    }
+  }, [task]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
