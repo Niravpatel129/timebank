@@ -25,7 +25,6 @@ const makeRequest = async (method, url, data = null, options = {}) => {
     };
 
     const response = await ipcRenderer.invoke('make-request', requestOptions);
-    console.log('🚀  response:', response);
     return response;
   } catch (error) {
     console.error('Request failed:', error);

@@ -46,7 +46,6 @@ export const TasksProvider = ({ children }) => {
     try {
       // return;
       const response = await newRequest.put(`/tasks/${updatedTask._id}`, updatedTask);
-      console.log('🚀  response:', response);
       // setTasks((prevTasks) =>
       //   prevTasks.map((task) => (task?._id === updatedTask._id ? response.data : task)),
       // );
@@ -89,7 +88,6 @@ export const TasksProvider = ({ children }) => {
     try {
       const response = await newRequest.post(`/tasks/${taskId}/start`);
 
-      console.log('🚀  response 2:', response);
       setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
       setActiveTaskId(taskId);
     } catch (error) {
@@ -102,7 +100,6 @@ export const TasksProvider = ({ children }) => {
       const response = await newRequest.post(`/tasks/${taskId}/pause`, {
         remainingTime,
       });
-      console.log('🚀  response:', response);
       setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
       // setActiveTaskId(null);
       setTotalTimeSpent(response.totalTimeSpent);
@@ -125,7 +122,6 @@ export const TasksProvider = ({ children }) => {
   }, []);
 
   const finishTask = useCallback(async (taskId) => {
-    console.log('🚀  taskId:', taskId);
     return;
     try {
       const response = await newRequest.post(`/tasks/${taskId}/finish`);
@@ -143,7 +139,6 @@ export const TasksProvider = ({ children }) => {
   const updateTaskStatus = useCallback(async (taskId, status) => {
     try {
       const response = await newRequest.patch(`/tasks/${taskId}/status`, { status });
-      console.log('🚀  response:', response);
       setTasks((prevTasks) =>
         prevTasks.map((task) => (task?._id === taskId ? response.data : task)),
       );

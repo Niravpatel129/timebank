@@ -20,10 +20,12 @@ import {
   FaUserPlus,
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { useProjectContext } from '../../context/useProjectContext';
 import { useTasksContext } from '../../context/useTasksContext';
 import './Dashboard.css';
 import Bubble from './components/Bubble';
 import DashboardAddTaskModal from './components/DashboardAddTaskModal';
+import DashboardCreateProjectModal from './components/DashboardCreateProjectModal/DashboardCreateProjectModal';
 import DashboardMiddleSection from './components/DashboardMiddleSection';
 import EditTaskModal from './components/EditTaskModal';
 import TimerTrack from './components/TimerTrack';
@@ -38,6 +40,8 @@ const Dashboard = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const profileDropdownRef = useRef(null);
+  const { projects, selectedProject, setSelectedProject, isModalOpen, openModal, closeModal } =
+    useProjectContext();
 
   const handleEditTask = (taskId) => {
     const task = tasks.find((t) => t._id === taskId);
@@ -130,9 +134,16 @@ const Dashboard = () => {
         <div
           style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}
         >
-          {/* Bubbles */}
-          <Bubble gradientColors={['#ffcc00', '#ff9900']} />
-          <Bubble gradientColors={['#9933ff', '#6600cc']} />
+          {/* Project Bubbles */}
+          {projects.map((project, index) => (
+            <div key={index}>
+              <Bubble
+                gradientColors={project.gradientColors || ['#ffcc00', '#ff9900']}
+                onClick={() => setSelectedProject(project)}
+                selected={selectedProject?._id === project._id}
+              />
+            </div>
+          ))}
           <motion.div
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
@@ -146,6 +157,7 @@ const Dashboard = () => {
               justifyContent: 'center',
               cursor: 'pointer',
             }}
+            onClick={() => openModal()}
           >
             <FaPlus style={{ color: '#666666', fontSize: '20px' }} />
           </motion.div>
@@ -286,6 +298,8 @@ const Dashboard = () => {
           onSave={handleSaveEditedTask}
         />
       )}
+
+      {isModalOpen && <DashboardCreateProjectModal isOpen={isModalOpen} />}
     </div>
   );
 };

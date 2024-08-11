@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import React from 'react';
 
-const Bubble = ({ gradientColors }) => (
+const Bubble = ({ gradientColors, selected, onClick }) => (
   <motion.div
     whileHover={{ scale: 1.1 }}
     whileTap={{ scale: 0.9 }}
@@ -14,7 +14,9 @@ const Bubble = ({ gradientColors }) => (
       alignItems: 'center',
       justifyContent: 'center',
       cursor: 'pointer',
+      border: selected ? '2px solid white' : 'none',
     }}
+    onClick={onClick}
   >
     <div
       style={{
