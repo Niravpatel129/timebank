@@ -3,43 +3,38 @@ import React, { useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import Select from 'react-select';
 import { useProjectContext } from '../../../../context/useProjectContext';
+import { useUserContext } from '../../../../context/useUserContext';
 
 const DashboardCreateProjectModal = () => {
+  const { user } = useUserContext();
   const [projectName, setProjectName] = useState('');
   const [members, setMembers] = useState([
     {
-      name: 'Frankie Sullivan',
-      email: 'frankie@untitledui.com',
-      role: { value: 'Owner', label: 'Owner' },
+      user: user._id,
+      name: user.name,
+      email: user.email,
+      role: { value: 'owner', label: 'owner' },
       status: 'You',
     },
-    {
-      name: 'Amélie Laurent',
-      email: 'amélie@untitledui.com',
-      role: { value: 'Editor', label: 'Editor' },
-    },
-    {
-      name: 'Katie Moss',
-      email: 'katie@untitledui.com',
-      role: { value: 'Editor', label: 'Editor' },
-      status: 'Invite pending',
-    },
   ]);
-  const [selectedColor, setSelectedColor] = useState('#6941C6');
+  const [projectColor, setProjectColor] = useState({
+    gradient1: '#6941C6',
+    gradient2: '#419ec6',
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const { addProject, closeModal } = useProjectContext();
 
   const colors = [
-    { value: '#000000', label: 'Black' },
-    { value: '#7F56D9', label: 'Purple' },
-    { value: '#6941C6', label: 'Indigo' },
-    { value: '#3538CD', label: 'Blue' },
-    { value: '#2563EB', label: 'Light Blue' },
-    { value: '#0086C9', label: 'Cyan' },
-    { value: '#0E9384', label: 'Teal' },
-    { value: '#099250', label: 'Green' },
-    { value: '#F5F5F5', label: 'Light Gray' },
+    { gradient1: '#000000', gradient2: '#333333', label: 'Black' },
+    { gradient1: '#7F56D9', gradient2: '#9E77ED', label: 'Purple' },
+    { gradient1: '#6941C6', gradient2: '#8B5CF6', label: 'Indigo' },
+    { gradient1: '#3538CD', gradient2: '#4F46E5', label: 'Blue' },
+    { gradient1: '#2563EB', gradient2: '#3B82F6', label: 'Light Blue' },
+    { gradient1: '#0086C9', gradient2: '#00A3E0', label: 'Cyan' },
+    { gradient1: '#0E9384', gradient2: '#14B8A6', label: 'Teal' },
+    { gradient1: '#099250', gradient2: '#10B981', label: 'Green' },
+    { gradient1: '#F5F5F5', gradient2: '#FFFFFF', label: 'Light Gray' },
   ];
 
   const roleOptions = [
@@ -68,7 +63,7 @@ const DashboardCreateProjectModal = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (projectName.trim()) {
-      await addProject({ name: projectName.trim() });
+      await addProject({ name: projectName.trim(), projectColor, members });
       closeModal();
     }
   };
@@ -147,7 +142,7 @@ const DashboardCreateProjectModal = () => {
               maxWidth: '80px',
               height: '80px',
               borderRadius: '8px',
-              background: '#F4EBFF',
+              background: `linear-gradient(45deg, ${projectColor.gradient1}, ${projectColor.gradient2})`,
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
@@ -206,20 +201,22 @@ const DashboardCreateProjectModal = () => {
                 fontWeight: 'bold',
               }}
             >
-              Icon Color
+              Project Color
             </label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               {colors.map((color) => (
                 <div
-                  key={color.value}
-                  onClick={() => setSelectedColor(color.value)}
+                  key={color.gradient1}
+                  onClick={() =>
+                    setProjectColor({ gradient1: color.gradient1, gradient2: color.gradient2 })
+                  }
                   style={{
                     width: '32px',
                     height: '32px',
                     borderRadius: '50%',
-                    backgroundColor: color.value,
+                    background: `linear-gradient(45deg, ${color.gradient1}, ${color.gradient2})`,
                     cursor: 'pointer',
-                    border: selectedColor === color.value ? '2px solid #000' : 'none',
+                    border: projectColor.gradient1 === color.gradient1 ? '2px solid #000' : 'none',
                   }}
                 />
               ))}
@@ -254,73 +251,75 @@ const DashboardCreateProjectModal = () => {
                 }}
               />
               <div style={{ marginTop: '10px' }}>
-                {members.map((member, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      marginBottom: '8px',
-                      flexWrap: 'wrap',
-                    }}
-                  >
+                {members.map((member, index) => {
+                  return (
                     <div
+                      key={index}
                       style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '50%',
-                        backgroundColor: '#ccc',
-                        marginRight: '8px',
-                        flexShrink: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginBottom: '8px',
+                        flexWrap: 'wrap',
                       }}
-                    ></div>
-                    <div style={{ flexGrow: 1, minWidth: '0' }}>
+                    >
                       <div
                         style={{
-                          fontSize: '14px',
-                          fontWeight: 'bold',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          background: `linear-gradient(45deg, ${projectColor.gradient1}, ${projectColor.gradient2})`,
+                          marginRight: '8px',
+                          flexShrink: 0,
                         }}
-                      >
-                        {member.name}{' '}
-                        {member.status && (
-                          <span style={{ fontWeight: 'normal', color: '#666' }}>
-                            ({member.status})
-                          </span>
-                        )}
+                      ></div>
+                      <div style={{ flexGrow: 1, minWidth: '0' }}>
+                        <div
+                          style={{
+                            fontSize: '14px',
+                            fontWeight: 'bold',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                        >
+                          {member.name}{' '}
+                          {member.status && (
+                            <span style={{ fontWeight: 'normal', color: '#666' }}>
+                              ({member.status})
+                            </span>
+                          )}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: '12px',
+                            color: '#666',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                        >
+                          {member.email}
+                        </div>
                       </div>
-                      <div
-                        style={{
-                          fontSize: '12px',
-                          color: '#666',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
+                      <Select
+                        value={member.role}
+                        onChange={(selectedOption) => {
+                          const updatedMembers = [...members];
+                          updatedMembers[index].role = selectedOption;
+                          setMembers(updatedMembers);
                         }}
-                      >
-                        {member.email}
-                      </div>
+                        options={roleOptions}
+                        styles={{
+                          control: (provided) => ({
+                            ...provided,
+                            minWidth: '120px',
+                            marginLeft: '8px',
+                          }),
+                        }}
+                      />
                     </div>
-                    <Select
-                      value={member.role}
-                      onChange={(selectedOption) => {
-                        const updatedMembers = [...members];
-                        updatedMembers[index].role = selectedOption;
-                        setMembers(updatedMembers);
-                      }}
-                      options={roleOptions}
-                      styles={{
-                        control: (provided) => ({
-                          ...provided,
-                          minWidth: '120px',
-                          marginLeft: '8px',
-                        }),
-                      }}
-                    />
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -363,12 +362,12 @@ const DashboardCreateProjectModal = () => {
                 style={{
                   padding: '8px 16px',
                   borderRadius: '6px',
-                  background: '#6941C6',
+                  background: `linear-gradient(45deg, ${projectColor.gradient1}, ${projectColor.gradient2})`,
                   color: 'white',
                   border: 'none',
                 }}
               >
-                Create team
+                Create project
               </button>
             </div>
           </div>

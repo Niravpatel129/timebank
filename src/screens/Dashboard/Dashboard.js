@@ -40,8 +40,15 @@ const Dashboard = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const profileDropdownRef = useRef(null);
-  const { projects, selectedProject, setSelectedProject, isModalOpen, openModal, closeModal } =
-    useProjectContext();
+  const {
+    projects,
+    selectedProject,
+    setSelectedProject,
+    isModalOpen,
+    openModal,
+    closeModal,
+    deleteProject,
+  } = useProjectContext();
 
   const handleEditTask = (taskId) => {
     const task = tasks.find((t) => t._id === taskId);
@@ -135,15 +142,23 @@ const Dashboard = () => {
           style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}
         >
           {/* Project Bubbles */}
-          {projects.map((project, index) => (
-            <div key={index}>
-              <Bubble
-                gradientColors={project.gradientColors || ['#ffcc00', '#ff9900']}
-                onClick={() => setSelectedProject(project)}
-                selected={selectedProject?._id === project._id}
-              />
-            </div>
-          ))}
+          {projects.map((project, index) => {
+            return (
+              <div key={index}>
+                <Bubble
+                  gradientColors={
+                    [
+                      project.projectColor?.gradient1 || '#ffcc00',
+                      project.projectColor?.gradient2 || '#ff9900',
+                    ] || ['#ffcc00', '#ff9900']
+                  }
+                  onClick={() => setSelectedProject(project)}
+                  selected={selectedProject?._id === project._id}
+                  onDelete={() => deleteProject(project._id)}
+                />
+              </div>
+            );
+          })}
           <motion.div
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}

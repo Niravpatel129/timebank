@@ -4,6 +4,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FaPlus, FaSearch } from 'react-icons/fa';
 import { Tooltip } from 'react-tooltip';
+import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
 import secondsToTimeObj from '../../../helpers/secondsToTimeObj';
 import Checklist from './CheckList';
@@ -58,13 +59,24 @@ const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
 export default function DashboardComponent({ handleTriggerAddTaskButton, onEditTask }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { selectedProject, updateProject } = useProjectContext();
+  console.log('🚀  selectedProject:', selectedProject);
   const [filterType, setFilterType] = useState('all'); // 'all' or 'my'
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const { tasks, updateTask, totalTimeSpent, dailyTimeSpent, setTasks } = useTasksContext();
   const username = 'user1'; // Assuming the current user's username is 'user1'
-  const [title, setTitle] = useState('Storybook for Vue.js');
+  const [title, setTitle] = useState(selectedProject?.name);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [totalHoursLastTwoMonths, setTotalHoursLastTwoMonths] = useState(0);
+
+  useEffect(() => {
+    setTitle(selectedProject?.name);
+  }, [selectedProject]);
+
+  // const handleUpdateProject = (project) => {
+  //   setTitle(project.name);
+  //   updateProject(project._id, { ...project, name: title });
+  // };
 
   const handleSearch = () => {
     if (isSearchOpen) {
@@ -193,7 +205,10 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
                   type='text'
                   value={title}
                   onChange={handleTitleChange}
-                  onBlur={handleTitleBlur}
+                  onBlur={() => {
+                    updateProject(selectedProject._id, { ...selectedProject, name: title });
+                    setIsEditingTitle(false);
+                  }}
                   style={{
                     color: commonStyles.primaryColor,
                     fontSize: '28px',

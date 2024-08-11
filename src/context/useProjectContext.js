@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import newRequest from '../api/newReqest';
 
 const ProjectContext = createContext();
@@ -44,7 +45,9 @@ export const ProjectProvider = ({ children }) => {
   const addProject = useCallback(async (projectData) => {
     try {
       const response = await newRequest.post('/projects', projectData);
+      console.log('🚀  response:', response);
       setProjects((prevProjects) => [...prevProjects, response]);
+      toast.success('Project created successfully');
       return response;
     } catch (error) {
       console.error('Error adding project:', error);
@@ -68,15 +71,18 @@ export const ProjectProvider = ({ children }) => {
   const deleteProject = useCallback(
     async (projectId) => {
       try {
+        if (projects.length <= 1) {
+          toast.error('Cannot delete the last project');
+          return;
+        }
+
         await newRequest.delete(`/projects/${projectId}`);
         setProjects((prevProjects) => prevProjects.filter((project) => project._id !== projectId));
+
         if (selectedProject && selectedProject._id === projectId) {
-          const newSelectedProject = projects.find((p) => p._id !== projectId) || null;
+          const newSelectedProject = projects.find((p) => p._id !== projectId);
           setSelectedProject(newSelectedProject);
-          localStorage.setItem(
-            'selectedProjectId',
-            newSelectedProject ? newSelectedProject._id : '',
-          );
+          localStorage.setItem('selectedProjectId', newSelectedProject._id);
         }
       } catch (error) {
         console.error('Error deleting project:', error);
@@ -94,19 +100,9 @@ export const ProjectProvider = ({ children }) => {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  const handleCreateProject = async (e) => {
-    e.preventDefault();
-    if (newProjectName.trim()) {
-      await addProject({ name: newProjectName.trim() });
-      setNewProjectName('');
-      closeModal();
-    }
-  };
-
   const value = {
     projects,
     fetchProjects,
-    addProject,
     updateProject,
     deleteProject,
     selectedProject,
@@ -114,6 +110,7 @@ export const ProjectProvider = ({ children }) => {
     openModal,
     isModalOpen,
     closeModal,
+    addProject,
   };
 
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>;
