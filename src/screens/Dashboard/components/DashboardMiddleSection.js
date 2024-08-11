@@ -14,6 +14,7 @@ import { commonStyles } from './sharedStyles/commonStyles';
 const fakeProfiles = ['User1', 'User2', 'User3'];
 
 const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
+  console.log('🚀  tasks:', tasks);
   return (
     <motion.div style={{ minHeight: '50px', padding: '10px 0' }}>
       <AnimatePresence>
@@ -26,6 +27,7 @@ const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
                   onEditTask={onEditTask}
                   key={task?._id}
                   id={task?._id}
+                  assignee={task?.assignee}
                   user={task?.user}
                   title={task?.name}
                   tag={task.category}

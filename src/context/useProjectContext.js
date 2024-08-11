@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import newRequest from '../api/newReqest';
 
@@ -11,6 +11,10 @@ export const ProjectProvider = ({ children }) => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
+
+  const members = useMemo(() => {
+    return selectedProject?.members?.map((member) => member.user.name);
+  }, [selectedProject]);
 
   useEffect(() => {
     fetchProjects();
@@ -111,6 +115,7 @@ export const ProjectProvider = ({ children }) => {
     isModalOpen,
     closeModal,
     addProject,
+    members,
   };
 
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>;

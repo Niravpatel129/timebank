@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { v4 as uuidv4 } from 'uuid';
 import newRequest from '../api/newReqest';
 import { useProjectContext } from './useProjectContext';
@@ -52,6 +53,15 @@ export const TasksProvider = ({ children }) => {
       // );
     } catch (error) {
       console.error('Error updating task:', error);
+    }
+  }, []);
+
+  const updateTaskAssignee = useCallback(async (taskId, assignee) => {
+    try {
+      const response = await newRequest.patch(`/tasks/${taskId}/assignee`, { assignee });
+    } catch (error) {
+      console.error('Error updating task assignee:', error);
+      toast.error('Error updating task assignee:', error);
     }
   }, []);
 
@@ -169,6 +179,7 @@ export const TasksProvider = ({ children }) => {
     updateTaskStatus,
     setTasks,
     editTask,
+    updateTaskAssignee,
   };
 
   return <TasksContext.Provider value={contextValue}>{children}</TasksContext.Provider>;

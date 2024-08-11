@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaCheck, FaPause, FaPlay } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
+import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
 import IconButton from './IconButton';
 import Tag from './Tag';
@@ -19,11 +20,20 @@ const Checklist = ({
   listType,
   onEditTask,
   timerState,
-  user,
+  assignee,
 }) => {
+  const [currentAssignee, setCurrentAssignee] = useState(assignee);
   const [isHovered, setIsHovered] = useState(false);
-  const { startTask, pauseTask, finishTask, activeTaskId, updateTaskStatus, tasks } =
-    useTasksContext();
+  const { selectedProject } = useProjectContext();
+  const {
+    startTask,
+    pauseTask,
+    finishTask,
+    activeTaskId,
+    updateTaskStatus,
+    tasks,
+    updateTaskAssignee,
+  } = useTasksContext();
   const [remainingTime, setRemainingTime] = useState(timerState.remainingTime);
   const [isAssigneeSelectOpen, setIsAssigneeSelectOpen] = useState(false);
   const assigneeSelectRef = useRef(null);
@@ -98,19 +108,13 @@ const Checklist = ({
   }
 
   const assignees = [
-    { value: 'unassigned', label: 'Unassigned', image: 'https://via.placeholder.com/150' },
-    {
-      value: 'user1',
-      label: 'User 1',
-      image:
-        'https://img.freepik.com/free-photo/cute-domestic-kitten-sits-window-staring-outside-generative-ai_188544-12519.jpg',
-    },
-    {
-      value: 'user2',
-      label: 'User 2',
-      image:
-        'https://images.pexels.com/photos/1170986/pexels-photo-1170986.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
-    },
+    ...selectedProject.members.map((member) => ({
+      value: member.user._id,
+      _id: member.user._id,
+      label: member.user.name || 'Member 1',
+      image: null,
+    })),
+    { value: null, label: 'Unassigned', image: null },
   ];
 
   const handleTaskClick = (e) => {
@@ -299,7 +303,7 @@ const Checklist = ({
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             ) : (
-              <span>{user?.name ? user.name[0].toUpperCase() : '?'}</span>
+              <span>{currentAssignee?.name[0].toUpperCase() || 'U'}</span>
             )}
           </motion.div>
           {isAssigneeSelectOpen && (
@@ -324,9 +328,6 @@ const Checklist = ({
                 <motion.div
                   key={assignee.value}
                   whileHover={{
-                    // backgroundColor: '#f0f0f0',
-                    textDecoration: 'underline',
-                    textUnderlineOffset: '4px',
                     scale: 1.05,
                     transition: { duration: 0.2 },
                   }}
@@ -342,21 +343,49 @@ const Checklist = ({
                   onClick={(e) => {
                     e.stopPropagation();
                     // Handle assignee selection here
+                    updateTaskAssignee(id, assignee.value);
+                    setCurrentAssignee({
+                      value: assignee.value,
+                      name: assignee.label,
+                      label: assignee.label,
+                      image: assignee.image,
+                    });
                     setIsAssigneeSelectOpen(false);
                   }}
                 >
-                  <img
-                    src={assignee.image}
-                    alt={assignee.label}
-                    style={{
-                      width: '30px',
-                      height: '30px',
-                      borderRadius: '50%',
-                      marginRight: '12px',
-                      objectFit: 'cover',
-                    }}
-                  />
-                  <span style={{ fontSize: '14px' }}>{assignee.label}</span>
+                  {assignee.image ? (
+                    <img
+                      src={assignee.image}
+                      alt={assignee.label}
+                      style={{
+                        width: '30px',
+                        height: '30px',
+                        borderRadius: '50%',
+                        marginRight: '12px',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: '30px',
+                        height: '30px',
+                        borderRadius: '50%',
+                        marginRight: '12px',
+                        backgroundColor:
+                          assignee?.value === currentAssignee?._id ? '#331db9' : '#d9dae3',
+                        color: '#ffffff',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        fontSize: '14px',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {assignee.label ? assignee.label[0].toUpperCase() : '?'}
+                    </div>
+                  )}
+                  <span style={{ fontSize: '14px' }}>{assignee.label || 'Unassigned'}</span>
                 </motion.div>
               ))}
             </motion.div>

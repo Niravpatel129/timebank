@@ -14,31 +14,9 @@ export default function DashboardAddTaskModal({ onClose }) {
   const [customMinutes, setCustomMinutes] = useState(0);
   const [category, setCategory] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [assignee, setAssignee] = useState(null);
+  const [assignee, setAssignee] = useState({ value: null, label: 'Unassigned' });
   const modalRef = useRef(null);
   const { addTask } = useTasksContext();
-
-  // Mock data for assignees, replace with actual data in your implementation
-  const assignees = [
-    {
-      value: '1',
-      label: 'John Doe',
-      avatar:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKK1zSX_YjOvNSHlqwuy84X_WMWRSHNigzpA&s',
-    },
-    {
-      value: '2',
-      label: 'Jane Smith',
-      avatar:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKK1zSX_YjOvNSHlqwuy84X_WMWRSHNigzpA&s',
-    },
-    {
-      value: '3',
-      label: 'Bob Johnson',
-      avatar:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKK1zSX_YjOvNSHlqwuy84X_WMWRSHNigzpA&s',
-    },
-  ];
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -123,16 +101,37 @@ export default function DashboardAddTaskModal({ onClose }) {
     }),
   };
 
-  const formatOptionLabel = ({ label, avatar }) => (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-      <img
-        src={avatar}
-        alt={label}
-        style={{ width: '24px', height: '24px', borderRadius: '50%', marginRight: '8px' }}
-      />
-      <span>{label}</span>
-    </div>
-  );
+  const formatOptionLabel = ({ label, avatar }) => {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {avatar ? (
+          <img
+            src={avatar}
+            alt={label}
+            style={{ width: '24px', height: '24px', borderRadius: '50%', marginRight: '8px' }}
+          />
+        ) : (
+          <div
+            style={{
+              width: '24px',
+              height: '24px',
+              borderRadius: '50%',
+              backgroundColor: '#ccc',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginRight: '8px',
+              fontSize: '12px',
+              fontWeight: 'bold',
+            }}
+          >
+            {label?.charAt(0).toUpperCase()}
+          </div>
+        )}
+        <span>{label}</span>
+      </div>
+    );
+  };
 
   return (
     <div
@@ -370,19 +369,28 @@ export default function DashboardAddTaskModal({ onClose }) {
           </div>
 
           {/* Assignee Select Dropdown */}
-          <div style={{ marginBottom: '15px' }}>
-            <label htmlFor='assignee'>Assignee</label>
-            <Select
-              id='assignee'
-              value={assignee}
-              onChange={setAssignee}
-              options={assignees}
-              styles={customStyles}
-              formatOptionLabel={formatOptionLabel}
-              placeholder='Select an assignee'
-              isClearable
-            />
-          </div>
+          {selectedProject?.members.length > 0 && (
+            <div style={{ marginBottom: '15px' }}>
+              <label htmlFor='assignee'>Assignee</label>
+              <Select
+                id='assignee'
+                value={assignee}
+                onChange={setAssignee}
+                options={[
+                  { value: null, label: 'Unassigned' },
+                  ...selectedProject?.members.map((member) => ({
+                    value: member.user._id,
+                    label: member.user?.name,
+                    avatar: null,
+                  })),
+                ]}
+                styles={customStyles}
+                formatOptionLabel={formatOptionLabel}
+                placeholder='Select an assignee'
+                isClearable
+              />
+            </div>
+          )}
 
           {/* Submit Button */}
           <motion.button

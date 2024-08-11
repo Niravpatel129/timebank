@@ -1,6 +1,7 @@
 // TimerTrack.js
 import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { CiClock1 } from 'react-icons/ci';
 import { FaPause, FaPlay } from 'react-icons/fa'; // Import play and pause icons
 import { IoSettingsOutline, IoTimerOutline } from 'react-icons/io5';
@@ -44,6 +45,10 @@ export default function TimerTrack() {
   };
 
   const handlePlay = (e) => {
+    if (!activeTask) {
+      toast.error('No active task to start');
+      return;
+    }
     e.stopPropagation();
     if (activeTask?.timerState?.isActive) {
       pauseTask(activeTaskId, remainingTime);
@@ -152,11 +157,11 @@ export default function TimerTrack() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                cursor: activeTask ? 'pointer' : 'default',
+                cursor: 'pointer',
                 marginTop: '20px',
                 boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
                 opacity: activeTask ? 1 : 0.5,
-                pointerEvents: activeTask ? 'auto' : 'none',
+                // pointerEvents: activeTask ? 'auto' : 'none',
               }}
             >
               {activeTask?.timerState?.isActive ? (
