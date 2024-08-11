@@ -14,6 +14,7 @@ const fakeProfiles = ['User1', 'User2', 'User3'];
 
 const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
   const { selectedProject } = useProjectContext();
+  console.log('🚀  selectedProject:', selectedProject);
 
   return (
     <motion.div style={{ minHeight: '50px', padding: '10px 0' }}>
@@ -70,6 +71,10 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   const [title, setTitle] = useState(selectedProject?.name);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [totalHoursLastTwoMonths, setTotalHoursLastTwoMonths] = useState(0);
+
+  const members = useMemo(() => {
+    return selectedProject?.members?.map((member) => member.user.name);
+  }, [selectedProject]);
 
   useEffect(() => {
     setTitle(selectedProject?.name);
@@ -243,27 +248,49 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
             </div>
           </div>
           <div style={commonStyles.flexContainer}>
-            <div style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginRight: '30px' }}>
               {/* profiles of 3 users, stacking like overlapping chips */}
-              {fakeProfiles.map((user, index) => (
+              {members?.map((user, index) => (
                 <div
                   key={user}
                   data-tooltip-id={`day-${index}`}
                   data-tooltip-content={`${user} - Last active: 2 hours ago`}
                   style={{ cursor: 'pointer' }}
                 >
-                  <img
-                    src='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
-                    alt={`${user} profile`}
-                    style={{
-                      width: '30px',
-                      height: '30px',
-                      borderRadius: '50%',
-                      marginRight: index !== 2 ? '-10px' : '0',
-                      border: '2px solid white',
-                      zIndex: 3 - index,
-                    }}
-                  />
+                  {user.profileImage ? (
+                    <img
+                      src={user.profileImage}
+                      alt={`${user} profile`}
+                      style={{
+                        width: '30px',
+                        height: '30px',
+                        borderRadius: '50%',
+                        marginRight: index !== 2 ? '-10px' : '0',
+                        border: '2px solid white',
+                        zIndex: 3 - index,
+                      }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: '30px',
+                        height: '30px',
+                        borderRadius: '50%',
+                        marginRight: index !== 2 ? '-10px' : '0',
+                        border: '2px solid white',
+                        zIndex: 3 - index,
+                        backgroundColor: '#ccc',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        color: '#fff',
+                      }}
+                    >
+                      {user.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
