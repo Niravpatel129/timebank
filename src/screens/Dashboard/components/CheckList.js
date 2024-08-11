@@ -22,10 +22,9 @@ const Checklist = ({
   timerState,
   assignee,
 }) => {
-  console.log('🚀  assignee:', assignee);
   const [currentAssignee, setCurrentAssignee] = useState(assignee);
   const [isHovered, setIsHovered] = useState(false);
-  const { selectedProject } = useProjectContext();
+  const { selectedProject, colorGradients } = useProjectContext();
   const {
     startTask,
     pauseTask,
@@ -179,7 +178,8 @@ const Checklist = ({
             borderRadius: '50%',
             border: '2px solid #ddd',
             cursor: 'pointer',
-            backgroundColor: status === 'completed' ? '#341dc0' : 'transparent',
+            backgroundColor:
+              status === 'completed' ? selectedProject?.projectColor?.gradient1 : 'transparent',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
@@ -206,7 +206,7 @@ const Checklist = ({
           </span>
           {tag && (
             <Tag
-              backgroundColor={tagBackgroundColor || commonStyles.primaryColor}
+              backgroundColor={tagBackgroundColor || colorGradients[0]}
               color='white'
               style={{
                 fontWeight: 'bold',
@@ -291,7 +291,7 @@ const Checklist = ({
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              backgroundColor: '#331db9',
+              backgroundColor: colorGradients[0],
               color: '#ffffff',
               fontSize: '14px',
               fontWeight: 'bold',
@@ -375,7 +375,7 @@ const Checklist = ({
                         backgroundColor:
                           (currentAssignee === undefined && assignee?.name === 'Unassigned') ||
                           assignee?.name === currentAssignee?.name
-                            ? '#331db9'
+                            ? colorGradients[0]
                             : '#d9dae3',
                         color: '#ffffff',
                         display: 'flex',

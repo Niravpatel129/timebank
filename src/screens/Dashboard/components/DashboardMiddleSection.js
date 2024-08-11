@@ -13,7 +13,7 @@ import { commonStyles } from './sharedStyles/commonStyles';
 
 const fakeProfiles = ['User1', 'User2', 'User3'];
 
-const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
+const TaskList = ({ tasks, listType, moveTask, onEditTask, colorGradients }) => {
   console.log('🚀  tasks:', tasks);
   return (
     <motion.div style={{ minHeight: '50px', padding: '10px 0' }}>
@@ -63,7 +63,7 @@ const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
 export default function DashboardComponent({ handleTriggerAddTaskButton, onEditTask }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const { selectedProject, updateProject } = useProjectContext();
+  const { selectedProject, updateProject, colorGradients } = useProjectContext();
   const [filterType, setFilterType] = useState('all'); // 'all' or 'my'
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const { tasks, updateTask, totalTimeSpent, dailyTimeSpent, setTasks } = useTasksContext();
@@ -208,7 +208,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
                   fontSize: '14px',
                   marginBottom: '10px',
                   fontWeight: 300,
-                  color: '#341dc0',
+                  color: selectedProject?.projectColor?.gradient1,
                 }}
               >
                 {selectedProject?.createdAt
@@ -238,7 +238,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
                     setIsEditingTitle(false);
                   }}
                   style={{
-                    color: commonStyles.primaryColor,
+                    color: colorGradients[0],
                     fontSize: '28px',
                     margin: '0',
                     border: 'none',
@@ -250,7 +250,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
               ) : (
                 <h1
                   style={{
-                    color: commonStyles.primaryColor,
+                    color: colorGradients[0],
                     fontSize: '28px',
                     margin: '0',
                     cursor: 'pointer',
@@ -340,7 +340,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
             />
             <div
               style={{
-                backgroundColor: commonStyles.primaryColor,
+                backgroundColor: colorGradients[0],
                 color: 'white',
                 width: '30px',
                 height: '30px',
@@ -394,7 +394,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
               <div style={{ ...commonStyles.flexContainer, gap: '4px' }}>
                 <span
                   style={{
-                    color: commonStyles.primaryColor,
+                    color: colorGradients[0],
                     fontSize: '18px',
                     fontWeight: 'bold',
                     textWrap: 'nowrap',
@@ -464,7 +464,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
         >
           <h2
             style={{
-              color: commonStyles.primaryColor,
+              color: colorGradients[0],
               marginBottom: '20px',
               ...commonStyles.flexContainer,
               gap: '4px',
@@ -487,7 +487,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
                   style={{
                     color:
                       filterType === (index === 0 ? 'all' : 'my')
-                        ? commonStyles.primaryColor
+                        ? colorGradients[0]
                         : commonStyles.secondaryColor,
                     fontSize: '15px',
                     cursor: 'pointer',
@@ -513,9 +513,10 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
           listType='currentWeek'
           moveTask={moveTask}
           onEditTask={onEditTask}
+          colorGradients={colorGradients}
         />
 
-        <h2 style={{ color: commonStyles.primaryColor, marginTop: '30px', marginBottom: '20px' }}>
+        <h2 style={{ color: colorGradients[0], marginTop: '30px', marginBottom: '20px' }}>
           Things to do
         </h2>
 

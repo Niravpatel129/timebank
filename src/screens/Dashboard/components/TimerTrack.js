@@ -5,11 +5,13 @@ import toast from 'react-hot-toast';
 import { CiClock1 } from 'react-icons/ci';
 import { FaPause, FaPlay } from 'react-icons/fa'; // Import play and pause icons
 import { IoSettingsOutline, IoTimerOutline } from 'react-icons/io5';
+import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
 
 export default function TimerTrack() {
   const { tasks, activeTaskId, getRemainingTime, pauseTask, finishTask, startTask } =
     useTasksContext();
+  const { colorGradients } = useProjectContext();
 
   const [remainingTime, setRemainingTime] = useState(0);
   const activeTask = tasks.find((task) => task?._id === activeTaskId);
@@ -102,7 +104,7 @@ export default function TimerTrack() {
         >
           <h2
             style={{
-              color: '#3a23c4',
+              color: colorGradients[0],
               fontSize: '14px',
               fontWeight: 'bold',
               display: 'flex',
@@ -110,7 +112,9 @@ export default function TimerTrack() {
             }}
           >
             <span>
-              <IoTimerOutline style={{ fontSize: '16px', color: '#3a23c4', marginRight: '7px' }} />
+              <IoTimerOutline
+                style={{ fontSize: '16px', color: colorGradients[0], marginRight: '7px' }}
+              />
             </span>
             <span>{activeTask ? 'Timer Running' : 'No Active Task'}</span>
           </h2>
@@ -118,7 +122,7 @@ export default function TimerTrack() {
             style={{
               fontSize: '72px',
               fontWeight: 'semibold',
-              color: '#3a23c4',
+              color: colorGradients[0],
               margin: '0px',
               padding: '0px',
             }}
@@ -264,7 +268,7 @@ export default function TimerTrack() {
           >
             <h3
               style={{
-                color: '#3a23c4',
+                color: colorGradients[0],
                 fontSize: '18px',
                 fontWeight: 'bold',
                 margin: 0,
@@ -304,7 +308,7 @@ export default function TimerTrack() {
               </div>
               <div
                 style={{
-                  color: '#3a23c4',
+                  color: colorGradients[0],
                   fontSize: '16px',
                   fontWeight: 400,
                   display: 'flex',

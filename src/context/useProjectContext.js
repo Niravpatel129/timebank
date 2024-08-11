@@ -11,6 +11,10 @@ export const ProjectProvider = ({ children }) => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
+  const colorGradients = [
+    selectedProject?.projectColor?.gradient1 || '',
+    selectedProject?.projectColor?.gradient2 || '',
+  ];
 
   const members = useMemo(() => {
     return selectedProject?.members?.map((member) => member.user.name);
@@ -116,6 +120,7 @@ export const ProjectProvider = ({ children }) => {
     closeModal,
     addProject,
     members,
+    colorGradients,
   };
 
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>;
