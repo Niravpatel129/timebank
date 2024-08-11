@@ -38,6 +38,7 @@ const newRequest = {
   post: (url, data, options) => makeRequest('POST', url, data, options),
   put: (url, data, options) => makeRequest('PUT', url, data, options),
   delete: (url, options) => makeRequest('DELETE', url, null, options),
+  patch: (url, data, options) => makeRequest('PATCH', url, data, options),
   // Add other methods as needed
 };
 

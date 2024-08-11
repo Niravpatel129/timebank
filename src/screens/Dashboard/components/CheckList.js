@@ -21,16 +21,15 @@ const Checklist = ({
   timerState,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { startTask, pauseTask, finishTask, activeTaskId, updateTaskStatus } = useTasksContext();
+  const { startTask, pauseTask, finishTask, activeTaskId, updateTaskStatus, tasks } =
+    useTasksContext();
   const [remainingTime, setRemainingTime] = useState(timerState.remainingTime);
-  console.log('🚀  remainingTime:', remainingTime);
   const [isAssigneeSelectOpen, setIsAssigneeSelectOpen] = useState(false);
   const assigneeSelectRef = useRef(null);
   const [isPlayButtonHovered, setIsPlayButtonHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
   const isDisabled = activeTaskId !== null && activeTaskId !== id;
-  console.log('🚀  timerState:', timerState);
 
   useEffect(() => {
     if (!timerState.remainingTime) {
@@ -68,7 +67,7 @@ const Checklist = ({
 
   const handleCheckboxChange = (e) => {
     e.stopPropagation();
-    updateTaskStatus(id, status === 'completed' ? 'notStarted' : 'completed');
+    updateTaskStatus(id, status === 'completed' ? 'not-started' : 'completed');
   };
 
   const handlePlay = (e) => {
