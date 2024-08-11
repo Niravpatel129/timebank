@@ -21,7 +21,6 @@ const Checklist = ({
   timerState,
   user,
 }) => {
-  console.log('🚀  timerState:', timerState);
   const [isHovered, setIsHovered] = useState(false);
   const { startTask, pauseTask, finishTask, activeTaskId, updateTaskStatus, tasks } =
     useTasksContext();
@@ -193,6 +192,9 @@ const Checklist = ({
               cursor: 'pointer',
               textDecoration: status === 'completed' ? 'line-through' : 'none',
               marginRight: '5px',
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              maxWidth: '550px',
             }}
           >
             {title}

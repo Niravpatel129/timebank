@@ -2,11 +2,13 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { CiClock1 } from 'react-icons/ci';
+import { FaPause, FaPlay } from 'react-icons/fa'; // Import play and pause icons
 import { IoSettingsOutline, IoTimerOutline } from 'react-icons/io5';
 import { useTasksContext } from '../../../context/useTasksContext';
 
 export default function TimerTrack() {
-  const { tasks, activeTaskId, getRemainingTime, pauseTask, finishTask } = useTasksContext();
+  const { tasks, activeTaskId, getRemainingTime, pauseTask, finishTask, startTask } =
+    useTasksContext();
 
   const [remainingTime, setRemainingTime] = useState(0);
   const activeTask = tasks.find((task) => task?._id === activeTaskId);
@@ -39,6 +41,15 @@ export default function TimerTrack() {
     return `${hours.toString().padStart(2, '0')}:${minutes
       .toString()
       .padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  const handlePlay = (e) => {
+    e.stopPropagation();
+    if (activeTask?.timerState?.isActive) {
+      pauseTask(activeTaskId, remainingTime);
+    } else if (activeTask) {
+      startTask(activeTaskId, remainingTime);
+    }
   };
 
   const handleStop = () => {
@@ -116,36 +127,43 @@ export default function TimerTrack() {
               margin: '0px',
               padding: '0px',
               fontWeight: 200,
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              maxWidth: '550px',
+              width: '90%',
+              textAlign: 'center',
             }}
           >
             {activeTask ? `Task: ${activeTask.name}` : 'Start a task to begin tracking'}
           </p>
           <div>
             <motion.div
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={handleStop}
+              whileHover={{ scale: activeTask ? 1.1 : 1 }}
+              whileTap={{ scale: activeTask ? 0.9 : 1 }}
+              onClick={handlePlay}
               style={{
                 width: '70px',
                 height: '70px',
                 borderRadius: '50%',
-                background: 'linear-gradient(to bottom, #ff0d15, #ff0087)',
+                background: activeTask
+                  ? 'linear-gradient(to bottom, #ff0d15, #ff0087)'
+                  : 'linear-gradient(to bottom, #ccc, #999)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                cursor: 'pointer',
+                cursor: activeTask ? 'pointer' : 'default',
                 marginTop: '20px',
                 boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                opacity: activeTask ? 1 : 0.5,
+                pointerEvents: activeTask ? 'auto' : 'none',
               }}
             >
-              <div
-                style={{
-                  width: '24px',
-                  height: '24px',
-                  backgroundColor: 'white',
-                  borderRadius: '2px',
-                }}
-              />
+              {activeTask?.timerState?.isActive ? (
+                <FaPause style={{ color: 'white', fontSize: '24px' }} />
+              ) : (
+                <FaPlay style={{ color: 'white', fontSize: '24px' }} />
+              )}
             </motion.div>
           </div>
         </div>
