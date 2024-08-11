@@ -14,9 +14,25 @@ export default function DashboardAddTaskModal({ onClose }) {
   const [customMinutes, setCustomMinutes] = useState(0);
   const [category, setCategory] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [assignee, setAssignee] = useState({ value: null, label: 'Unassigned' });
+  const [assignee, setAssignee] = useState(null);
+  console.log('🚀  assignee:', assignee);
   const modalRef = useRef(null);
   const { addTask } = useTasksContext();
+
+  useEffect(() => {
+    // pick the first assignee
+    if (selectedProject?.members.length > 0) {
+      if (selectedProject.members[0].user._id && selectedProject.members[0].user.name) {
+        setAssignee({
+          value: selectedProject.members[0].user._id,
+          _id: selectedProject.members[0].user._id,
+          name: selectedProject.members[0].user.name,
+          email: selectedProject.members[0].user.email,
+          avatar: null,
+        });
+      }
+    }
+  }, [selectedProject]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -29,7 +45,8 @@ export default function DashboardAddTaskModal({ onClose }) {
       category: category || null,
       dateDue: date,
       dateCreated: new Date().toISOString(),
-      assignee: assignee ? assignee.value : null,
+      assignee: assignee?.value,
+      assigneeDetails: assignee,
     };
     addTask({ ...newTask, project: selectedProject._id });
     onClose();
@@ -101,13 +118,13 @@ export default function DashboardAddTaskModal({ onClose }) {
     }),
   };
 
-  const formatOptionLabel = ({ label, avatar }) => {
+  const formatOptionLabel = ({ name, avatar }) => {
     return (
       <div style={{ display: 'flex', alignItems: 'center' }}>
         {avatar ? (
           <img
             src={avatar}
-            alt={label}
+            alt={name}
             style={{ width: '24px', height: '24px', borderRadius: '50%', marginRight: '8px' }}
           />
         ) : (
@@ -125,10 +142,10 @@ export default function DashboardAddTaskModal({ onClose }) {
               fontWeight: 'bold',
             }}
           >
-            {label?.charAt(0).toUpperCase()}
+            {name?.charAt(0).toUpperCase()}
           </div>
         )}
-        <span>{label}</span>
+        <span>{name}</span>
       </div>
     );
   };
@@ -377,12 +394,12 @@ export default function DashboardAddTaskModal({ onClose }) {
                 value={assignee}
                 onChange={setAssignee}
                 options={[
-                  { value: null, label: 'Unassigned' },
                   ...selectedProject?.members.map((member) => ({
                     value: member.user._id,
                     label: member.user?.name,
                     avatar: null,
                   })),
+                  { value: null, label: 'Unassigned' },
                 ]}
                 styles={customStyles}
                 formatOptionLabel={formatOptionLabel}

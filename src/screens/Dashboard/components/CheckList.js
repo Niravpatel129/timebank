@@ -22,6 +22,7 @@ const Checklist = ({
   timerState,
   assignee,
 }) => {
+  console.log('🚀  assignee:', assignee);
   const [currentAssignee, setCurrentAssignee] = useState(assignee);
   const [isHovered, setIsHovered] = useState(false);
   const { selectedProject } = useProjectContext();
@@ -111,10 +112,10 @@ const Checklist = ({
     ...selectedProject.members.map((member) => ({
       value: member.user._id,
       _id: member.user._id,
-      label: member.user.name || 'Member 1',
+      name: member.user.name || 'Member 1',
       image: null,
     })),
-    { value: null, label: 'Unassigned', image: null },
+    { value: null, image: null, name: 'Unassigned', _id: null },
   ];
 
   const handleTaskClick = (e) => {
@@ -303,7 +304,7 @@ const Checklist = ({
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             ) : (
-              <span>{currentAssignee?.name[0].toUpperCase() || 'U'}</span>
+              <span>{currentAssignee?.name?.[0].toUpperCase() || 'U'}</span>
             )}
           </motion.div>
           {isAssigneeSelectOpen && (
@@ -346,8 +347,7 @@ const Checklist = ({
                     updateTaskAssignee(id, assignee.value);
                     setCurrentAssignee({
                       value: assignee.value,
-                      name: assignee.label,
-                      label: assignee.label,
+                      name: assignee.name,
                       image: assignee.image,
                     });
                     setIsAssigneeSelectOpen(false);
@@ -356,7 +356,7 @@ const Checklist = ({
                   {assignee.image ? (
                     <img
                       src={assignee.image}
-                      alt={assignee.label}
+                      alt={assignee.name}
                       style={{
                         width: '30px',
                         height: '30px',
@@ -373,7 +373,10 @@ const Checklist = ({
                         borderRadius: '50%',
                         marginRight: '12px',
                         backgroundColor:
-                          assignee?.value === currentAssignee?._id ? '#331db9' : '#d9dae3',
+                          (currentAssignee === undefined && assignee?.name === 'Unassigned') ||
+                          assignee?.name === currentAssignee?.name
+                            ? '#331db9'
+                            : '#d9dae3',
                         color: '#ffffff',
                         display: 'flex',
                         justifyContent: 'center',
@@ -382,10 +385,10 @@ const Checklist = ({
                         fontWeight: 'bold',
                       }}
                     >
-                      {assignee.label ? assignee.label[0].toUpperCase() : '?'}
+                      {assignee.name ? assignee.name?.[0].toUpperCase() : 'U'}
                     </div>
                   )}
-                  <span style={{ fontSize: '14px' }}>{assignee.label || 'Unassigned'}</span>
+                  <span style={{ fontSize: '14px' }}>{assignee.name || 'Unassigned'}</span>
                 </motion.div>
               ))}
             </motion.div>
