@@ -74,7 +74,7 @@ export const UserProvider = ({ children }) => {
         verificationCode: code,
       });
       if (response.user) {
-        handleLoginAndSetUser(response.user, response.token);
+        handleLoginAndSetUser(response.user, response.authToken);
       }
       return response;
     } catch (error) {
