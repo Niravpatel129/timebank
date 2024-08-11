@@ -13,9 +13,7 @@ import { commonStyles } from './sharedStyles/commonStyles';
 const fakeProfiles = ['User1', 'User2', 'User3'];
 
 const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
-  const { selectedProject } = useProjectContext();
-  console.log('🚀  selectedProject:', selectedProject);
-
+  console.log('🚀  tasks:', tasks);
   return (
     <motion.div style={{ minHeight: '50px', padding: '10px 0' }}>
       <AnimatePresence>
@@ -28,6 +26,7 @@ const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
                   onEditTask={onEditTask}
                   key={task?._id}
                   id={task?._id}
+                  user={task?.user}
                   title={task?.name}
                   tag={task.category}
                   status={task.status}
@@ -35,7 +34,7 @@ const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
                     Math.floor((task.taskDuration % 3600) / 60),
                   ).padStart(2, '0')}`}
                   taskDuration={task.taskDuration}
-                  profileImage='https://steamuserimages-a.akamaihd.net/ugc/952958837545085710/66EE7FE7365BF1365AFA9E8EB3C7447FF4DF81CD/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false'
+                  profileImage={null}
                   listType={listType}
                   moveTask={moveTask}
                   disabled={listType === 'currentWeek' && task.status === 'completed'}
@@ -257,9 +256,9 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
                   data-tooltip-content={`${user} - Last active: 2 hours ago`}
                   style={{ cursor: 'pointer' }}
                 >
-                  {user.profileImage ? (
+                  {user?.profileImage ? (
                     <img
-                      src={user.profileImage}
+                      src={user?.profileImage}
                       alt={`${user} profile`}
                       style={{
                         width: '30px',

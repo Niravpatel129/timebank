@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import newRequest from '../api/newReqest';
+import { useProjectContext } from './useProjectContext';
 
 const TasksContext = createContext();
 
@@ -10,15 +11,15 @@ export const TasksProvider = ({ children }) => {
   const [tasks, setTasks] = useState([]);
   const [activeTaskId, setActiveTaskId] = useState(null);
   const [totalTimeSpent, setTotalTimeSpent] = useState(0);
-  const [dailyTimeSpent, setDailyTimeSpent] = useState({});
+  const { selectedProject, projects } = useProjectContext();
 
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const response = await newRequest.get('/tasks');
+        const response = await newRequest.get(`/tasks/${selectedProject?._id}`);
         setTasks(response.data);
+        console.log('🚀  response123:', response);
         setTotalTimeSpent(response.totalTimeSpent);
-        setDailyTimeSpent(response.dailyTimeSpent);
 
         // if any task is active, set it as active
         const activeTask = response.data.find((task) => task.timerState.isActive);
@@ -30,7 +31,7 @@ export const TasksProvider = ({ children }) => {
       }
     };
     fetchInitialData();
-  }, []);
+  }, [projects, selectedProject]);
 
   const addTask = useCallback(async (task) => {
     try {
@@ -75,8 +76,6 @@ export const TasksProvider = ({ children }) => {
       setTasks((prevTasks) =>
         prevTasks.map((task) => (task?._id === editedTask._id ? response : task)),
       );
-      setTotalTimeSpent(response.totalTimeSpent);
-      setDailyTimeSpent(response.dailyTimeSpent);
     } catch (error) {
       console.error('Error editing task:', error);
     }
@@ -102,8 +101,6 @@ export const TasksProvider = ({ children }) => {
       });
       setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
       // setActiveTaskId(null);
-      setTotalTimeSpent(response.totalTimeSpent);
-      setDailyTimeSpent(response.dailyTimeSpent);
     } catch (error) {
       console.error('Error pausing task:', error);
     }
@@ -129,8 +126,6 @@ export const TasksProvider = ({ children }) => {
         prevTasks.map((task) => (task?._id === taskId ? response.data : task)),
       );
       setActiveTaskId(null);
-      setTotalTimeSpent(response.totalTimeSpent);
-      setDailyTimeSpent(response.dailyTimeSpent);
     } catch (error) {
       console.error('Error finishing task:', error);
     }
@@ -170,7 +165,6 @@ export const TasksProvider = ({ children }) => {
     getRemainingTime,
     activeTaskId,
     totalTimeSpent,
-    dailyTimeSpent,
     updateTaskStatus,
     setTasks,
     editTask,

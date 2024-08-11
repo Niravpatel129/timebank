@@ -19,6 +19,7 @@ const Checklist = ({
   listType,
   onEditTask,
   timerState,
+  user,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { startTask, pauseTask, finishTask, activeTaskId, updateTaskStatus, tasks } =
@@ -275,13 +276,24 @@ const Checklist = ({
               cursor: 'pointer',
               overflow: 'hidden',
               boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: '#331db9',
+              color: '#ffffff',
+              fontSize: '14px',
+              fontWeight: 'bold',
             }}
           >
-            <img
-              src={profileImage}
-              alt='profile'
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
+            {profileImage ? (
+              <img
+                src={profileImage}
+                alt='profile'
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <span>{user?.name ? user.name[0].toUpperCase() : '?'}</span>
+            )}
           </motion.div>
           {isAssigneeSelectOpen && (
             <motion.div

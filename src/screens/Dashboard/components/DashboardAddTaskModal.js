@@ -2,9 +2,11 @@ import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import Select from 'react-select';
+import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
 
 export default function DashboardAddTaskModal({ onClose }) {
+  const { selectedProject } = useProjectContext();
   const [taskName, setTaskName] = useState('');
   const [duration, setDuration] = useState('30m');
   const [showCustomDuration, setShowCustomDuration] = useState(false);
@@ -51,7 +53,7 @@ export default function DashboardAddTaskModal({ onClose }) {
       dateCreated: new Date().toISOString(),
       assignee: assignee ? assignee.value : null,
     };
-    addTask(newTask);
+    addTask({ ...newTask, project: selectedProject._id });
     onClose();
   };
 
