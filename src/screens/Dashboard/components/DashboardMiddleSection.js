@@ -13,6 +13,8 @@ import { commonStyles } from './sharedStyles/commonStyles';
 const fakeProfiles = ['User1', 'User2', 'User3'];
 
 const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
+  const { selectedProject } = useProjectContext();
+
   return (
     <motion.div style={{ minHeight: '50px', padding: '10px 0' }}>
       <AnimatePresence>
@@ -176,7 +178,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
         >
           <div>
             <div style={{ fontSize: '14px', color: '#8888a4' }}>
-              <span style={{ marginRight: '10px' }}>Project:</span>
+              <span style={{ marginRight: '10px' }}>Date Created:</span>
               <div
                 style={{
                   backgroundColor: '#eae8f2',
@@ -189,7 +191,13 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
                   color: '#341dc0',
                 }}
               >
-                design system
+                {selectedProject?.createdAt
+                  ? new Date(selectedProject.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
+                  : 'N/A'}
               </div>
             </div>
             <div
