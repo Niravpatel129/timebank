@@ -15,7 +15,6 @@ export default function DashboardAddTaskModal({ onClose }) {
   const [category, setCategory] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [assignee, setAssignee] = useState(null);
-  console.log('🚀  assignee:', assignee);
   const modalRef = useRef(null);
   const { addTask } = useTasksContext();
 
