@@ -20,7 +20,6 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   const { selectedProject, updateProject, colorGradients } = useProjectContext();
   const [filterType, setFilterType] = useState('all');
   const { tasks, updateTask, totalTimeSpent, dailyTimeSpent, setTasks } = useTasksContext();
-  console.log('🚀  tasks:', tasks);
   const [title, setTitle] = useState(selectedProject?.name);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [totalHoursLastTwoMonths, setTotalHoursLastTwoMonths] = useState(0);

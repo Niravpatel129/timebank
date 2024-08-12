@@ -13,13 +13,20 @@ export const TasksProvider = ({ children }) => {
   const [tasks, setTasks] = useState([]);
   const [activeTaskId, setActiveTaskId] = useState(null);
   const [totalTimeSpent, setTotalTimeSpent] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const { selectedProject, projects } = useProjectContext();
   const { addHistoryEntry } = useHistoryContext();
 
   useEffect(() => {
     const fetchInitialData = async () => {
+      setIsLoading(true);
       try {
-        if (!selectedProject) return;
+        if (!selectedProject) {
+          setTasks([]);
+          setTotalTimeSpent(0);
+          setActiveTaskId(null);
+          return;
+        }
 
         const response = await newRequest.get(`/tasks/${selectedProject?._id}`);
         setTasks(response.tasks);
@@ -29,9 +36,14 @@ export const TasksProvider = ({ children }) => {
         const activeTask = response.tasks.find((task) => task.timerState.isActive);
         if (activeTask) {
           setActiveTaskId(activeTask._id);
+        } else {
+          setActiveTaskId(null);
         }
       } catch (error) {
         console.error('Error fetching initial data:', error);
+        toast.error('Failed to load tasks. Please try again.');
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchInitialData();
@@ -69,6 +81,7 @@ export const TasksProvider = ({ children }) => {
         });
       } catch (error) {
         console.error('Error adding task:', error);
+        toast.error('Failed to add task. Please try again.');
       }
     },
     [addHistoryEntry, selectedProject],
@@ -82,6 +95,7 @@ export const TasksProvider = ({ children }) => {
       );
     } catch (error) {
       console.error('Error updating task:', error);
+      toast.error('Failed to update task. Please try again.');
     }
   }, []);
 
@@ -92,7 +106,7 @@ export const TasksProvider = ({ children }) => {
       setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
     } catch (error) {
       console.error('Error updating task assignee:', error);
-      toast.error('Error updating task assignee:', error);
+      toast.error('Error updating task assignee. Please try again.');
     }
   }, []);
 
@@ -106,6 +120,7 @@ export const TasksProvider = ({ children }) => {
         }
       } catch (error) {
         console.error('Error deleting task:', error);
+        toast.error('Failed to delete task. Please try again.');
       }
     },
     [activeTaskId],
@@ -120,6 +135,7 @@ export const TasksProvider = ({ children }) => {
       );
     } catch (error) {
       console.error('Error editing task:', error);
+      toast.error('Failed to edit task. Please try again.');
     }
   }, []);
 
@@ -133,6 +149,7 @@ export const TasksProvider = ({ children }) => {
       setActiveTaskId(taskId);
     } catch (error) {
       console.error('Error starting task:', error);
+      toast.error('Failed to start task. Please try again.');
     }
   }, []);
 
@@ -145,6 +162,7 @@ export const TasksProvider = ({ children }) => {
       // setActiveTaskId(null);
     } catch (error) {
       console.error('Error pausing task:', error);
+      toast.error('Failed to pause task. Please try again.');
     }
   }, []);
 
@@ -155,6 +173,7 @@ export const TasksProvider = ({ children }) => {
       setActiveTaskId(taskId);
     } catch (error) {
       console.error('Error resuming task:', error);
+      toast.error('Failed to resume task. Please try again.');
     }
   }, []);
 
@@ -166,6 +185,7 @@ export const TasksProvider = ({ children }) => {
       setActiveTaskId(null);
     } catch (error) {
       console.error('Error finishing task:', error);
+      toast.error('Failed to finish task. Please try again.');
     }
   }, []);
 
@@ -181,6 +201,7 @@ export const TasksProvider = ({ children }) => {
       // );
     } catch (error) {
       console.error('Error updating task status:', error);
+      toast.error('Failed to update task status. Please try again.');
     }
   }, []);
 
@@ -211,6 +232,7 @@ export const TasksProvider = ({ children }) => {
     setTasks,
     editTask,
     updateTaskAssignee,
+    isLoading,
   };
 
   return <TasksContext.Provider value={contextValue}>{children}</TasksContext.Provider>;

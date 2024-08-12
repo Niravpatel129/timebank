@@ -38,9 +38,9 @@ const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            style={{ color: '#888', textAlign: '' }}
+            style={{ color: '#888', fontSize: '16px' }}
           >
-            No tasks in this list
+            🌴 Relax, No tasks here yet.
           </motion.div>
         )}
       </AnimatePresence>
