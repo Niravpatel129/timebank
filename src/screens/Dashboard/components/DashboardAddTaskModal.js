@@ -396,9 +396,10 @@ export default function DashboardAddTaskModal({ onClose }) {
                   ...selectedProject?.members.map((member) => ({
                     value: member.user._id,
                     label: member.user?.name,
+                    name: member.user?.name,
                     avatar: null,
                   })),
-                  { value: null, label: 'Unassigned' },
+                  { value: null, label: 'Unassigned', name: 'Unassigned' },
                 ]}
                 styles={customStyles}
                 formatOptionLabel={formatOptionLabel}

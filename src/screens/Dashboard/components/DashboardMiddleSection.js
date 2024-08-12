@@ -7,12 +7,15 @@ import { Tooltip } from 'react-tooltip';
 import newRequest from '../../../api/newReqest';
 import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
+import { useUserContext } from '../../../context/useUserContext';
 import secondsToTimeObj from '../../../helpers/secondsToTimeObj';
 import { commonStyles } from './sharedStyles/commonStyles';
 import TaskList from './TaskList/TaskList';
 
 export default function DashboardComponent({ handleTriggerAddTaskButton, onEditTask }) {
   const [searchQuery, setSearchQuery] = useState('');
+  const { user } = useUserContext();
+  console.log('🚀  user:', user);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { selectedProject, updateProject, colorGradients } = useProjectContext();
   const [filterType, setFilterType] = useState('all');
@@ -39,7 +42,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   }, [tasks, selectedProject]);
 
   const members = useMemo(() => {
-    return selectedProject?.members?.map((member) => member.user.name);
+    return selectedProject?.members?.map((member) => member?.user?.name);
   }, [selectedProject]);
 
   useEffect(() => {
@@ -56,15 +59,21 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
     }
   };
 
-  const currentWeekTasks = useMemo(
-    () => tasks?.filter((task) => task?.listType === 'currentWeek'),
-    [tasks],
-  );
+  const currentWeekTasks = useMemo(() => {
+    const filteredTasks = tasks?.filter((task) => task?.listType === 'currentWeek');
+    return filterType === 'all'
+      ? filteredTasks
+      : filteredTasks.filter((task) => {
+          return task.assignee?.name === user?.name;
+        });
+  }, [tasks, filterType, user?.name]);
 
-  const thingsToDoTasks = useMemo(
-    () => tasks?.filter((task) => task?.listType === 'thingsToDo'),
-    [tasks],
-  );
+  const thingsToDoTasks = useMemo(() => {
+    const filteredTasks = tasks?.filter((task) => task?.listType === 'thingsToDo');
+    return filterType === 'all'
+      ? filteredTasks
+      : filteredTasks.filter((task) => task.assignee === user?.name);
+  }, [tasks, filterType, user?.name]);
 
   const moveTask = useCallback(
     (id, targetList) => {
@@ -417,7 +426,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
             transition={{ duration: 0.3 }}
           >
             <div style={{ ...commonStyles.flexContainer, gap: '20px' }}>
-              {['All Tasks', 'My Tasks'].map((text, index) => (
+              {['All Tasks', `${user?.name}'s Tasks`].map((text, index) => (
                 <motion.div
                   key={index}
                   whileHover={{ scale: 1.05 }}
