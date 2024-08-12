@@ -1,4 +1,6 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
+import Checklist from '../CheckList';
 
 const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
   return (

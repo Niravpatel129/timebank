@@ -8,57 +8,8 @@ import newRequest from '../../../api/newReqest';
 import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
 import secondsToTimeObj from '../../../helpers/secondsToTimeObj';
-import Checklist from './CheckList';
 import { commonStyles } from './sharedStyles/commonStyles';
-
-const fakeProfiles = ['User1', 'User2', 'User3'];
-
-const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
-  console.log('🚀  tasks:', tasks);
-  return (
-    <motion.div style={{ minHeight: '50px', padding: '10px 0' }}>
-      <AnimatePresence>
-        {tasks.length > 0 ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {tasks.map((task) => {
-              if (!task) return null;
-              return (
-                <Checklist
-                  onEditTask={onEditTask}
-                  key={task?._id}
-                  id={task?._id}
-                  assignee={task?.assignee}
-                  user={task?.user}
-                  title={task?.name}
-                  tag={task.category}
-                  status={task.status}
-                  time={`${Math.floor(task.taskDuration / 3600)}:${String(
-                    Math.floor((task.taskDuration % 3600) / 60),
-                  ).padStart(2, '0')}`}
-                  taskDuration={task.taskDuration}
-                  profileImage={null}
-                  listType={listType}
-                  moveTask={moveTask}
-                  disabled={listType === 'currentWeek' && task.status === 'completed'}
-                  timerState={task.timerState}
-                />
-              );
-            })}
-          </div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            style={{ color: '#888', textAlign: '' }}
-          >
-            No tasks in this list
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-};
+import TaskList from './TaskList/TaskList';
 
 export default function DashboardComponent({ handleTriggerAddTaskButton, onEditTask }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -529,9 +480,6 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
           onEditTask={onEditTask}
         />
       </div>
-      {fakeProfiles.map((profile, index) => (
-        <Tooltip key={`${profile}-${index}`} id={`day-${index}`} />
-      ))}
 
       {Array(60)
         .fill()
