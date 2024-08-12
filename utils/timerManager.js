@@ -15,6 +15,7 @@ class TimerManager {
     ipcMain.on('stop-timer', this.stopTimer.bind(this));
     ipcMain.on('reset-timer', this.resetTimer.bind(this));
     ipcMain.on('update-uncompleted-tasks', this.updateUncompletedTasks.bind(this));
+    ipcMain.on('update-tray-title', this.updateTrayTitleFromRenderer.bind(this));
   }
 
   startTimer(event, task) {
@@ -76,6 +77,14 @@ class TimerManager {
       const seconds = (time % 60).toString().padStart(2, '0');
       this.tray.setTitle(`${minutes}:${seconds}`);
     }
+  }
+
+  updateTrayTitleFromRenderer(event, time) {
+    const minutes = Math.floor(time / 60)
+      .toString()
+      .padStart(2, '0');
+    const seconds = (time % 60).toString().padStart(2, '0');
+    this.tray.setTitle(`${minutes}:${seconds}`);
   }
 }
 

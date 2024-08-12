@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTasksContext } from '../context/useTasksContext';
+const { ipcRenderer } = window.require('electron');
 
 export const useTimerHook = (taskId) => {
   const { tasks, finishTask } = useTasksContext();
@@ -21,6 +22,10 @@ export const useTimerHook = (taskId) => {
         );
         const newRemainingTime = Math.max(0, task.timerState.remainingTime - elapsedSeconds);
         setRemainingTime(newRemainingTime);
+
+        // Send the updated time to the main process
+        ipcRenderer.send('update-tray-title', newRemainingTime);
+
         if (newRemainingTime <= 0) {
           finishTask(taskId);
         }
