@@ -5,7 +5,6 @@ import AllTasksButton from '../components/AllTasksButton';
 import QuickAlarmModal from '../components/QuickAlarmModal';
 import Time from '../components/Time';
 import TrackingCard from '../components/TrackingCard';
-import TrackingCardsBeno from '../components/TrackingCardsBeno';
 import { useScreenContext } from '../context/useScreenContext';
 
 const { ipcRenderer } = window.require('electron');
@@ -17,7 +16,7 @@ export default function Home({ currentTask, setCurrentTask }) {
   const menuRef = useRef(null);
 
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+    // setIsMenuOpen(!isMenuOpen);
   };
 
   const handleShowDashboard = () => {
@@ -39,6 +38,8 @@ export default function Home({ currentTask, setCurrentTask }) {
   };
 
   const handleShowAllTasks = () => {
+    ipcRenderer.send('show-dashboard');
+    return;
     setScreen('tasks');
   };
 
@@ -158,11 +159,11 @@ export default function Home({ currentTask, setCurrentTask }) {
         )}
       </AnimatePresence>
       <div style={{ width: '100%' }}>
-        <Time />
+        <Time onClick={handleShowDashboard} />
         <div style={{ height: '1px', background: '#40366d' }} />
 
         <div
-          onClick={handleTrackingCardClick}
+          // onClick={handleTrackingCardClick}
           style={{ cursor: currentTask ? 'pointer' : 'default' }}
         >
           <TrackingCard
@@ -171,7 +172,7 @@ export default function Home({ currentTask, setCurrentTask }) {
             toggleAddTimeModal={toggleAddTimeModal}
           />
         </div>
-        <TrackingCardsBeno />
+        {/* <TrackingCardsBeno /> */}
 
         <AllTasksButton onClick={handleShowAllTasks} />
 

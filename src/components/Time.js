@@ -1,75 +1,45 @@
 import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
-import React, { useState } from 'react';
+import React from 'react';
 import { FaCheck, FaCirclePause, FaCirclePlay, FaFeather } from 'react-icons/fa6';
-import { useScreenContext } from '../context/useScreenContext';
+import { useTasksContext } from '../context/useTasksContext';
+import { useTimerHook } from '../hooks/useTimerHook';
 import PrimaryButton from './PrimaryButton';
 import TimeText from './TimeText';
 
-export default function Time() {
-  const {
-    currentTask,
-    finishCurrentTask,
-    isRunning,
-    startTimer,
-    stopTimer,
-    getDisplayTime,
-    setScreen,
-  } = useScreenContext();
+export default function Time({ onClick }) {
+  const { tasks, activeTaskId, getRemainingTime, pauseTask, finishTask, startTask } =
+    useTasksContext();
 
-  const [timeDisplayMode, setTimeDisplayMode] = useState('normal');
+  const activeTask = tasks.find((task) => {
+    return task?._id === activeTaskId;
+  });
+  const remainingTime = useTimerHook(activeTaskId);
+  console.log('🚀  activeTask:', activeTask);
+
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes
+      .toString()
+      .padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
 
   const toggleTimer = () => {
-    if (isRunning) {
-      stopTimer();
-    } else if (currentTask) {
-      // dont allow starting a timer if there is no time on the task
-      if (currentTask.taskDuration === 0) {
+    return;
+    if (activeTask) {
+      if (remainingTime > 0) {
+        if (activeTask.status === 'running') {
+          pauseTask(activeTask._id);
+        } else {
+          startTask(activeTask._id);
+        }
+      } else {
         // alert the user to set the time on the task
         return;
       }
-      startTimer();
     } else {
-      setScreen('tasks');
-    }
-  };
-
-  const formatTime = (timeInSeconds) => {
-    const absTime = Math.abs(timeInSeconds);
-    const hours = String(Math.floor(absTime / 3600)).padStart(2, '0');
-    const minutes = String(Math.floor((absTime % 3600) / 60)).padStart(2, '0');
-    const seconds = String(absTime % 60).padStart(2, '0');
-    return `${hours}:${minutes}:${seconds}`;
-  };
-
-  const displayTime = getDisplayTime();
-
-  const toggleTimeDisplay = () => {
-    setTimeDisplayMode((prevMode) => {
-      switch (prevMode) {
-        case 'normal':
-          return 'countdown';
-        case 'countdown':
-          return 'percentage';
-        default:
-          return 'normal';
-      }
-    });
-  };
-
-  const renderTimeDisplay = () => {
-    switch (timeDisplayMode) {
-      case 'normal':
-        return <TimeText variation={2} time={formatTime(displayTime)} />;
-      case 'countdown':
-        const remainingTime = currentTask ? currentTask.taskDuration - displayTime : 0;
-        return <TimeText variation={2} time={formatTime(remainingTime)} />;
-      case 'percentage':
-        const percentage = currentTask
-          ? Math.max(0, 100 - Math.round((displayTime / currentTask.taskDuration) * 100))
-          : 100;
-        return <TimeText variation={3} time={`${percentage}% progress`} />;
-      default:
-        return <TimeText variation={1} time={formatTime(displayTime)} />;
+      onClick();
     }
   };
 
@@ -107,7 +77,7 @@ export default function Time() {
             border: '1px solid #40366d',
             cursor: 'pointer',
           }}
-          onClick={finishCurrentTask}
+          onClick={() => activeTask && finishTask(activeTask._id)}
         >
           <FaFeather style={{ color: '#c5c1f0', fontSize: '20px' }} />
         </motion.div>
@@ -116,18 +86,17 @@ export default function Time() {
           initial={{ scale: 0.8 }}
           animate={{ scale: 1 }}
           transition={{ duration: 0.3 }}
-          onClick={toggleTimeDisplay}
+          onClick={() => {}}
           style={{ cursor: 'pointer' }}
         >
           <AnimatePresence mode='wait'>
             <motion.div
-              key={timeDisplayMode}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.2 }}
             >
-              {renderTimeDisplay()}
+              <TimeText variation={2} time={formatTime(remainingTime)} />
             </motion.div>
           </AnimatePresence>
         </motion.div>
@@ -141,14 +110,21 @@ export default function Time() {
           <motion.div layout whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <PrimaryButton
               onClick={toggleTimer}
-              icon={currentTask ? isRunning ? <FaCirclePause /> : <FaCirclePlay /> : null}
+              icon={
+                activeTask ? (
+                  activeTask.status === 'running' ? (
+                    <FaCirclePause />
+                  ) : (
+                    <FaCirclePlay />
+                  )
+                ) : null
+              }
             >
-              {currentTask ? (isRunning ? 'Pause' : 'Start') : 'Select Task'}
+              {activeTask ? (activeTask.status === 'running' ? 'Pause' : 'Start') : 'Select Task'}
             </PrimaryButton>
           </motion.div>
           <AnimatePresence>
-            s
-            {currentTask && isRunning && (
+            {activeTask && activeTask.status === 'running' && (
               <motion.div
                 layout
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -157,7 +133,7 @@ export default function Time() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <PrimaryButton onClick={finishCurrentTask} icon={<FaCheck />}>
+                <PrimaryButton onClick={() => finishTask(activeTask._id)} icon={<FaCheck />}>
                   Complete
                 </PrimaryButton>
               </motion.div>

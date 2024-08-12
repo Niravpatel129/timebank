@@ -22,7 +22,7 @@ let dashboardWindow = null;
 let timerManager = null;
 
 const widthMultiplier = 0.25;
-const heightMultiplier = 0.72;
+const heightMultiplier = 0.52;
 const dashboardAspectRatio = 16 / 9;
 
 // Configure logging for autoUpdater

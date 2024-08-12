@@ -43,6 +43,7 @@ export default function AllTasksButton({ onClick }) {
         transition: 'all 0.2s ease-in-out',
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
+        marginTop: '40px',
       }}
     >
       <FaTasks style={{ marginRight: '8px' }} />
