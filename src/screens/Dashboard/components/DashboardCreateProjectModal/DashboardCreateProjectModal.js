@@ -10,9 +10,9 @@ const DashboardCreateProjectModal = () => {
   const [projectName, setProjectName] = useState('');
   const [members, setMembers] = useState([
     {
-      user: user._id,
-      name: user.name,
-      email: user.email,
+      user: user?._id,
+      name: user?.name,
+      email: user?.email,
       role: { value: 'owner', label: 'owner' },
       status: 'You',
     },
