@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 import { FaTimes } from 'react-icons/fa';
 
-const SetupProfileModal = ({ isOpen, onClose }) => {
+const IntroductionModal = ({ isOpen, onClose }) => {
   const modalVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
@@ -64,19 +64,18 @@ const SetupProfileModal = ({ isOpen, onClose }) => {
               <div style={{ marginBottom: '30px' }}>
                 <img
                   style={{ width: '50%' }}
-                  src={
-                    'https://global.discourse-cdn.com/business7/uploads/glideapps/original/3X/d/e/dee19e27e6a3c21a5ccba3474d9e7920321695b8.gif'
-                  }
-                  alt='Profile Setup'
+                  src={'https://cdn.dribbble.com/users/1162077/screenshots/3848914/programmer.gif'}
+                  alt='Todo App Introduction'
                 />
               </div>
-              <h2 style={{ marginBottom: '15px', fontSize: '28px' }}>Setup your profile</h2>
+              <h2 style={{ marginBottom: '15px', fontSize: '28px' }}>Welcome to Your Todo App!</h2>
               <p style={{ color: '#666', marginBottom: '30px', fontSize: '18px' }}>
-                Develop your profile with a diverse range of offerings, we cater to all types of
-                lessons to suit your needs.
+                Stay organized and boost your productivity with our easy-to-use todo app. Create,
+                manage, and complete tasks effortlessly.
               </p>
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <button
+                  onClick={onClose}
                   style={{
                     padding: '12px 25px',
                     backgroundColor: '#4153AF',
@@ -87,7 +86,7 @@ const SetupProfileModal = ({ isOpen, onClose }) => {
                     fontSize: '16px',
                   }}
                 >
-                  Explore
+                  Get Started
                 </button>
               </div>
             </div>
@@ -98,4 +97,4 @@ const SetupProfileModal = ({ isOpen, onClose }) => {
   );
 };
 
-export default SetupProfileModal;
+export default IntroductionModal;
