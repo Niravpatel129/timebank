@@ -15,8 +15,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { selectedProject, updateProject, colorGradients } = useProjectContext();
-  const [filterType, setFilterType] = useState('all'); // 'all' or 'my'
-  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
+  const [filterType, setFilterType] = useState('all');
   const { tasks, updateTask, totalTimeSpent, dailyTimeSpent, setTasks } = useTasksContext();
   const [title, setTitle] = useState(selectedProject?.name);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -46,11 +45,6 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   useEffect(() => {
     setTitle(selectedProject?.name);
   }, [selectedProject]);
-
-  // const handleUpdateProject = (project) => {
-  //   setTitle(project.name);
-  //   updateProject(project._id, { ...project, name: title });
-  // };
 
   const handleSearch = () => {
     if (isSearchOpen) {
@@ -86,20 +80,12 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
     [tasks, updateTask],
   );
 
-  const toggleFilterDropdown = () => {
-    setIsFilterDropdownOpen(!isFilterDropdownOpen);
-  };
-
   const handleTitleClick = () => {
     setIsEditingTitle(true);
   };
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
-  };
-
-  const handleTitleBlur = () => {
-    setIsEditingTitle(false);
   };
 
   useEffect(() => {
