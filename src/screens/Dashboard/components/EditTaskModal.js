@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaTrash } from 'react-icons/fa';
 import Select from 'react-select';
 
-export default function EditTaskModal({ onClose, task, onSave }) {
+export default function EditTaskModal({ onClose, task, onSave, onDelete }) {
   const [taskName, setTaskName] = useState(task.name || '');
   const [duration, setDuration] = useState('');
   const [showCustomDuration, setShowCustomDuration] = useState(false);
@@ -396,22 +396,43 @@ export default function EditTaskModal({ onClose, task, onSave }) {
             />
           </div>
 
-          {/* Submit Button */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            type='submit'
-            style={{
-              padding: '10px',
-              backgroundColor: 'black',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-            }}
-          >
-            Save changes
-          </motion.button>
+          {/* Submit and Delete Buttons */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              type='submit'
+              style={{
+                padding: '10px',
+                backgroundColor: 'black',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+              }}
+            >
+              Save changes
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              type='button'
+              onClick={() => onDelete(task._id)}
+              style={{
+                padding: '10px',
+                backgroundColor: 'red',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+              }}
+            >
+              <FaTrash /> Delete
+            </motion.button>
+          </div>
         </form>
       </motion.div>
     </div>

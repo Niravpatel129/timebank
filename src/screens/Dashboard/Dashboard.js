@@ -33,7 +33,7 @@ const { ipcRenderer } = window.require('electron');
 
 const Dashboard = () => {
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
-  const { tasks, editTask } = useTasksContext();
+  const { tasks, editTask, deleteTask } = useTasksContext();
   const [data, setData] = useState(null);
   const navigate = useNavigate();
   const [taskToEdit, setTaskToEdit] = useState(null);
@@ -63,6 +63,11 @@ const Dashboard = () => {
 
   const handleSaveEditedTask = (editedTask) => {
     editTask(editedTask);
+    handleCloseEditModal();
+  };
+
+  const handleDeleteTask = (taskId) => {
+    deleteTask(taskId);
     handleCloseEditModal();
   };
 
@@ -319,6 +324,7 @@ const Dashboard = () => {
           task={taskToEdit}
           onClose={handleCloseEditModal}
           onSave={handleSaveEditedTask}
+          onDelete={handleDeleteTask}
         />
       )}
 
