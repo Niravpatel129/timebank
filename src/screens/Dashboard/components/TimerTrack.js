@@ -1,11 +1,12 @@
 // TimerTrack.js
 import { motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import toast from 'react-hot-toast';
 import { FaPause, FaPlay } from 'react-icons/fa'; // Import play and pause icons
 import { IoSettingsOutline, IoTimerOutline } from 'react-icons/io5';
 import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
+import { useTimerHook } from '../../../hooks/useTimerHook';
 import LastActivity from './LastActivity/LastActivity';
 
 export default function TimerTrack() {
@@ -13,29 +14,8 @@ export default function TimerTrack() {
     useTasksContext();
   const { colorGradients } = useProjectContext();
 
-  const [remainingTime, setRemainingTime] = useState(0);
   const activeTask = tasks.find((task) => task?._id === activeTaskId);
-
-  useEffect(() => {
-    if (!activeTask?.timerState.remainingTime) {
-      return;
-    }
-
-    let intervalId;
-    if (activeTask.timerState.isActive) {
-      intervalId = setInterval(() => {
-        const elapsedSeconds = Math.floor(
-          (Date.now() - new Date(activeTask.timerState.startTime).getTime()) / 1000,
-        );
-        const newRemainingTime = Math.max(0, activeTask.timerState.remainingTime - elapsedSeconds);
-        setRemainingTime(newRemainingTime);
-        if (newRemainingTime <= 0) {
-          finishTask(activeTaskId);
-        }
-      }, 1000);
-    }
-    return () => clearInterval(intervalId);
-  }, [activeTask, activeTaskId, finishTask]);
+  const remainingTime = useTimerHook(activeTaskId);
 
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);

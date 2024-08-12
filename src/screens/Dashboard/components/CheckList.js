@@ -5,6 +5,7 @@ import { GrDrag } from 'react-icons/gr';
 import ScribbleText from '../../../components/ScribbleText';
 import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
+import { useTimerHook } from '../../../hooks/useTimerHook';
 import IconButton from './IconButton';
 import Tag from './Tag';
 import { commonStyles } from './sharedStyles/commonStyles';
@@ -27,38 +28,39 @@ const Checklist = ({
   const { selectedProject, colorGradients } = useProjectContext();
   const { startTask, pauseTask, finishTask, activeTaskId, updateTaskStatus, updateTaskAssignee } =
     useTasksContext();
-  const [remainingTime, setRemainingTime] = useState(timerState.remainingTime);
+  // const [remainingTime, setRemainingTime] = useState(timerState.remainingTime);
   const [isAssigneeSelectOpen, setIsAssigneeSelectOpen] = useState(false);
   const assigneeSelectRef = useRef(null);
   const [isPlayButtonHovered, setIsPlayButtonHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
   const isDisabled = activeTaskId !== null && activeTaskId !== id;
+  const remainingTime = useTimerHook(id);
 
-  useEffect(() => {
-    setRemainingTime(timerState.remainingTime);
-  }, [timerState]);
+  // useEffect(() => {
+  //   setRemainingTime(timerState.remainingTime);
+  // }, [timerState]);
 
-  useEffect(() => {
-    if (!timerState.remainingTime) {
-      return;
-    }
+  // useEffect(() => {
+  //   if (!timerState.remainingTime) {
+  //     return;
+  //   }
 
-    let intervalId;
-    if (timerState.isActive) {
-      intervalId = setInterval(() => {
-        const elapsedSeconds = Math.floor(
-          (Date.now() - new Date(timerState.startTime).getTime()) / 1000,
-        );
-        const newRemainingTime = Math.max(0, timerState.remainingTime - elapsedSeconds);
-        setRemainingTime(newRemainingTime);
-        if (newRemainingTime <= 0) {
-          finishTask(id);
-        }
-      }, 1000);
-    }
-    return () => clearInterval(intervalId);
-  }, [timerState, id, finishTask]);
+  //   let intervalId;
+  //   if (timerState.isActive) {
+  //     intervalId = setInterval(() => {
+  //       const elapsedSeconds = Math.floor(
+  //         (Date.now() - new Date(timerState.startTime).getTime()) / 1000,
+  //       );
+  //       // const newRemainingTime = Math.max(0, timerState.remainingTime - elapsedSeconds);
+  //       // setRemainingTime(newRemainingTime);
+  //       // if (newRemainingTime <= 0) {
+  //       //   finishTask(id);
+  //       // }
+  //     }, 1000);
+  //   }
+  //   return () => clearInterval(intervalId);
+  // }, [timerState, id, finishTask]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
