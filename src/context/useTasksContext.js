@@ -20,8 +20,7 @@ export const TasksProvider = ({ children }) => {
         if (!selectedProject) return;
 
         const response = await newRequest.get(`/tasks/${selectedProject?._id}`);
-        setTasks(response.data);
-        console.log('🚀  response123:', response);
+        setTasks(response.tasks);
         setTotalTimeSpent(response.totalTimeSpent);
 
         // if any task is active, set it as active
@@ -124,9 +123,7 @@ export const TasksProvider = ({ children }) => {
   const resumeTask = useCallback(async (taskId) => {
     try {
       const response = await newRequest.post(`/tasks/${taskId}/resume`);
-      setTasks((prevTasks) =>
-        prevTasks.map((task) => (task?._id === taskId ? response.data : task)),
-      );
+      setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
       setActiveTaskId(taskId);
     } catch (error) {
       console.error('Error resuming task:', error);
@@ -137,9 +134,7 @@ export const TasksProvider = ({ children }) => {
     return;
     try {
       const response = await newRequest.post(`/tasks/${taskId}/finish`);
-      setTasks((prevTasks) =>
-        prevTasks.map((task) => (task?._id === taskId ? response.data : task)),
-      );
+      setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
       setActiveTaskId(null);
     } catch (error) {
       console.error('Error finishing task:', error);
@@ -149,9 +144,7 @@ export const TasksProvider = ({ children }) => {
   const updateTaskStatus = useCallback(async (taskId, status) => {
     try {
       const response = await newRequest.patch(`/tasks/${taskId}/status`, { status });
-      setTasks((prevTasks) =>
-        prevTasks.map((task) => (task?._id === taskId ? response.data : task)),
-      );
+      setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
     } catch (error) {
       console.error('Error updating task status:', error);
     }
