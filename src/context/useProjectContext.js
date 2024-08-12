@@ -51,20 +51,29 @@ export const ProjectProvider = ({ children }) => {
     }
   }, []);
 
-  const addProject = useCallback(async (projectData) => {
-    try {
-      const response = await newRequest.post('/projects', projectData);
-      setProjects((prevProjects) => [...prevProjects, response]);
-      // update the selected project
-      setSelectedProject(response);
+  const addProject = useCallback(
+    async (projectData) => {
+      try {
+        console.log('🚀  projects:', projects);
+        if (projects.length >= 7) {
+          toast.error('Maximum of 7 projects allowed');
+          return;
+        }
 
-      toast.success('Project created successfully');
-      return response;
-    } catch (error) {
-      console.error('Error adding project:', error);
-      throw error;
-    }
-  }, []);
+        const response = await newRequest.post('/projects', projectData);
+        setProjects((prevProjects) => [...prevProjects, response]);
+        // update the selected project
+        setSelectedProject(response);
+
+        toast.success('Project created successfully');
+        return response;
+      } catch (error) {
+        console.error('Error adding project:', error);
+        throw error;
+      }
+    },
+    [projects],
+  );
 
   const updateProject = useCallback(async (projectId, updatedData) => {
     try {

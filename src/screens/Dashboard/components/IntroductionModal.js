@@ -13,6 +13,12 @@ const IntroductionModal = ({ isOpen, onClose }) => {
     visible: { opacity: 1 },
   };
 
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -34,6 +40,7 @@ const IntroductionModal = ({ isOpen, onClose }) => {
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
             zIndex: 1000,
           }}
+          onClick={handleOverlayClick}
         >
           <motion.div
             initial='hidden'
