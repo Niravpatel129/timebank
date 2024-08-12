@@ -1,5 +1,5 @@
 import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaCheck, FaCirclePause, FaCirclePlay, FaFeather } from 'react-icons/fa6';
 import { useTasksContext } from '../context/useTasksContext';
 import { useTimerHook } from '../hooks/useTimerHook';
@@ -10,11 +10,13 @@ export default function Time({ onClick }) {
   const { tasks, activeTaskId, getRemainingTime, pauseTask, finishTask, startTask } =
     useTasksContext();
 
-  const activeTask = tasks.find((task) => {
-    return task?._id === activeTaskId;
-  });
+  const [activeTask, setActiveTask] = useState(null);
   const remainingTime = useTimerHook(activeTaskId);
-  console.log('🚀  activeTask:', activeTask);
+
+  useEffect(() => {
+    const task = tasks.find((task) => task?._id === activeTaskId);
+    setActiveTask(task);
+  }, [activeTaskId, tasks]);
 
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
