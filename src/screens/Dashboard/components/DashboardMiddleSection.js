@@ -23,6 +23,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [totalHoursLastTwoMonths, setTotalHoursLastTwoMonths] = useState(0);
   const [lastTwoMonthsTimeSpent, setLastTwoMonthsTimeSpent] = useState(0);
+  const [hideCompleted, setHideCompleted] = useState(false);
 
   useEffect(() => {
     const fetchTwoMonthsAgo = async () => {
@@ -59,20 +60,26 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   };
 
   const currentWeekTasks = useMemo(() => {
-    const filteredTasks = tasks?.filter((task) => task?.listType === 'currentWeek');
+    let filteredTasks = tasks?.filter((task) => task?.listType === 'currentWeek');
+    if (hideCompleted) {
+      filteredTasks = filteredTasks.filter((task) => task.status !== 'completed');
+    }
     return filterType === 'all'
       ? filteredTasks
       : filteredTasks.filter((task) => {
           return task.assignee?.name === user?.name;
         });
-  }, [tasks, filterType, user?.name]);
+  }, [tasks, filterType, user?.name, hideCompleted]);
 
   const thingsToDoTasks = useMemo(() => {
-    const filteredTasks = tasks?.filter((task) => task?.listType === 'thingsToDo');
+    let filteredTasks = tasks?.filter((task) => task?.listType === 'thingsToDo');
+    if (hideCompleted) {
+      filteredTasks = filteredTasks.filter((task) => task.status !== 'completed');
+    }
     return filterType === 'all'
       ? filteredTasks
       : filteredTasks.filter((task) => task.assignee === user?.name);
-  }, [tasks, filterType, user?.name]);
+  }, [tasks, filterType, user?.name, hideCompleted]);
 
   const moveTask = useCallback(
     (id, targetList) => {
@@ -416,7 +423,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
               gap: '4px',
             }}
           >
-            <span>Current Todo's</span>
+            <span>Active Tasks</span>
           </h2>
 
           <motion.div
@@ -424,6 +431,8 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
+            {/* button here to toggle hide completed tasks */}
+
             <div style={{ ...commonStyles.flexContainer, gap: '20px' }}>
               {['All Tasks', `${user?.name}'s Tasks`].map((text, index) => (
                 <motion.div
@@ -463,7 +472,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
         />
 
         <h2 style={{ color: colorGradients[0], marginTop: '30px', marginBottom: '20px' }}>
-          Things to do
+          Not in the board
         </h2>
 
         {/* items */}
