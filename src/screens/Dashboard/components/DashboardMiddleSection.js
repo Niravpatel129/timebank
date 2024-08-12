@@ -416,7 +416,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
               gap: '4px',
             }}
           >
-            <span>Current week</span>
+            <span>Current Todo's</span>
           </h2>
 
           <motion.div
