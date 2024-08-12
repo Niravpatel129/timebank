@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { HashRouter as Router } from 'react-router-dom';
 import 'react-tooltip/dist/react-tooltip.css';
 import App from './App';
+import { HistoryProvider } from './context/useHistoryContext';
 import { ProjectProvider } from './context/useProjectContext';
 import { ScreenProvider } from './context/useScreenContext';
 import { TasksProvider } from './context/useTasksContext';
@@ -29,13 +30,15 @@ root.render(
       <Toaster />
       <Router>
         <ProjectProvider>
-          <ScreenProvider>
-            <TasksProvider>
-              <UserProvider>
-                <App />
-              </UserProvider>
-            </TasksProvider>
-          </ScreenProvider>
+          <HistoryProvider>
+            <ScreenProvider>
+              <TasksProvider>
+                <UserProvider>
+                  <App />
+                </UserProvider>
+              </TasksProvider>
+            </ScreenProvider>
+          </HistoryProvider>
         </ProjectProvider>
       </Router>
     </div>

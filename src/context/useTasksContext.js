@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 import toast from 'react-hot-toast';
 import { v4 as uuidv4 } from 'uuid';
 import newRequest from '../api/newReqest';
+import { useHistoryContext } from './useHistoryContext';
 import { useProjectContext } from './useProjectContext';
 
 const TasksContext = createContext();
@@ -13,6 +14,7 @@ export const TasksProvider = ({ children }) => {
   const [activeTaskId, setActiveTaskId] = useState(null);
   const [totalTimeSpent, setTotalTimeSpent] = useState(0);
   const { selectedProject, projects } = useProjectContext();
+  const { addHistoryEntry } = useHistoryContext();
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -35,15 +37,41 @@ export const TasksProvider = ({ children }) => {
     fetchInitialData();
   }, [projects, selectedProject]);
 
-  const addTask = useCallback(async (task) => {
-    try {
-      const newTask = { ...task, _id: uuidv4(), timeSpent: 0 };
-      const response = await newRequest.post('/tasks', newTask);
-      setTasks((prevTasks) => [...prevTasks, response.task]);
-    } catch (error) {
-      console.error('Error adding task:', error);
-    }
-  }, []);
+  const addTask = useCallback(
+    async (task) => {
+      console.log('🚀  task:', task);
+      try {
+        const newTask = { ...task, _id: uuidv4(), timeSpent: 0 };
+        const response = await newRequest.post('/tasks', newTask);
+        setTasks((prevTasks) => [...prevTasks, response.task]);
+
+        // add history entry
+        if (!response.task.project) return;
+
+        addHistoryEntry({
+          entityType: 'task',
+          entityId: response.task._id,
+          entityName: response.task.name || 'New Task',
+          action: 'add',
+          details: {
+            name: response.task.name,
+            status: response.task.status,
+            taskDuration: response.task.taskDuration,
+            hours: response.task.hours,
+            category: response.task.category,
+            dateDue: response.task.dateDue,
+            dateCreated: response.task.dateCreated,
+            assignee: response.task.assignee,
+            assigneeDetails: response.task.assigneeDetails,
+            project: response.task.project,
+          },
+        });
+      } catch (error) {
+        console.error('Error adding task:', error);
+      }
+    },
+    [addHistoryEntry],
+  );
 
   const updateTask = useCallback(async (updatedTask) => {
     try {
