@@ -46,13 +46,14 @@ export const TasksProvider = ({ children }) => {
         setTasks((prevTasks) => [...prevTasks, response.task]);
 
         // add history entry
-        if (!response.task.project) return;
+        if (!selectedProject._id) return;
 
         addHistoryEntry({
           entityType: 'task',
           entityId: response.task._id,
           entityName: response.task.name || 'New Task',
           action: 'add',
+          projectId: selectedProject._id,
           details: {
             name: response.task.name,
             status: response.task.status,
@@ -70,7 +71,7 @@ export const TasksProvider = ({ children }) => {
         console.error('Error adding task:', error);
       }
     },
-    [addHistoryEntry],
+    [addHistoryEntry, selectedProject],
   );
 
   const updateTask = useCallback(async (updatedTask) => {

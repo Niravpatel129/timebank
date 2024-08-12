@@ -1,5 +1,6 @@
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import newRequest from '../api/newReqest';
+import { useProjectContext } from './useProjectContext';
 
 const HistoryContext = createContext();
 
@@ -7,15 +8,38 @@ export const useHistoryContext = () => useContext(HistoryContext);
 
 export const HistoryProvider = ({ children }) => {
   const [historyEntries, setHistoryEntries] = useState([]);
+  const [selectedProjectHistory, setSelectedProjectHistory] = useState([]);
+  console.log('🚀  selectedProjectHistory:', selectedProjectHistory);
+  const { selectedProject } = useProjectContext();
 
-  const addHistoryEntry = useCallback(async (entry) => {
-    try {
-      const response = await newRequest.post('/history/add', entry);
-      setHistoryEntries((prevEntries) => [response.entry, ...prevEntries]);
-    } catch (error) {
-      console.error('Error adding history entry:', error);
-    }
-  }, []);
+  useEffect(() => {
+    const fetchSelectedProjectHistory = async () => {
+      if (!selectedProject) return;
+      try {
+        const response = await newRequest.get(`/history/project/${selectedProject._id}`);
+        setSelectedProjectHistory(response.history);
+      } catch (error) {
+        console.error('Error fetching selected project history:', error);
+      }
+    };
+
+    fetchSelectedProjectHistory();
+  }, [selectedProject]);
+
+  const addHistoryEntry = useCallback(
+    async (entry) => {
+      try {
+        const response = await newRequest.post('/history/add', entry);
+        setHistoryEntries((prevEntries) => [response.entry, ...prevEntries]);
+        if (entry.projectId === selectedProject?._id) {
+          setSelectedProjectHistory((prevHistory) => [response.entry, ...prevHistory]);
+        }
+      } catch (error) {
+        console.error('Error adding history entry:', error);
+      }
+    },
+    [selectedProject],
+  );
 
   const fetchHistoryEntries = useCallback(async () => {
     try {
@@ -38,6 +62,7 @@ export const HistoryProvider = ({ children }) => {
     addHistoryEntry,
     fetchHistoryEntries,
     getRecentEntries,
+    selectedProjectHistory,
   };
 
   return <HistoryContext.Provider value={contextValue}>{children}</HistoryContext.Provider>;

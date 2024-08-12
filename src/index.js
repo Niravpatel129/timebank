@@ -12,7 +12,7 @@ import { UserProvider } from './context/useUserContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
+  <React.Fragment>
     <div
       className='title-bar'
       style={{
@@ -42,5 +42,5 @@ root.render(
         </ProjectProvider>
       </Router>
     </div>
-  </React.StrictMode>,
+  </React.Fragment>,
 );
