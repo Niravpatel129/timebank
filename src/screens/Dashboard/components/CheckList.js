@@ -2,12 +2,12 @@ import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaCheck, FaPause, FaPlay } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
+import ScribbleText from '../../../components/ScribbleText';
 import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
 import IconButton from './IconButton';
 import Tag from './Tag';
 import { commonStyles } from './sharedStyles/commonStyles';
-
 const Checklist = ({
   id,
   title,
@@ -181,22 +181,7 @@ const Checklist = ({
           {status === 'completed' && <FaCheck color='white' size={12} />}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <span
-            style={{
-              flexGrow: 1,
-              fontSize: '16px',
-              fontWeight: '500',
-              color: '#333',
-              cursor: 'pointer',
-              textDecoration: status === 'completed' ? 'line-through' : 'none',
-              marginRight: '5px',
-              textOverflow: 'ellipsis',
-              overflow: 'hidden',
-              maxWidth: '550px',
-            }}
-          >
-            {title}
-          </span>
+          <ScribbleText text={title} isCompleted={status === 'completed'} />
           {tag && (
             <Tag
               backgroundColor={tagBackgroundColor || colorGradients[0]}
