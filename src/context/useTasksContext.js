@@ -40,7 +40,7 @@ export const TasksProvider = ({ children }) => {
     try {
       const newTask = { ...task, _id: uuidv4(), timeSpent: 0 };
       const response = await newRequest.post('/tasks', newTask);
-      setTasks((prevTasks) => [...prevTasks, response.data]);
+      setTasks((prevTasks) => [...prevTasks, response]);
     } catch (error) {
       console.error('Error adding task:', error);
     }
@@ -48,11 +48,10 @@ export const TasksProvider = ({ children }) => {
 
   const updateTask = useCallback(async (updatedTask) => {
     try {
-      // return;
       const response = await newRequest.put(`/tasks/${updatedTask._id}`, updatedTask);
-      // setTasks((prevTasks) =>
-      //   prevTasks.map((task) => (task?._id === updatedTask._id ? response.data : task)),
-      // );
+      setTasks((prevTasks) =>
+        prevTasks.map((task) => (task?._id === updatedTask._id ? response : task)),
+      );
     } catch (error) {
       console.error('Error updating task:', error);
     }
@@ -61,6 +60,9 @@ export const TasksProvider = ({ children }) => {
   const updateTaskAssignee = useCallback(async (taskId, assignee) => {
     try {
       const response = await newRequest.patch(`/tasks/${taskId}/assignee`, { assignee });
+      // update the task in the state
+      console.log('🚀  response:', response);
+      setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
     } catch (error) {
       console.error('Error updating task assignee:', error);
       toast.error('Error updating task assignee:', error);
