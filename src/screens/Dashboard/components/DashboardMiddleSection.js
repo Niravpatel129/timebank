@@ -293,7 +293,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
             />
             <div
               style={{
-                backgroundColor: colorGradients[0],
+                backgroundColor: colorGradients[0] || '#000',
                 color: 'white',
                 width: '30px',
                 height: '30px',

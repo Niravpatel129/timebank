@@ -186,65 +186,45 @@ export default function TimerTrack() {
           }}
         />
         <div style={{ paddingRight: '20px', paddingLeft: '20px', height: '100%' }}>
-          {activeTask && (
-            <div style={{}}>
+          <div style={{}}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+                marginBottom: '20px',
+              }}
+            >
               <div
                 style={{
                   display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  height: '100%',
-                  marginBottom: '20px',
+                  justifyContent: 'space-between',
+                  gap: '10px',
                 }}
               >
-                {activeTask.category && (
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      gap: '10px',
-                    }}
-                  >
-                    <div style={{ color: '#8f8f9d', fontSize: '14px', fontWeight: 400 }}>
-                      Category
-                    </div>
-                    <div style={{ color: '#000000', fontSize: '15px', fontWeight: 500 }}>
-                      {activeTask.category}
-                    </div>
-                  </div>
-                )}
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    marginTop: '20px',
-                    gap: '10px',
-                  }}
-                >
-                  <div style={{ color: '#8f8f9d', fontSize: '14px', fontWeight: 400 }}>Project</div>
-                  <div style={{ color: '#000000', fontSize: '15px', fontWeight: 500 }}>
-                    {activeTask.projectName || 'User'}
-                  </div>
+                <div style={{ color: '#8f8f9d', fontSize: '14px', fontWeight: 400 }}>Category</div>
+                <div style={{ color: '#000000', fontSize: '15px', fontWeight: 500 }}>
+                  {activeTask?.category || 'No task'}
                 </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    marginTop: '20px',
-                    gap: '10px',
-                  }}
-                >
-                  <div style={{ color: '#8f8f9d', fontSize: '14px', fontWeight: 400 }}>
-                    Duration
-                  </div>
-                  <div style={{ color: '#000000', fontSize: '15px', fontWeight: 500 }}>
-                    {Math.floor(activeTask.taskDuration / 60)} minutes
-                  </div>
+              </div>
+
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  marginTop: '20px',
+                  gap: '10px',
+                }}
+              >
+                <div style={{ color: '#8f8f9d', fontSize: '14px', fontWeight: 400 }}>Duration</div>
+                <div style={{ color: '#000000', fontSize: '15px', fontWeight: 500 }}>
+                  {Math.floor(activeTask?.taskDuration / 60) || 30} minutes
                 </div>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
       {/* Bottom */}

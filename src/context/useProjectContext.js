@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import newRequest from '../api/newReqest';
+import { useUserContext } from './useUserContext';
 
 const ProjectContext = createContext();
 
@@ -8,6 +9,7 @@ export const useProjectContext = () => useContext(ProjectContext);
 
 export const ProjectProvider = ({ children }) => {
   const [projects, setProjects] = useState([]);
+  const { user } = useUserContext();
   const [selectedProject, setSelectedProject] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
@@ -22,7 +24,7 @@ export const ProjectProvider = ({ children }) => {
 
   useEffect(() => {
     fetchProjects();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const storedSelectedProjectId = localStorage.getItem('selectedProjectId');

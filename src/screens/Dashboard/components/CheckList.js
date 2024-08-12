@@ -181,7 +181,11 @@ const Checklist = ({
           {status === 'completed' && <FaCheck color='white' size={12} />}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <ScribbleText text={title} isCompleted={status === 'completed'} />
+          <ScribbleText
+            text={title}
+            isCompleted={status === 'completed'}
+            strokeColor={colorGradients[0]}
+          />
           {tag && (
             <Tag
               backgroundColor={tagBackgroundColor || colorGradients[0]}

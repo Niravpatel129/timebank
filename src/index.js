@@ -29,17 +29,17 @@ root.render(
     <div style={{ paddingTop: '3vh', marginTop: '-3vh' }}>
       <Toaster />
       <Router>
-        <ProjectProvider>
-          <HistoryProvider>
-            <ScreenProvider>
-              <TasksProvider>
-                <UserProvider>
+        <UserProvider>
+          <ProjectProvider>
+            <HistoryProvider>
+              <ScreenProvider>
+                <TasksProvider>
                   <App />
-                </UserProvider>
-              </TasksProvider>
-            </ScreenProvider>
-          </HistoryProvider>
-        </ProjectProvider>
+                </TasksProvider>
+              </ScreenProvider>
+            </HistoryProvider>
+          </ProjectProvider>
+        </UserProvider>
       </Router>
     </div>
   </React.Fragment>,

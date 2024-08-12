@@ -19,15 +19,16 @@ import {
   FaTrash,
   FaUserPlus,
 } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
 import { useProjectContext } from '../../context/useProjectContext';
 import { useTasksContext } from '../../context/useTasksContext';
+import { useUserContext } from '../../context/useUserContext';
 import './Dashboard.css';
 import Bubble from './components/Bubble';
 import DashboardAddTaskModal from './components/DashboardAddTaskModal';
 import DashboardCreateProjectModal from './components/DashboardCreateProjectModal/DashboardCreateProjectModal';
 import DashboardMiddleSection from './components/DashboardMiddleSection';
 import EditTaskModal from './components/EditTaskModal';
+import IntroductionModal from './components/IntroductionModal';
 import TimerTrack from './components/TimerTrack';
 const { ipcRenderer } = window.require('electron');
 
@@ -35,11 +36,12 @@ const Dashboard = () => {
   const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
   const { tasks, editTask, deleteTask } = useTasksContext();
   const [data, setData] = useState(null);
-  const navigate = useNavigate();
   const [taskToEdit, setTaskToEdit] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [isIntroModalOpen, setIsIntroModalOpen] = useState(false);
   const profileDropdownRef = useRef(null);
+  const { logout } = useUserContext();
   const {
     projects,
     selectedProject,
@@ -48,6 +50,7 @@ const Dashboard = () => {
     openModal,
     closeModal,
     deleteProject,
+    colorGradients,
   } = useProjectContext();
 
   const handleEditTask = (taskId) => {
@@ -86,6 +89,13 @@ const Dashboard = () => {
 
     document.addEventListener('mousedown', handleClickOutside);
 
+    // Check if it's the first launch
+    const isFirstLaunch = localStorage.getItem('isFirstLaunch') !== 'false';
+    if (true) {
+      setIsIntroModalOpen(true);
+      localStorage.setItem('isFirstLaunch', 'false');
+    }
+
     return () => {
       ipcRenderer.removeAllListeners('dashboard-data');
       document.removeEventListener('mousedown', handleClickOutside);
@@ -116,7 +126,7 @@ const Dashboard = () => {
     { icon: FaGift, text: "What's new" },
     { icon: FaStar, text: 'Upgrade to Pro' },
     { icon: FaSync, text: 'Sync', subtext: '7 seconds ago' },
-    { icon: FaSignOutAlt, text: 'Log out' },
+    { icon: FaSignOutAlt, text: 'Log out', onClick: () => logout() },
   ];
 
   return (
@@ -244,6 +254,7 @@ const Dashboard = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   key={index}
+                  onClick={item.onClick}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -278,7 +289,9 @@ const Dashboard = () => {
         style={{
           width: '80px',
           height: '100%',
-          background: '#1c207f',
+          background: `linear-gradient(to top, ${colorGradients[1] || '#212d8b'}, ${
+            colorGradients[0] || '#1f2f8c'
+          })`,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -329,6 +342,10 @@ const Dashboard = () => {
       )}
 
       {isModalOpen && <DashboardCreateProjectModal isOpen={isModalOpen} />}
+
+      {isIntroModalOpen && (
+        <IntroductionModal isOpen={isIntroModalOpen} onClose={() => setIsIntroModalOpen(false)} />
+      )}
     </div>
   );
 };

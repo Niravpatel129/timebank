@@ -115,7 +115,7 @@ export const UserProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await newRequest.post('/user/logout');
+      // await newRequest.post('/user/logout');
       localStorage.removeItem('authToken');
       Cookies.remove('authToken');
       setUser(null);

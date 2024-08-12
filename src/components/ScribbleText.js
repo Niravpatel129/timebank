@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import React from 'react';
 
-const ScribbleText = ({ text, isCompleted }) => {
+const ScribbleText = ({ text, isCompleted, strokeColor }) => {
   const pathLength = text.length * 15;
 
   return (
@@ -23,7 +23,7 @@ const ScribbleText = ({ text, isCompleted }) => {
             d={`M0,10 Q${pathLength / 4},0 ${pathLength / 2},10 T${pathLength},10`}
             fill='transparent'
             strokeWidth='2'
-            stroke='#331db9'
+            stroke={strokeColor || '#331db9'}
             initial={{ pathLength: 0 }}
             animate={{ pathLength: 1 }}
             transition={{ duration: 1 }}

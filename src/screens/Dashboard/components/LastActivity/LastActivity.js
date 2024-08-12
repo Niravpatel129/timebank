@@ -137,58 +137,80 @@ export default function LastActivity({ colorGradients }) {
       </div>
       <div style={{ overflowY: 'scroll', flex: 1, padding: '0 20px 20px' }}>
         <AnimatePresence>
-          {filteredHistory.map((item, index) => (
-            <motion.div
-              key={item._id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
-              style={{
-                marginBottom: '15px',
-                display: 'flex',
-                justifyContent: 'space-between',
-              }}
-            >
-              <div>
-                <div
-                  style={{
-                    color: '#2d2c31',
-                    fontSize: '16px',
-                    fontWeight: '400',
-                    marginBottom: '5px',
-                    textTransform: 'capitalize',
-                  }}
-                >
-                  {item.entityName}
-                </div>
-                <div style={{ color: '#8f8f9d', fontSize: '14px' }}>
-                  {getActionText(item.action)} {item.entityType} {formatDate(item.timestamp)}
-                </div>
-              </div>
-              <div
+          {filteredHistory.length > 0 ? (
+            filteredHistory.map((item, index) => (
+              <motion.div
+                key={item._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
                 style={{
-                  color: colorGradients[0],
-                  fontSize: '16px',
-                  fontWeight: 400,
+                  marginBottom: '15px',
                   display: 'flex',
-                  alignItems: 'center',
+                  justifyContent: 'space-between',
                 }}
               >
-                <span
+                <div>
+                  <div
+                    style={{
+                      color: '#2d2c31',
+                      fontSize: '16px',
+                      fontWeight: '400',
+                      marginBottom: '5px',
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {item.entityName}
+                  </div>
+                  <div style={{ color: '#8f8f9d', fontSize: '14px' }}>
+                    {getActionText(item.action)} {item.entityType} {formatDate(item.timestamp)}
+                  </div>
+                </div>
+                <div
                   style={{
-                    marginRight: '5px',
+                    color: colorGradients[0],
                     fontSize: '16px',
-                    paddingTop: '2px',
-                    color: '#cbccd5',
+                    fontWeight: 400,
+                    display: 'flex',
+                    alignItems: 'center',
                   }}
                 >
-                  <CiClock1 />
-                </span>
-                <span>{Math.floor(item.details.taskDuration / 60)} minutes</span>
-              </div>
+                  <span
+                    style={{
+                      marginRight: '5px',
+                      fontSize: '16px',
+                      paddingTop: '2px',
+                      color: '#cbccd5',
+                    }}
+                  >
+                    <CiClock1 />
+                  </span>
+                  <span>{Math.floor(item.details.taskDuration / 60)} minutes</span>
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+                color: '#8f8f9d',
+                fontSize: '16px',
+                textAlign: 'center',
+              }}
+            >
+              <span style={{ fontSize: '48px', marginBottom: '20px' }}>🏝️</span>
+              <p>No activity to show. Time to start something new!</p>
             </motion.div>
-          ))}
+          )}
         </AnimatePresence>
       </div>
     </motion.div>
