@@ -24,7 +24,7 @@ export const TasksProvider = ({ children }) => {
         setTotalTimeSpent(response.totalTimeSpent);
 
         // if any task is active, set it as active
-        const activeTask = response.data.find((task) => task.timerState.isActive);
+        const activeTask = response.tasks.find((task) => task.timerState.isActive);
         if (activeTask) {
           setActiveTaskId(activeTask._id);
         }
