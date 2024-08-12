@@ -81,7 +81,7 @@ const IntroductionModal = ({ isOpen, onClose }) => {
                   alt='Todo App Introduction'
                 />
               </div>
-              <h2 style={{ marginBottom: '15px', fontSize: '28px' }}>Welcome to Your Todo App!</h2>
+              <h2 style={{ marginBottom: '15px', fontSize: '28px' }}>You made it!</h2>
               <p style={{ color: '#666', marginBottom: '30px', fontSize: '18px' }}>
                 Stay organized and boost your productivity with our easy-to-use todo app. Create,
                 manage, and complete tasks effortlessly.

@@ -19,7 +19,8 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { selectedProject, updateProject, colorGradients } = useProjectContext();
   const [filterType, setFilterType] = useState('all');
-  const { tasks, updateTask, totalTimeSpent, dailyTimeSpent, setTasks } = useTasksContext();
+  const { tasks, updateTask, totalTimeSpent, dailyTimeSpent, setTasks, isLoading } =
+    useTasksContext();
   const [title, setTitle] = useState(selectedProject?.name);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [totalHoursLastTwoMonths, setTotalHoursLastTwoMonths] = useState(0);
@@ -130,9 +131,27 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
     return commonStyles.primaryColor;
   };
 
+  const loadingVariants = {
+    start: {
+      opacity: 0.5,
+      y: -20,
+    },
+    end: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        yoyo: Infinity,
+      },
+    },
+  };
+
   return (
     <DndProvider backend={HTML5Backend}>
-      <div
+      <motion.div
+        initial='start'
+        animate={isLoading ? 'start' : 'end'}
+        variants={loadingVariants}
         style={{
           backgroundColor: '#ffffff',
           fontFamily: 'sans-serif',
@@ -478,7 +497,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
           moveTask={moveTask}
           onEditTask={onEditTask}
         />
-      </div>
+      </motion.div>
 
       {Array(60)
         .fill()
