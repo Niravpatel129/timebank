@@ -39,7 +39,7 @@ export const TasksProvider = ({ children }) => {
     try {
       const newTask = { ...task, _id: uuidv4(), timeSpent: 0 };
       const response = await newRequest.post('/tasks', newTask);
-      setTasks((prevTasks) => [...prevTasks, response]);
+      setTasks((prevTasks) => [...prevTasks, response.task]);
     } catch (error) {
       console.error('Error adding task:', error);
     }
