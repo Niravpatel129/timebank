@@ -25,15 +25,8 @@ const Checklist = ({
   const [currentAssignee, setCurrentAssignee] = useState(assignee);
   const [isHovered, setIsHovered] = useState(false);
   const { selectedProject, colorGradients } = useProjectContext();
-  const {
-    startTask,
-    pauseTask,
-    finishTask,
-    activeTaskId,
-    updateTaskStatus,
-    tasks,
-    updateTaskAssignee,
-  } = useTasksContext();
+  const { startTask, pauseTask, finishTask, activeTaskId, updateTaskStatus, updateTaskAssignee } =
+    useTasksContext();
   const [remainingTime, setRemainingTime] = useState(timerState.remainingTime);
   const [isAssigneeSelectOpen, setIsAssigneeSelectOpen] = useState(false);
   const assigneeSelectRef = useRef(null);

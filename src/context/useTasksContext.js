@@ -143,7 +143,10 @@ export const TasksProvider = ({ children }) => {
   const updateTaskStatus = useCallback(async (taskId, status) => {
     try {
       const response = await newRequest.patch(`/tasks/${taskId}/status`, { status });
-      setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
+      // find the task in the state and update it with status, dont use response.task
+      setTasks((prevTasks) =>
+        prevTasks.map((task) => (task?._id === taskId ? { ...task, status } : task)),
+      );
     } catch (error) {
       console.error('Error updating task status:', error);
     }
