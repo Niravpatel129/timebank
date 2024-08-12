@@ -75,6 +75,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   useEffect(() => {
     const fetchTwoMonthsAgo = async () => {
       try {
+        if (!selectedProject) return;
         const twoMonthsAgo = await newRequest.get(
           `/timeTrack/last-two-months/${selectedProject?._id}`,
         );

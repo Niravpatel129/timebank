@@ -17,6 +17,8 @@ export const TasksProvider = ({ children }) => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
+        if (!selectedProject) return;
+
         const response = await newRequest.get(`/tasks/${selectedProject?._id}`);
         setTasks(response.data);
         console.log('🚀  response123:', response);
