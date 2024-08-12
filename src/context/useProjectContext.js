@@ -55,6 +55,9 @@ export const ProjectProvider = ({ children }) => {
     try {
       const response = await newRequest.post('/projects', projectData);
       setProjects((prevProjects) => [...prevProjects, response]);
+      // update the selected project
+      setSelectedProject(response);
+
       toast.success('Project created successfully');
       return response;
     } catch (error) {

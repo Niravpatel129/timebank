@@ -218,49 +218,53 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
           <div style={commonStyles.flexContainer}>
             <div style={{ display: 'flex', alignItems: 'center', marginRight: '30px' }}>
               {/* profiles of 3 users, stacking like overlapping chips */}
-              {members?.map((user, index) => (
-                <div
-                  key={user}
-                  data-tooltip-id={`day-${index}`}
-                  data-tooltip-content={`${user} - Last active: 2 hours ago`}
-                  style={{ cursor: 'pointer' }}
-                >
-                  {user?.profileImage ? (
-                    <img
-                      src={user?.profileImage}
-                      alt={`${user} profile`}
-                      style={{
-                        width: '30px',
-                        height: '30px',
-                        borderRadius: '50%',
-                        marginRight: index !== 2 ? '-10px' : '0',
-                        border: '2px solid white',
-                        zIndex: 3 - index,
-                      }}
-                    />
-                  ) : (
-                    <div
-                      style={{
-                        width: '30px',
-                        height: '30px',
-                        borderRadius: '50%',
-                        marginRight: index !== 2 ? '-10px' : '0',
-                        border: '2px solid white',
-                        zIndex: 3 - index,
-                        backgroundColor: '#ccc',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        fontSize: '16px',
-                        fontWeight: 'bold',
-                        color: '#fff',
-                      }}
-                    >
-                      {user?.charAt(0)?.toUpperCase()}
-                    </div>
-                  )}
-                </div>
-              ))}
+              {members?.map((user, index) => {
+                if (!user) return null;
+
+                return (
+                  <div
+                    key={user}
+                    data-tooltip-id={`day-${index}`}
+                    data-tooltip-content={`${user} - Last active: 2 hours ago`}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {user?.profileImage ? (
+                      <img
+                        src={user?.profileImage}
+                        alt={`${user} profile`}
+                        style={{
+                          width: '30px',
+                          height: '30px',
+                          borderRadius: '50%',
+                          marginRight: index !== 2 ? '-10px' : '0',
+                          border: '2px solid white',
+                          zIndex: 3 - index,
+                        }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          width: '30px',
+                          height: '30px',
+                          borderRadius: '50%',
+                          marginRight: index !== 2 ? '-10px' : '0',
+                          border: '2px solid white',
+                          zIndex: 3 - index,
+                          backgroundColor: '#ccc',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          fontSize: '16px',
+                          fontWeight: 'bold',
+                          color: '#fff',
+                        }}
+                      >
+                        {user?.charAt(0)?.toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
             <AnimatePresence>
               {isSearchOpen && (
