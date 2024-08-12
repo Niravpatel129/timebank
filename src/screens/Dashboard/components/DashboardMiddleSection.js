@@ -2,9 +2,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { FaPlus, FaSearch } from 'react-icons/fa';
+import { FaSearch } from 'react-icons/fa';
 import { Tooltip } from 'react-tooltip';
 import newRequest from '../../../api/newReqest';
+import AddTaskButton from '../../../components/AddTaskButton';
 import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
 import { useUserContext } from '../../../context/useUserContext';
@@ -295,22 +296,10 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
               }}
               onClick={handleSearch}
             />
-            <div
-              style={{
-                backgroundColor: colorGradients[0] || '#000',
-                color: 'white',
-                width: '30px',
-                height: '30px',
-                borderRadius: '50%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                cursor: 'pointer',
-              }}
-              onClick={handleTriggerAddTaskButton}
-            >
-              <FaPlus />
-            </div>
+            <AddTaskButton
+              handleTriggerAddTaskButton={handleTriggerAddTaskButton}
+              colorGradients={colorGradients}
+            />
           </div>
         </div>
 
