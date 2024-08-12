@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 import { FaTimes } from 'react-icons/fa';
 
-const IntroductionModal = ({ isOpen, onClose }) => {
+const SetupProfileModal = ({ isOpen, onClose }) => {
   const modalVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
@@ -39,19 +39,21 @@ const IntroductionModal = ({ isOpen, onClose }) => {
             <div
               style={{
                 backgroundColor: 'white',
-                padding: '30px',
-                borderRadius: '10px',
+                padding: '40px',
+                borderRadius: '15px',
                 maxWidth: '500px',
-                width: '90%',
+                width: '95%',
                 position: 'relative',
+                textAlign: 'center',
+                background: 'white',
               }}
             >
               <button
                 onClick={onClose}
                 style={{
                   position: 'absolute',
-                  top: '10px',
-                  right: '10px',
+                  top: '15px',
+                  right: '15px',
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
@@ -59,36 +61,35 @@ const IntroductionModal = ({ isOpen, onClose }) => {
               >
                 <FaTimes />
               </button>
-              <h2 style={{ marginBottom: '20px' }}>Welcome to Your Task Manager!</h2>
-              <p>
-                This task manager is designed to help you organize your work efficiently. Here are
-                some key features:
+              <div style={{ marginBottom: '30px' }}>
+                <img
+                  style={{ width: '50%' }}
+                  src={
+                    'https://global.discourse-cdn.com/business7/uploads/glideapps/original/3X/d/e/dee19e27e6a3c21a5ccba3474d9e7920321695b8.gif'
+                  }
+                  alt='Profile Setup'
+                />
+              </div>
+              <h2 style={{ marginBottom: '15px', fontSize: '28px' }}>Setup your profile</h2>
+              <p style={{ color: '#666', marginBottom: '30px', fontSize: '18px' }}>
+                Develop your profile with a diverse range of offerings, we cater to all types of
+                lessons to suit your needs.
               </p>
-              <ul style={{ marginLeft: '20px', marginBottom: '20px' }}>
-                <li>Create and manage tasks</li>
-                <li>Organize tasks into projects</li>
-                <li>Track time spent on tasks</li>
-                <li>Set priorities and due dates</li>
-                <li>Collaborate with team members</li>
-              </ul>
-              <p>
-                We hope this tool helps you boost your productivity. If you have any questions,
-                please don't hesitate to reach out to our support team.
-              </p>
-              <button
-                onClick={onClose}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#007bff',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '5px',
-                  cursor: 'pointer',
-                  marginTop: '20px',
-                }}
-              >
-                Get Started
-              </button>
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <button
+                  style={{
+                    padding: '12px 25px',
+                    backgroundColor: '#4153AF',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                  }}
+                >
+                  Explore
+                </button>
+              </div>
             </div>
           </motion.div>
         </motion.div>
@@ -97,4 +98,4 @@ const IntroductionModal = ({ isOpen, onClose }) => {
   );
 };
 
-export default IntroductionModal;
+export default SetupProfileModal;
