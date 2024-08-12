@@ -20,6 +20,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   const { selectedProject, updateProject, colorGradients } = useProjectContext();
   const [filterType, setFilterType] = useState('all');
   const { tasks, updateTask, totalTimeSpent, dailyTimeSpent, setTasks } = useTasksContext();
+  console.log('🚀  tasks:', tasks);
   const [title, setTitle] = useState(selectedProject?.name);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [totalHoursLastTwoMonths, setTotalHoursLastTwoMonths] = useState(0);
@@ -135,11 +136,13 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
       <div
         style={{
           backgroundColor: '#ffffff',
-          fontFamily: 'Arial, sans-serif',
+          fontFamily: 'sans-serif',
           padding: '20px',
           paddingBottom: '100px',
           height: '100vh',
-          overflow: 'auto',
+          overflowY: tasks.length >= 100 ? 'auto' : 'visible',
+          // overflowX: 'visible',
+          position: 'relative',
         }}
       >
         {/* Top Section */}
@@ -299,6 +302,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
             <AddTaskButton
               handleTriggerAddTaskButton={handleTriggerAddTaskButton}
               colorGradients={colorGradients}
+              showNudge={tasks.length === 0}
             />
           </div>
         </div>
