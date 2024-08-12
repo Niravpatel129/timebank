@@ -139,13 +139,20 @@ const Dashboard = () => {
       >
         {/* Top section */}
         <div
-          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '20px',
+            paddingTop: '20px',
+          }}
         >
           {/* Project  Bubbles */}
           {projects.map((project, index) => {
             return (
               <div key={index}>
                 <Bubble
+                  name={project.name}
                   gradientColors={
                     [
                       project.projectColor?.gradient1 || '#ffcc00',
@@ -155,6 +162,7 @@ const Dashboard = () => {
                   onClick={() => setSelectedProject(project)}
                   selected={selectedProject?._id === project._id}
                   onDelete={() => deleteProject(project._id)}
+                  updatedAt={project.updatedAt}
                 />
               </div>
             );

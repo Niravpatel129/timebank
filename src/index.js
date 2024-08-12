@@ -12,17 +12,32 @@ import { UserProvider } from './context/useUserContext';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <Toaster />
-    <Router>
-      <ProjectProvider>
-        <ScreenProvider>
-          <TasksProvider>
-            <UserProvider>
-              <App />
-            </UserProvider>
-          </TasksProvider>
-        </ScreenProvider>
-      </ProjectProvider>
-    </Router>
+    <div
+      className='title-bar'
+      style={{
+        height: '3vh',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1000,
+      }}
+    >
+      {/* empty */}
+    </div>
+    <div style={{ paddingTop: '3vh', marginTop: '-3vh' }}>
+      <Toaster />
+      <Router>
+        <ProjectProvider>
+          <ScreenProvider>
+            <TasksProvider>
+              <UserProvider>
+                <App />
+              </UserProvider>
+            </TasksProvider>
+          </ScreenProvider>
+        </ProjectProvider>
+      </Router>
+    </div>
   </React.StrictMode>,
 );

@@ -143,9 +143,10 @@ function createDashboardWindow() {
     width: dashboardWidth,
     height: dashboardHeight,
     show: false,
-    frame: true,
+    titleBarStyle: 'hiddenInset',
+    frame: false,
     resizable: true,
-    roundedCorners: false,
+    roundedCorners: true,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,

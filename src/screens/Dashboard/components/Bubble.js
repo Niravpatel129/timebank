@@ -1,10 +1,13 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaTrash } from 'react-icons/fa';
+import formatDistanceToNow from '../../../../utils/formatDistanceToNow';
 
-const Bubble = ({ gradientColors, selected, onClick, onDelete }) => {
+const Bubble = ({ gradientColors, selected, onClick, onDelete, name, updatedAt }) => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const dropdownRef = useRef(null);
+  const bubbleRef = useRef(null);
 
   const handleRightClick = (e) => {
     e.preventDefault();
@@ -31,6 +34,7 @@ const Bubble = ({ gradientColors, selected, onClick, onDelete }) => {
 
   return (
     <motion.div
+      ref={bubbleRef}
       style={{
         width: '60px',
         height: '60px',
@@ -45,6 +49,8 @@ const Bubble = ({ gradientColors, selected, onClick, onDelete }) => {
       }}
       onClick={onClick}
       onContextMenu={handleRightClick}
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
     >
       <div
         style={{
@@ -95,6 +101,43 @@ const Bubble = ({ gradientColors, selected, onClick, onDelete }) => {
           </motion.div>
         )}
       </AnimatePresence>
+      {showTooltip && (
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -10 }}
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: 'calc(100% + 15px)',
+            transform: 'translateY(-50%)',
+            background: 'white',
+            color: 'black',
+            padding: '8px 12px',
+            borderRadius: '4px',
+            whiteSpace: 'nowrap',
+            zIndex: 1001,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+          }}
+        >
+          <span
+            style={{
+              fontSize: '14px',
+              fontWeight: '600',
+              textTransform: 'capitalize',
+              marginBottom: '4px',
+            }}
+          >
+            {name}
+          </span>
+          <span style={{ fontSize: '12px', color: '#666', fontWeight: '500' }}>
+            {formatDistanceToNow(updatedAt)}
+          </span>
+        </motion.div>
+      )}
     </motion.div>
   );
 };
