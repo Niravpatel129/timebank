@@ -43,7 +43,6 @@ export const ProjectProvider = ({ children }) => {
   const fetchProjects = useCallback(async () => {
     try {
       const response = await newRequest.get('/projects');
-      console.log('🚀  response:', response);
       setProjects(response);
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -53,7 +52,6 @@ export const ProjectProvider = ({ children }) => {
   const addProject = useCallback(async (projectData) => {
     try {
       const response = await newRequest.post('/projects', projectData);
-      console.log('🚀  response:', response);
       setProjects((prevProjects) => [...prevProjects, response]);
       toast.success('Project created successfully');
       return response;

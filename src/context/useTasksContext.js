@@ -60,7 +60,6 @@ export const TasksProvider = ({ children }) => {
     try {
       const response = await newRequest.patch(`/tasks/${taskId}/assignee`, { assignee });
       // update the task in the state
-      console.log('🚀  response:', response);
       setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
     } catch (error) {
       console.error('Error updating task assignee:', error);

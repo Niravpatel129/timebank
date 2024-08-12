@@ -15,7 +15,6 @@ import TaskList from './TaskList/TaskList';
 export default function DashboardComponent({ handleTriggerAddTaskButton, onEditTask }) {
   const [searchQuery, setSearchQuery] = useState('');
   const { user } = useUserContext();
-  console.log('🚀  user:', user);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { selectedProject, updateProject, colorGradients } = useProjectContext();
   const [filterType, setFilterType] = useState('all');
