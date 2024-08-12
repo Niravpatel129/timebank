@@ -326,12 +326,11 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {addTaskModalOpen && (
-        <DashboardAddTaskModal
-          onClose={() => setAddTaskModalOpen(false)}
-          onAddTask={handleAddTask}
-        />
-      )}
+      <DashboardAddTaskModal
+        isOpen={addTaskModalOpen}
+        onClose={() => setAddTaskModalOpen(false)}
+        onAddTask={handleAddTask}
+      />
       {isEditModalOpen && taskToEdit && (
         <EditTaskModal
           task={taskToEdit}
@@ -343,9 +342,7 @@ const Dashboard = () => {
 
       {isModalOpen && <DashboardCreateProjectModal isOpen={isModalOpen} />}
 
-      {isIntroModalOpen && (
-        <IntroductionModal isOpen={isIntroModalOpen} onClose={() => setIsIntroModalOpen(false)} />
-      )}
+      <IntroductionModal isOpen={isIntroModalOpen} onClose={() => setIsIntroModalOpen(false)} />
     </div>
   );
 };

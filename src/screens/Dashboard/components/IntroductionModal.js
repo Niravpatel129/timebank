@@ -84,13 +84,20 @@ const IntroductionModal = ({ isOpen, onClose }) => {
                   onClick={onClose}
                   style={{
                     padding: '12px 25px',
-                    backgroundColor: '#4153AF',
+                    background: 'linear-gradient(135deg, #4153AF, #6941C6)',
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',
                     cursor: 'pointer',
                     fontSize: '16px',
+                    transition: 'background 0.3s ease',
                   }}
+                  onMouseOver={(e) =>
+                    (e.target.style.background = 'linear-gradient(135deg, #3646A0, #5832B7)')
+                  }
+                  onMouseOut={(e) =>
+                    (e.target.style.background = 'linear-gradient(135deg, #4153AF, #6941C6)')
+                  }
                 >
                   Get Started
                 </button>
