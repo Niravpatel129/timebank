@@ -1,4 +1,4 @@
-const { ipcMain, Notification } = require('electron');
+const { ipcMain, Notification, BrowserWindow } = require('electron');
 
 class TimerManager {
   constructor(tray) {
@@ -30,7 +30,11 @@ class TimerManager {
       } else {
         this.currentTask.timeRemaining = Math.max(0, this.currentTask.timeRemaining - 1);
       }
-      event.reply('timer-update', this.currentTask);
+
+      // Broadcast timer update to all windows
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('timer-update', this.currentTask);
+      });
 
       this.updateTrayTitle();
 
@@ -48,12 +52,21 @@ class TimerManager {
     clearInterval(this.timerInterval);
     this.timerInterval = null;
     this.updateTrayTitle();
+
+    // Broadcast stop timer to all windows
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('timer-stopped', this.currentTask);
+    });
   }
 
   resetTimer(event, task) {
     this.currentTask = task;
     this.stopTimer();
-    event.reply('timer-update', this.currentTask);
+
+    // Broadcast reset timer to all windows
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('timer-reset', this.currentTask);
+    });
   }
 
   updateUncompletedTasks(event, count) {
@@ -88,6 +101,11 @@ class TimerManager {
       .padStart(2, '0');
     const seconds = (time % 60).toString().padStart(2, '0');
     this.tray.setTitle(`${minutes}:${seconds}`);
+
+    // emit the time to all windows
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('timer-update', time);
+    });
   }
 
   getCurrentTask(event) {
@@ -97,6 +115,11 @@ class TimerManager {
   setCurrentTask(event, task) {
     this.currentTask = task;
     event.reply('current-task-set', this.currentTask);
+
+    // Broadcast current task update to all windows
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('current-task-updated', this.currentTask);
+    });
   }
 }
 

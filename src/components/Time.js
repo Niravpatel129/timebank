@@ -1,12 +1,26 @@
 import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaCirclePause, FaCirclePlay, FaFeather } from 'react-icons/fa6';
 import PrimaryButton from './PrimaryButton';
 import TimeText from './TimeText';
+const { ipcRenderer } = window.require('electron');
 
 export default function Time({ trayTrackingData }) {
   const { currentTask, status } = trayTrackingData;
-  const timeRemaining = currentTask?.timerState?.remainingTime;
+  const [timeRemaining, setTimeRemaining] = useState(currentTask?.timerState?.remainingTime || 0);
+
+  useEffect(() => {
+    const handleTimerUpdate = (event, updatedTimeRemaining) => {
+      console.log('🚀  updatedTimeRemaining:', updatedTimeRemaining);
+      setTimeRemaining(updatedTimeRemaining);
+    };
+
+    ipcRenderer.on('timer-update', handleTimerUpdate);
+
+    return () => {
+      ipcRenderer.removeListener('timer-update', handleTimerUpdate);
+    };
+  }, [currentTask]);
 
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
