@@ -26,6 +26,14 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
     [],
   );
 
+  const contentVariants = useMemo(
+    () => ({
+      hidden: { opacity: 0, y: 20 },
+      visible: { opacity: 1, y: 0 },
+    }),
+    [],
+  );
+
   const handleOverlayClick = useCallback(
     (e) => {
       if (e.target === e.currentTarget) {
@@ -82,7 +90,13 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
       const randomColor = getRandomColor(member.user.email);
 
       return (
-        <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+          style={{ display: 'flex', alignItems: 'center' }}
+        >
           <div
             style={{
               width: '32px',
@@ -120,7 +134,7 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
             <option value='Admin'>Admin</option>
             <option value='Editor'>Editor</option>
           </select>
-        </div>
+        </motion.div>
       );
     },
     [getRandomColor],
@@ -132,7 +146,14 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
 
   const renderPendingInvite = useCallback(
     (invite, index) => (
-      <div key={`pending-${index}`} style={{ display: 'flex', alignItems: 'center' }}>
+      <motion.div
+        key={`pending-${index}`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ delay: index * 0.1 }}
+        style={{ display: 'flex', alignItems: 'center' }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
           <div
             style={{
@@ -202,7 +223,7 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
           <option value='Admin'>Admin</option>
           <option value='Editor'>Editor</option>
         </select>
-      </div>
+      </motion.div>
     ),
     [getRandomColor, handleRemoveInvite],
   );
@@ -237,7 +258,7 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
             variants={modalVariants}
             transition={{ duration: 0.3, type: 'spring', stiffness: 300, damping: 30 }}
           >
-            <div
+            <motion.div
               style={{
                 backgroundColor: 'white',
                 padding: '24px',
@@ -248,6 +269,10 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
                 textAlign: 'left',
                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
               }}
+              initial='hidden'
+              animate='visible'
+              variants={contentVariants}
+              transition={{ delay: 0.2, duration: 0.3 }}
             >
               <button
                 onClick={onClose}
@@ -264,13 +289,16 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
               >
                 <FaTimes />
               </button>
-              <div
+              <motion.div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   maxHeight: '200px',
                   overflow: 'hidden',
                 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.3 }}
               >
                 <div style={{ color: '#0f1121' }}>
                   <h2 style={{ marginBottom: '8px', fontSize: '23px', fontWeight: '600' }}>
@@ -287,9 +315,14 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
                     style={{ maxHeight: '100%', width: '150px', objectFit: 'contain' }}
                   />
                 </div>
-              </div>
+              </motion.div>
 
-              <div style={{ marginBottom: '24px' }}>
+              <motion.div
+                style={{ marginBottom: '24px' }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.3 }}
+              >
                 <label
                   style={{
                     display: 'block',
@@ -332,17 +365,30 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
                     Add
                   </button>
                 </div>
-              </div>
-              <div style={{ marginBottom: '24px' }}>
+              </motion.div>
+              <motion.div
+                style={{ marginBottom: '24px' }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.3 }}
+              >
                 <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px' }}>
                   In this project
                 </h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <motion.div
+                  style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
+                  layout
+                >
                   {selectedProject?.members?.map(renderMember)}
-                  {pendingInvites.map(renderPendingInvite)}
-                </div>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
+                  <AnimatePresence>{pendingInvites.map(renderPendingInvite)}</AnimatePresence>
+                </motion.div>
+              </motion.div>
+              <motion.div
+                style={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.3 }}
+              >
                 <button
                   style={{
                     padding: '10px 20px',
@@ -377,8 +423,8 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
                 >
                   {isLoading ? 'Sending...' : 'Invite team members'}
                 </button>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </motion.div>
         </motion.div>
       )}
