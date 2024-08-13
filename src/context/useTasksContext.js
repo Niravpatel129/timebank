@@ -179,28 +179,62 @@ export const TasksProvider = ({ children }) => {
       }
 
       try {
-        const response = await newRequest.post(`/tasks/${taskId}/start`);
-
-        setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
+        setTasks((prevTasks) =>
+          prevTasks.map((task) => {
+            if (task?._id === taskId) {
+              return {
+                ...task,
+                timerState: {
+                  ...task.timerState,
+                  isActive: true,
+                  startTime: new Date(),
+                  remainingTime:
+                    task.timerState.remainingTime === 0
+                      ? task.taskDuration * 60 * 1000
+                      : task.timerState.remainingTime,
+                },
+                status: 'in-progress',
+              };
+            }
+            return task;
+          }),
+        );
         setActiveTaskId(taskId);
 
-        const activeTask = tasks.find((task) => task?._id === activeTaskId);
+        await newRequest.post(`/tasks/${taskId}/start`);
 
+        const activeTask = tasks.find((task) => task?._id === taskId);
         ipcRenderer.send('set-current-task', activeTask);
       } catch (error) {
         console.error('Error starting task:', error);
         toast.error('Failed to start task. Please try again.');
       }
     },
-    [tasks, activeTaskId],
+    [tasks],
   );
 
   const pauseTask = useCallback(async (taskId, remainingTime) => {
     try {
-      const response = await newRequest.post(`/tasks/${taskId}/pause`, {
+      setTasks((prevTasks) =>
+        prevTasks.map((task) => {
+          if (task?._id === taskId) {
+            return {
+              ...task,
+              timerState: {
+                ...task.timerState,
+                remainingTime,
+                isActive: false,
+              },
+              status: 'paused',
+            };
+          }
+          return task;
+        }),
+      );
+      setActiveTaskId(null);
+      await newRequest.post(`/tasks/${taskId}/pause`, {
         remainingTime,
       });
-      setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
     } catch (error) {
       console.error('Error pausing task:', error);
       toast.error('Failed to pause task. Please try again.');
