@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaCircle } from 'react-icons/fa';
 import { FaDollarSign, FaPlus } from 'react-icons/fa6';
 import { GoTag } from 'react-icons/go';
@@ -8,11 +8,26 @@ import { Tooltip } from 'react-tooltip';
 import { useScreenContext } from '../context/useScreenContext';
 import secondsToTime from '../helpers/secondsToTime';
 
-export default function TrackingCard({ currentTask, toggleAddTimeModal }) {
+const { ipcRenderer } = window.require('electron');
+
+export default function TrackingCard({ toggleAddTimeModal }) {
   const { isRunning, getDisplayTime } = useScreenContext();
+  const [currentTask, setCurrentTask] = useState(null);
   const displayTime = secondsToTime(getDisplayTime());
   const status = currentTask ? (isRunning ? 'running' : 'paused') : 'not-started';
   const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    ipcRenderer.send('get-current-task');
+    ipcRenderer.on('current-task', (event, task) => {
+      console.log('🚀  task:', task);
+      setCurrentTask(task);
+    });
+
+    return () => {
+      ipcRenderer.removeAllListeners('current-task');
+    };
+  }, []);
 
   const getStatusColor = () => {
     switch (status) {

@@ -9,7 +9,6 @@ export const useHistoryContext = () => useContext(HistoryContext);
 export const HistoryProvider = ({ children }) => {
   const [historyEntries, setHistoryEntries] = useState([]);
   const [selectedProjectHistory, setSelectedProjectHistory] = useState([]);
-  console.log('🚀  selectedProjectHistory:', selectedProjectHistory);
   const { selectedProject } = useProjectContext();
 
   useEffect(() => {

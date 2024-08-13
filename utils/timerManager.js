@@ -11,11 +11,14 @@ class TimerManager {
   }
 
   setupIpcListeners() {
+    console.log('🚀  setupIpcListeners:');
     ipcMain.on('start-timer', this.startTimer.bind(this));
     ipcMain.on('stop-timer', this.stopTimer.bind(this));
     ipcMain.on('reset-timer', this.resetTimer.bind(this));
     ipcMain.on('update-uncompleted-tasks', this.updateUncompletedTasks.bind(this));
     ipcMain.on('update-tray-title', this.updateTrayTitleFromRenderer.bind(this));
+    ipcMain.on('get-current-task', this.getCurrentTask.bind(this));
+    ipcMain.on('set-current-task', this.setCurrentTask.bind(this));
   }
 
   startTimer(event, task) {
@@ -85,6 +88,15 @@ class TimerManager {
       .padStart(2, '0');
     const seconds = (time % 60).toString().padStart(2, '0');
     this.tray.setTitle(`${minutes}:${seconds}`);
+  }
+
+  getCurrentTask(event) {
+    event.reply('current-task', this.currentTask);
+  }
+
+  setCurrentTask(event, task) {
+    this.currentTask = task;
+    event.reply('current-task-set', this.currentTask);
   }
 }
 

@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import newRequest from '../api/newReqest';
 import { useHistoryContext } from './useHistoryContext';
 import { useProjectContext } from './useProjectContext';
+const { ipcRenderer } = window.require('electron');
 
 const TasksContext = createContext();
 
@@ -36,6 +37,8 @@ export const TasksProvider = ({ children }) => {
         const activeTask = response.tasks.find((task) => task.timerState.isActive);
         if (activeTask) {
           setActiveTaskId(activeTask._id);
+          // set the task as active in the timer manager
+          ipcRenderer.send('set-current-task', activeTask);
         } else {
           setActiveTaskId(null);
         }
