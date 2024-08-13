@@ -5,6 +5,7 @@ const { ipcRenderer } = window.require('electron');
 
 export function useTrayTracking() {
   const [currentTask, setCurrentTask] = useState(null);
+  console.log('🚀  currentTask:', currentTask);
   const [trayOpenCount, setTrayOpenCount] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -16,7 +17,7 @@ export function useTrayTracking() {
     getCurrentTask();
 
     ipcRenderer.on('current-task', (event, task) => {
-      console.log('🚀  task:', task);
+      console.log('we got a new current task');
       setCurrentTask(task);
     });
 
@@ -48,6 +49,20 @@ export function useTrayTracking() {
     }
   };
 
+  const toggleTask = () => {
+    console.log('🚀  status:', status);
+    if (status === 'running') {
+      console.log('pausing');
+      ipcRenderer.send('pause-active-task');
+    } else {
+      ipcRenderer.send('start-active-task');
+    }
+    // Request updated task information after toggling
+    setTimeout(() => {
+      ipcRenderer.send('get-current-task');
+    }, 300);
+  };
+
   return {
     currentTask,
     displayTime,
@@ -55,5 +70,6 @@ export function useTrayTracking() {
     getStatusColor,
     isHovered,
     setIsHovered,
+    toggleTask,
   };
 }

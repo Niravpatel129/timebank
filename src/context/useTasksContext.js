@@ -20,13 +20,34 @@ export const TasksProvider = ({ children }) => {
 
   useEffect(() => {
     if (!tasks.length || !activeTaskId) return;
-    console.log('🚀  updated active tasks');
     const activeTask = tasks.find((task) => task?._id === activeTaskId);
 
     if (!activeTask) return;
 
     ipcRenderer.send('set-current-task', activeTask);
   }, [activeTaskId, tasks]);
+
+  useEffect(() => {
+    // listen for start, pause
+    ipcRenderer.on('start-active-task', (event, task) => {
+      startTask(task._id);
+    });
+
+    ipcRenderer.on('pause-active-task', (event, task) => {
+      console.log('hey we got pause task request');
+      if (!task) return;
+
+      // get timeRemainging from task.timerState.startTime and now date
+      console.log('🚀  task time:', task.time);
+
+      pauseTask(task._id, task.time);
+    });
+
+    return () => {
+      ipcRenderer.removeAllListeners('start-active-task');
+      ipcRenderer.removeAllListeners('pause-active-task');
+    };
+  }, []);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -62,7 +83,6 @@ export const TasksProvider = ({ children }) => {
 
   const addTask = useCallback(
     async (task) => {
-      console.log('🚀  task:', task);
       try {
         const newTask = { ...task, _id: uuidv4(), timeSpent: 0 };
         const response = await newRequest.post('/tasks', newTask);
@@ -158,6 +178,10 @@ export const TasksProvider = ({ children }) => {
 
       setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
       setActiveTaskId(taskId);
+
+      const activeTask = tasks.find((task) => task?._id === activeTaskId);
+
+      ipcRenderer.send('set-current-task', activeTask);
     } catch (error) {
       console.error('Error starting task:', error);
       toast.error('Failed to start task. Please try again.');

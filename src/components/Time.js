@@ -6,7 +6,7 @@ import TimeText from './TimeText';
 const { ipcRenderer } = window.require('electron');
 
 export default function Time({ trayTrackingData }) {
-  const { currentTask, status } = trayTrackingData;
+  const { currentTask, status, toggleTask } = trayTrackingData;
   const [timeRemaining, setTimeRemaining] = useState(currentTask?.timerState?.remainingTime || 0);
 
   useEffect(() => {
@@ -96,6 +96,7 @@ export default function Time({ trayTrackingData }) {
         >
           <motion.div layout whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <PrimaryButton
+              onClick={toggleTask}
               icon={
                 currentTask ? status === 'running' ? <FaCirclePause /> : <FaCirclePlay /> : null
               }

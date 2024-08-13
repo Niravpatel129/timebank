@@ -2,6 +2,7 @@ const { ipcMain, Notification, BrowserWindow } = require('electron');
 
 class TimerManager {
   constructor(tray) {
+    this.time = 0;
     this.tray = tray;
     this.timerInterval = null;
     this.currentTask = null;
@@ -19,6 +20,25 @@ class TimerManager {
     ipcMain.on('update-tray-title', this.updateTrayTitleFromRenderer.bind(this));
     ipcMain.on('get-current-task', this.getCurrentTask.bind(this));
     ipcMain.on('set-current-task', this.setCurrentTask.bind(this));
+    ipcMain.on('start-active-task', this.startActiveTask.bind(this));
+    ipcMain.on('pause-active-task', this.pauseActiveTask.bind(this));
+  }
+
+  startActiveTask(event, task) {
+    // reply with the current task
+    // event.reply('start-active-task', this.currentTask);
+
+    // send the current task to all windows
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('start-active-task', this.currentTask);
+    });
+  }
+
+  pauseActiveTask(event, task) {
+    // reply with the current task
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('pause-active-task', { ...this.currentTask, time: this.time });
+    });
   }
 
   startTimer(event, task) {
@@ -96,6 +116,12 @@ class TimerManager {
   }
 
   updateTrayTitleFromRenderer(event, time) {
+    // make sure valid time is passed
+    if (typeof time !== 'number' || time < 0) {
+      return;
+    }
+    this.time = time;
+
     const minutes = Math.floor(time / 60)
       .toString()
       .padStart(2, '0');
