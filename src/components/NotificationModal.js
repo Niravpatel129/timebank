@@ -1,18 +1,10 @@
 import { motion } from 'framer-motion';
 import React from 'react';
 import { FaTimes } from 'react-icons/fa';
+import { useNotificationContext } from '../context/useNotificationContext';
 
 export default function NotificationModal({ isOpen, onClose }) {
-  const notifications = [
-    {
-      id: 1,
-      avatar: 'Julius',
-      action: 'invited you to',
-      target: 'Blog design',
-      time: 'Friday 2:22 PM',
-      timeAgo: '3 hours ago',
-    },
-  ];
+  const { notifications } = useNotificationContext();
 
   return (
     <>
@@ -32,13 +24,13 @@ export default function NotificationModal({ isOpen, onClose }) {
           display: 'flex',
           flexDirection: 'column',
           borderRadius: '15px',
-          fontSize: '14px', // Reduced font size
+          fontSize: '14px',
           fontFamily: 'sans-serif',
         }}
       >
         <div
           style={{
-            padding: '15px', // Reduced padding
+            padding: '15px',
             borderBottom: '1px solid #f3f3f3',
             display: 'flex',
             justifyContent: 'space-between',
@@ -49,92 +41,109 @@ export default function NotificationModal({ isOpen, onClose }) {
           <FaTimes onClick={onClose} style={{ cursor: 'pointer', fontSize: '16px' }} />
         </div>
         <div style={{ padding: '15px', overflowY: 'auto', flex: 1 }}>
-          {notifications.map((notification) => (
+          {notifications && notifications.length > 0 ? (
+            notifications.map((notification) => (
+              <div
+                key={notification.id}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  marginBottom: '15px',
+                  padding: '8px',
+                  paddingTop: '16px',
+                  paddingBottom: '16px',
+                  borderBottom: '1px solid #f3f3f3',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      backgroundColor: '#ddd',
+                      marginRight: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 'bold',
+                      fontSize: '12px',
+                      border: '1px solid #f3f3f3',
+                    }}
+                  >
+                    {notification.avatar[0]}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ margin: '0 0 3px 0', fontSize: '13px' }}>
+                      <strong>{notification.avatar}</strong> {notification.action}{' '}
+                      <strong>{notification.target}</strong>
+                    </p>
+                    <div style={{ display: 'flex', marginTop: '10px' }}>
+                      <button
+                        style={{
+                          flex: 1,
+                          marginRight: '6px',
+                          padding: '5px 10px',
+                          backgroundColor: 'white',
+                          color: 'black',
+                          border: '1px solid #ccc',
+                          borderRadius: '7px',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = '#f0f0f0';
+                          e.target.style.borderColor = '#999';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = 'white';
+                          e.target.style.borderColor = '#ccc';
+                        }}
+                      >
+                        Decline
+                      </button>
+                      <button
+                        style={{
+                          flex: 1,
+                          padding: '5px 10px',
+                          backgroundColor: '#007bff',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '7px',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = '#0056b3';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = '#007bff';
+                        }}
+                      >
+                        Accept
+                      </button>
+                    </div>
+                  </div>
+                  <div style={{ color: '#888', fontSize: '0.8em' }}>{notification.timeAgo}</div>
+                </div>
+              </div>
+            ))
+          ) : (
             <div
-              key={notification.id}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                marginBottom: '15px', // Reduced margin
-                padding: '8px', // Reduced padding
-                paddingTop: '16px',
-                paddingBottom: '16px',
-                borderBottom: '1px solid #f3f3f3',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+                textAlign: 'center',
+                color: '#888',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div
-                  style={{
-                    width: '32px', // Reduced size
-                    height: '32px', // Reduced size
-                    borderRadius: '50%',
-                    backgroundColor: '#ddd',
-                    marginRight: '12px', // Reduced margin
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 'bold',
-                    fontSize: '12px', // Reduced font size
-                    border: '1px solid #f3f3f3',
-                  }}
-                >
-                  {notification.avatar[0]}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <p style={{ margin: '0 0 3px 0', fontSize: '13px' }}>
-                    <strong>{notification.avatar}</strong> {notification.action}{' '}
-                    <strong>{notification.target}</strong>
-                  </p>
-                  <div style={{ display: 'flex', marginTop: '10px' }}>
-                    <button
-                      style={{
-                        flex: 1,
-                        marginRight: '6px',
-                        padding: '5px 10px',
-                        backgroundColor: 'white',
-                        color: 'black',
-                        border: '1px solid #ccc',
-                        borderRadius: '7px',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = '#f0f0f0';
-                        e.target.style.borderColor = '#999';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = 'white';
-                        e.target.style.borderColor = '#ccc';
-                      }}
-                    >
-                      Decline
-                    </button>
-                    <button
-                      style={{
-                        flex: 1,
-                        padding: '5px 10px',
-                        backgroundColor: '#007bff',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '7px',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = '#0056b3';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = '#007bff';
-                      }}
-                    >
-                      Accept
-                    </button>
-                  </div>
-                </div>
-                <div style={{ color: '#888', fontSize: '0.8em' }}>3 hours ago</div>
-              </div>
+              <span style={{ fontSize: '48px', marginBottom: '20px' }}>🌟</span>
+              <p>You're all caught up! No new notifications.</p>
             </div>
-          ))}
+          )}
         </div>
       </motion.div>
       {isOpen && (
