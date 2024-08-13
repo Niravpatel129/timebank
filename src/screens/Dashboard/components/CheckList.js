@@ -160,7 +160,7 @@ const Checklist = ({
           <ScribbleText
             text={title}
             isCompleted={status === 'completed'}
-            strokeColor={colorGradients[0]}
+            strokeGradient={colorGradients}
           />
           {tag && (
             <Tag

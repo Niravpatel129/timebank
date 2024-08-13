@@ -194,7 +194,7 @@ export default function DashboardComponent({
           backgroundColor: '#ffffff',
           fontFamily: 'sans-serif',
           padding: '20px',
-          paddingBottom: '100px',
+          paddingBottom: '300px',
           height: '100vh',
           overflowY: tasks.length === 0 ? 'visible' : 'scroll',
           position: 'relative',
@@ -343,7 +343,7 @@ export default function DashboardComponent({
                     cursor: 'pointer',
                     zIndex: members.length + 1,
                     position: 'relative',
-                    marginLeft: '-10px', // Add negative margin to align with other avatars
+                    marginLeft: '-5px', // Add negative margin to align with other avatars
                   }}
                   onMouseEnter={() => setShowInviteButton(true)}
                   onMouseLeave={() => setShowInviteButton(false)}
@@ -547,6 +547,7 @@ export default function DashboardComponent({
             </div>
           </motion.div>
         </div>
+
         <TaskList
           tasks={currentWeekTasks}
           listType='currentWeek'
@@ -559,13 +560,15 @@ export default function DashboardComponent({
           Not in the board
         </h2>
 
-        {/* items */}
-        <TaskList
-          tasks={thingsToDoTasks}
-          listType='thingsToDo'
-          moveTask={moveTask}
-          onEditTask={onEditTask}
-        />
+        <div style={{ marginBottom: '300px', marginTop: '30px' }}>
+          {/* items */}
+          <TaskList
+            tasks={thingsToDoTasks}
+            listType='thingsToDo'
+            moveTask={moveTask}
+            onEditTask={onEditTask}
+          />
+        </div>
       </motion.div>
 
       {Array(60)

@@ -58,7 +58,7 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
 
   const handleAddInvite = useCallback(() => {
     if (!inviteEmail) return;
-    setPendingInvites((prevInvites) => [...prevInvites, { email: inviteEmail, role: 'Editor' }]);
+    setPendingInvites((prevInvites) => [...prevInvites, { email: inviteEmail, role: 'member' }]);
     setInviteEmail('');
   }, [inviteEmail]);
 
@@ -130,9 +130,9 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
             }}
             defaultValue={member.role}
           >
-            <option value='Owner'>Owner</option>
-            <option value='Admin'>Admin</option>
-            <option value='Editor'>Editor</option>
+            <option value='owner'>Owner</option>
+            <option value='admin'>Admin</option>
+            <option value='member'>Member</option>
           </select>
         </motion.div>
       );
@@ -220,8 +220,8 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
             });
           }}
         >
-          <option value='Admin'>Admin</option>
-          <option value='Editor'>Editor</option>
+          <option value='admin'>Admin</option>
+          <option value='member'>Member</option>
         </select>
       </motion.div>
     ),
