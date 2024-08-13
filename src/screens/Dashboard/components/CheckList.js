@@ -78,9 +78,9 @@ const Checklist = ({
 
   const assignees = [
     ...selectedProject.members.map((member) => ({
-      value: member.user._id,
-      _id: member.user._id,
-      name: member.user.name || 'Member 1',
+      value: member.user?._id,
+      _id: member.user?._id,
+      name: member.user?.name || 'Member 1',
       image: null,
     })),
     { value: null, image: null, name: 'Unassigned', _id: null },

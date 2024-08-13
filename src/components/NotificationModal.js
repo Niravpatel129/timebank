@@ -1,10 +1,58 @@
 import { motion } from 'framer-motion';
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 import { FaTimes } from 'react-icons/fa';
+import newRequest from '../api/newReqest';
 import { useNotificationContext } from '../context/useNotificationContext';
+import { useProjectContext } from '../context/useProjectContext';
 
 export default function NotificationModal({ isOpen, onClose }) {
-  const { notifications } = useNotificationContext();
+  const { notifications, removeNotification, fetchNotifications } = useNotificationContext();
+  const { fetchProjects } = useProjectContext();
+
+  const fetchNotificationsOnOpen = useCallback(() => {
+    if (isOpen) {
+      fetchNotifications();
+    }
+  }, [isOpen, fetchNotifications]);
+
+  useEffect(() => {
+    fetchNotificationsOnOpen();
+  }, [fetchNotificationsOnOpen]);
+
+  const handleDecline = async (notification) => {
+    if (notification.type === 'project_invitation') {
+      try {
+        await newRequest.post('/notification/project/decline-invitation', {
+          notificationId: notification._id,
+        });
+        removeNotification(notification._id);
+        toast.success('Invitation declined');
+      } catch (error) {
+        console.error('Failed to decline invitation:', error);
+        toast.error('Failed to decline invitation. Please try again.');
+      }
+    }
+  };
+
+  const handleAccept = async (notification) => {
+    if (notification.type === 'project_invitation') {
+      try {
+        await newRequest.post('/notification/project/accept-invitation', {
+          notificationId: notification._id,
+        });
+        removeNotification(notification._id);
+
+        setTimeout(() => {
+          fetchProjects();
+        }, 1000);
+        toast.success('Invitation accepted');
+      } catch (error) {
+        console.error('Failed to accept invitation:', error);
+        toast.error('Failed to accept invitation. Please try again.');
+      }
+    }
+  };
 
   return (
     <>
@@ -44,7 +92,7 @@ export default function NotificationModal({ isOpen, onClose }) {
           {notifications && notifications.length > 0 ? (
             notifications.map((notification) => (
               <div
-                key={notification.id}
+                key={notification._id}
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -71,13 +119,10 @@ export default function NotificationModal({ isOpen, onClose }) {
                       border: '1px solid #f3f3f3',
                     }}
                   >
-                    {notification.avatar[0]}
+                    {notification.relatedProject.name[0].toUpperCase()}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <p style={{ margin: '0 0 3px 0', fontSize: '13px' }}>
-                      <strong>{notification.avatar}</strong> {notification.action}{' '}
-                      <strong>{notification.target}</strong>
-                    </p>
+                    <p style={{ margin: '0 0 3px 0', fontSize: '13px' }}>{notification.content}</p>
                     <div style={{ display: 'flex', marginTop: '10px' }}>
                       <button
                         style={{
@@ -99,6 +144,7 @@ export default function NotificationModal({ isOpen, onClose }) {
                           e.target.style.backgroundColor = 'white';
                           e.target.style.borderColor = '#ccc';
                         }}
+                        onClick={() => handleDecline(notification)}
                       >
                         Decline
                       </button>
@@ -119,12 +165,28 @@ export default function NotificationModal({ isOpen, onClose }) {
                         onMouseLeave={(e) => {
                           e.target.style.backgroundColor = '#007bff';
                         }}
+                        onClick={() => handleAccept(notification)}
                       >
                         Accept
                       </button>
                     </div>
                   </div>
-                  <div style={{ color: '#888', fontSize: '0.8em' }}>{notification.timeAgo}</div>
+                  <div style={{ color: '#888', fontSize: '0.8em' }}>
+                    {(() => {
+                      const now = new Date();
+                      const createdAt = new Date(notification.createdAt);
+                      const diffInHours = Math.floor((now - createdAt) / (1000 * 60 * 60));
+
+                      if (diffInHours < 1) {
+                        return 'Just now';
+                      } else if (diffInHours < 24) {
+                        return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+                      } else {
+                        const diffInDays = Math.floor(diffInHours / 24);
+                        return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+                      }
+                    })()}
+                  </div>
                 </div>
               </div>
             ))

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import newRequest from '../api/newReqest';
 
 const NotificationContext = createContext();
@@ -12,7 +12,7 @@ export const NotificationProvider = ({ children }) => {
 
   const removeNotification = (id) => {
     setNotifications((prevNotifications) =>
-      prevNotifications.filter((notification) => notification.id !== id),
+      prevNotifications.filter((notification) => notification._id !== id),
     );
   };
 
@@ -20,19 +20,19 @@ export const NotificationProvider = ({ children }) => {
     setNotifications([]);
   };
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     try {
       const response = await newRequest.get('/notification');
       console.log('🚀  response:', response);
-      setNotifications(response.data);
+      setNotifications(response);
     } catch (error) {
       console.error('Error fetching notifications:', error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchNotifications();
-  }, []);
+  }, [fetchNotifications]);
 
   return (
     <NotificationContext.Provider

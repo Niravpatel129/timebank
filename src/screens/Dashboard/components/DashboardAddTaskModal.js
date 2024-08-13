@@ -455,7 +455,7 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
                     onChange={setAssignee}
                     options={[
                       ...selectedProject?.members.map((member) => ({
-                        value: member.user._id,
+                        value: member.user?._id,
                         label: member.user?.name,
                         name: member.user?.name,
                         avatar: null,

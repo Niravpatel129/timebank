@@ -112,7 +112,7 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
 
   const renderMember = useCallback(
     (member, index) => {
-      const randomColor = getRandomColor(member.user.email);
+      const randomColor = getRandomColor(member.user?.email);
 
       return (
         <motion.div
@@ -138,12 +138,12 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
               textTransform: 'uppercase',
             }}
           >
-            {member.user.name[0]}
+            {member.user?.name[0]}
           </div>
 
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '14px', fontWeight: '500' }}>{member.user.name}</div>
-            <div style={{ fontSize: '14px', color: '#6B7280' }}>{member.user.email}</div>
+            <div style={{ fontSize: '14px', fontWeight: '500' }}>{member.user?.name}</div>
+            <div style={{ fontSize: '14px', color: '#6B7280' }}>{member.user?.email}</div>
           </div>
           <select
             style={{

@@ -19,7 +19,7 @@ export const ProjectProvider = ({ children }) => {
   ];
 
   const members = useMemo(() => {
-    return selectedProject?.members?.map((member) => member.user.name);
+    return selectedProject?.members?.map((member) => member.user?.name);
   }, [selectedProject]);
 
   useEffect(() => {
