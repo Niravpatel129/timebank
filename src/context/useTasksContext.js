@@ -55,7 +55,7 @@ export const TasksProvider = ({ children }) => {
         if (!selectedProject) {
           setTasks([]);
           setTotalTimeSpent(0);
-          setActiveTaskId(null);
+          // setActiveTaskId(null);
           return;
         }
 
@@ -69,7 +69,7 @@ export const TasksProvider = ({ children }) => {
           await pauseTask(task._id, task.timerState.remainingTime);
         }
 
-        setActiveTaskId(null);
+        // setActiveTaskId(null);
       } catch (error) {
         console.error('Error fetching initial data:', error);
         toast.error('Failed to load tasks. Please try again.');
@@ -146,7 +146,7 @@ export const TasksProvider = ({ children }) => {
         await newRequest.delete(`/tasks/${taskId}`);
         setTasks((prevTasks) => prevTasks.filter((task) => task?._id !== taskId));
         if (activeTaskId === taskId) {
-          setActiveTaskId(null);
+          // setActiveTaskId(null);
         }
       } catch (error) {
         console.error('Error deleting task:', error);
@@ -231,7 +231,7 @@ export const TasksProvider = ({ children }) => {
           return task;
         }),
       );
-      setActiveTaskId(null);
+      // setActiveTaskId(null);
       await newRequest.post(`/tasks/${taskId}/pause`, {
         remainingTime,
       });
