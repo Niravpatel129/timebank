@@ -60,7 +60,7 @@ export function useTrayTracking() {
     // Request updated task information after toggling
     setTimeout(() => {
       ipcRenderer.send('get-current-task');
-    }, 300);
+    }, 1000);
   };
 
   return {

@@ -1,4 +1,4 @@
-const { ipcMain, Notification, BrowserWindow } = require('electron');
+const { ipcMain, Notification, BrowserWindow, app } = require('electron');
 
 class TimerManager {
   constructor(tray) {
@@ -25,9 +25,6 @@ class TimerManager {
   }
 
   startActiveTask(event, task) {
-    // reply with the current task
-    // event.reply('start-active-task', this.currentTask);
-
     // send the current task to all windows
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('start-active-task', this.currentTask);
@@ -60,10 +57,7 @@ class TimerManager {
 
       if (this.currentTask.timeRemaining === 0 && !this.currentTask.isCountingUp) {
         this.stopTimer();
-        new Notification({
-          title: "Time's up!",
-          body: `Time's up for task: ${this.currentTask.name}`,
-        }).show();
+        this.showNotification("Time's up!", `Time's up for task: ${this.currentTask.name}`);
       }
     }, 1000);
   }
@@ -117,9 +111,10 @@ class TimerManager {
 
   updateTrayTitleFromRenderer(event, time) {
     // make sure valid time is passed
-    if (typeof time !== 'number' || time < 0) {
+    if (typeof time !== 'number') {
       return;
     }
+
     this.time = time;
 
     const minutes = Math.floor(time / 60)
@@ -132,6 +127,14 @@ class TimerManager {
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('timer-update', time);
     });
+
+    if (time === 0) {
+      this.showNotification("Time's up!", `Time's up for task: ${this.currentTask.name}`);
+
+      // stop the timer
+      this.pauseActiveTask();
+      return;
+    }
   }
 
   getCurrentTask(event) {
@@ -146,6 +149,30 @@ class TimerManager {
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('current-task-updated', this.currentTask);
     });
+  }
+
+  showNotification(title, body) {
+    const notification = new Notification({ title, body });
+    notification.on('click', () => {
+      // When notification is clicked, focus or create the main window
+      let mainWindow = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        mainWindow.focus();
+      } else {
+        // If no window exists, create a new one
+        mainWindow = new BrowserWindow({
+          width: 800,
+          height: 600,
+          webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+          },
+        });
+        mainWindow.loadFile('index.html'); // Adjust this to your app's entry point
+      }
+    });
+    notification.show();
   }
 }
 

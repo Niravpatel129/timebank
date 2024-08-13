@@ -7,7 +7,13 @@ const { ipcRenderer } = window.require('electron');
 
 export default function Time({ trayTrackingData }) {
   const { currentTask, status, toggleTask } = trayTrackingData;
-  const [timeRemaining, setTimeRemaining] = useState(currentTask?.timerState?.remainingTime || 0);
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [isToggling, setIsToggling] = useState(false);
+  console.log('🚀  currentTask tray:', currentTask);
+
+  useEffect(() => {
+    setTimeRemaining(currentTask?.timerState?.remainingTime || 0);
+  }, [currentTask]);
 
   useEffect(() => {
     const handleTimerUpdate = (event, updatedTimeRemaining) => {
@@ -19,7 +25,7 @@ export default function Time({ trayTrackingData }) {
     return () => {
       ipcRenderer.removeListener('timer-update', handleTimerUpdate);
     };
-  }, [currentTask]);
+  }, []);
 
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
@@ -28,6 +34,14 @@ export default function Time({ trayTrackingData }) {
     return `${hours.toString().padStart(2, '0')}:${minutes
       .toString()
       .padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  const handleToggleTask = async () => {
+    setIsToggling(true);
+    await toggleTask();
+    // wait for 1 second
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setIsToggling(false);
   };
 
   return (
@@ -94,12 +108,18 @@ export default function Time({ trayTrackingData }) {
             gap: '10px',
           }}
         >
-          <motion.div layout whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <motion.div
+            layout
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            animate={isToggling ? { scale: 0.95 } : { scale: 1 }}
+          >
             <PrimaryButton
-              onClick={toggleTask}
+              onClick={handleToggleTask}
               icon={
                 currentTask ? status === 'running' ? <FaCirclePause /> : <FaCirclePlay /> : null
               }
+              disabled={isToggling}
             >
               {currentTask ? (status === 'running' ? 'Pause' : 'Start') : 'Select Task'}
             </PrimaryButton>
