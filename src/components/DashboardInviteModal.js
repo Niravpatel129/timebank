@@ -126,31 +126,62 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
     [getRandomColor],
   );
 
+  const handleRemoveInvite = useCallback((index) => {
+    setPendingInvites((prevInvites) => prevInvites.filter((_, i) => i !== index));
+  }, []);
+
   const renderPendingInvite = useCallback(
     (invite, index) => (
       <div key={`pending-${index}`} style={{ display: 'flex', alignItems: 'center' }}>
-        <div
-          style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            backgroundColor: getRandomColor(invite.email),
-            marginRight: '12px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            fontSize: '14px',
-            color: 'white',
-            fontWeight: 'bold',
-            textTransform: 'uppercase',
-          }}
-        >
-          {invite.email[0]}
+        <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+          <div
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: getRandomColor(invite.email),
+              marginRight: '12px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              fontSize: '14px',
+              color: 'white',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              position: 'relative',
+            }}
+            onClick={() => handleRemoveInvite(index)}
+          >
+            {invite.email[0]}
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                opacity: 0,
+                transition: 'opacity 0.2s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = 0)}
+            >
+              <FaTimes color='white' />
+            </div>
+          </div>
         </div>
+
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: '14px', fontWeight: '500' }}>{invite.email}</div>
           <div style={{ fontSize: '14px', color: '#6B7280' }}>Pending</div>
         </div>
+
         <select
           style={{
             padding: '6px 8px',
@@ -173,7 +204,7 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
         </select>
       </div>
     ),
-    [],
+    [getRandomColor, handleRemoveInvite],
   );
 
   return (
