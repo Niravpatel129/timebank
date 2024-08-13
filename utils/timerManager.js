@@ -46,6 +46,10 @@ class TimerManager {
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send('timer-finished', task._id);
         });
+        this.tray.setTitle('Time up!');
+        setTimeout(() => {
+          this.tray.setTitle('');
+        }, 6000);
       }
     }, 1000);
 
