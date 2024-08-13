@@ -101,7 +101,9 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
     filteredTasks =
       filterType === 'all'
         ? filteredTasks
-        : filteredTasks.filter((task) => task.assignee === user?.name);
+        : filteredTasks.filter((task) => {
+            return task.assignee?.name === user?.name;
+          });
     return sortTasks(filteredTasks, 'thingsToDo');
   }, [tasks, filterType, user?.name, hideCompleted]);
 
