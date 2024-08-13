@@ -18,6 +18,17 @@ export const TasksProvider = ({ children }) => {
   const { selectedProject, projects } = useProjectContext();
   const { addHistoryEntry } = useHistoryContext();
 
+  const getRemainingTime = useCallback(
+    (taskId) => {
+      const task = tasks.find((t) => t._id === taskId);
+      if (!task || !task.timerState.isActive) return task?.timerState.remainingTime || 0;
+
+      const elapsed = Date.now() - new Date(task.timerState.startTime).getTime();
+      return Math.max(0, task.timerState.remainingTime - elapsed);
+    },
+    [tasks],
+  );
+
   useEffect(() => {
     if (!tasks.length || !activeTaskId) return;
     const activeTask = tasks.find((task) => task?._id === activeTaskId);
@@ -169,58 +180,85 @@ export const TasksProvider = ({ children }) => {
     }
   }, []);
 
-  const startTask = useCallback(async (taskId) => {
-    if (!taskId) return;
+  const startTask = useCallback(
+    async (taskId) => {
+      if (!taskId) return;
 
-    try {
-      const response = await newRequest.post(`/tasks/${taskId}/start`);
+      try {
+        // Pause the currently active task if there is one
+        if (activeTaskId) {
+          await pauseTask(activeTaskId, getRemainingTime(activeTaskId));
+        }
 
-      setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
-      setActiveTaskId(taskId);
+        const response = await newRequest.post(`/tasks/${taskId}/start`);
 
-      const activeTask = tasks.find((task) => task?._id === activeTaskId);
+        setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
+        setActiveTaskId(taskId);
 
-      ipcRenderer.send('set-current-task', activeTask);
-    } catch (error) {
-      console.error('Error starting task:', error);
-      toast.error('Failed to start task. Please try again.');
-    }
-  }, []);
+        const activeTask = tasks.find((task) => task?._id === taskId);
 
-  const pauseTask = useCallback(async (taskId, remainingTime) => {
-    try {
-      const response = await newRequest.post(`/tasks/${taskId}/pause`, {
-        remainingTime,
-      });
-      setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
-    } catch (error) {
-      console.error('Error pausing task:', error);
-      toast.error('Failed to pause task. Please try again.');
-    }
-  }, []);
+        ipcRenderer.send('set-current-task', activeTask);
+      } catch (error) {
+        console.error('Error starting task:', error);
+        toast.error('Failed to start task. Please try again.');
+      }
+    },
+    [activeTaskId, getRemainingTime, tasks],
+  );
 
-  const resumeTask = useCallback(async (taskId) => {
-    try {
-      const response = await newRequest.post(`/tasks/${taskId}/resume`);
-      setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
-      setActiveTaskId(taskId);
-    } catch (error) {
-      console.error('Error resuming task:', error);
-      toast.error('Failed to resume task. Please try again.');
-    }
-  }, []);
+  const pauseTask = useCallback(
+    async (taskId, remainingTime) => {
+      try {
+        const response = await newRequest.post(`/tasks/${taskId}/pause`, {
+          remainingTime,
+        });
+        setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
+        if (activeTaskId === taskId) {
+          setActiveTaskId(null);
+        }
+      } catch (error) {
+        console.error('Error pausing task:', error);
+        toast.error('Failed to pause task. Please try again.');
+      }
+    },
+    [activeTaskId],
+  );
 
-  const finishTask = useCallback(async (taskId) => {
-    return;
-    try {
-      const response = await newRequest.post(`/tasks/${taskId}/finish`);
-      setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
-      setActiveTaskId(null);
-    } catch (error) {
-      console.error('Error finishing task:', error);
-      toast.error('Failed to finish task. Please try again.');
-    }
-  }, []);
+  const resumeTask = useCallback(
+    async (taskId) => {
+      try {
+        // Pause the currently active task if there is one
+        if (activeTaskId && activeTaskId !== taskId) {
+          await pauseTask(activeTaskId, getRemainingTime(activeTaskId));
+        }
+
+        const response = await newRequest.post(`/tasks/${taskId}/resume`);
+        setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
+        setActiveTaskId(taskId);
+      } catch (error) {
+        console.error('Error resuming task:', error);
+        toast.error('Failed to resume task. Please try again.');
+      }
+    },
+    [activeTaskId, getRemainingTime, pauseTask],
+  );
+
+  const finishTask = useCallback(
+    async (taskId) => {
+      return;
+      try {
+        const response = await newRequest.post(`/tasks/${taskId}/finish`);
+        setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
+        if (activeTaskId === taskId) {
+          setActiveTaskId(null);
+        }
+      } catch (error) {
+        console.error('Error finishing task:', error);
+        toast.error('Failed to finish task. Please try again.');
+      }
+    },
+    [activeTaskId],
+  );
 
   const updateTaskStatus = useCallback(async (taskId, status) => {
     try {
@@ -237,17 +275,6 @@ export const TasksProvider = ({ children }) => {
       toast.error('Failed to update task status. Please try again.');
     }
   }, []);
-
-  const getRemainingTime = useCallback(
-    (taskId) => {
-      const task = tasks.find((t) => t._id === taskId);
-      if (!task || !task.timerState.isActive) return task?.timerState.remainingTime || 0;
-
-      const elapsed = Date.now() - new Date(task.timerState.startTime).getTime();
-      return Math.max(0, task.timerState.remainingTime - elapsed);
-    },
-    [tasks],
-  );
 
   const contextValue = {
     tasks,
