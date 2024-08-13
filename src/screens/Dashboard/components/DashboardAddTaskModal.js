@@ -33,6 +33,17 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
     }
   }, [selectedProject]);
 
+  const resetForm = () => {
+    setTaskName('');
+    setDuration('30m');
+    setShowCustomDuration(false);
+    setCustomHours(0);
+    setCustomMinutes(0);
+    setCategory('');
+    setDate(new Date().toISOString().split('T')[0]);
+    setAssignee(null);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const taskDurationInSeconds = calculateDurationInSeconds(duration);
@@ -48,6 +59,7 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
       assigneeDetails: assignee,
     };
     addTask({ ...newTask, project: selectedProject._id });
+    resetForm();
     onClose();
   };
 
