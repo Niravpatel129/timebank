@@ -161,16 +161,11 @@ export default function Home({ currentTask, setCurrentTask }) {
         )}
       </AnimatePresence>
       <div style={{ width: '100%' }}>
-        <Time onClick={handleShowDashboard} />
+        <Time onClick={handleShowDashboard} trayTrackingData={trayTrackingData} />
         <div style={{ height: '1px', background: '#40366d' }} />
 
-        <div
-          // onClick={handleTrackingCardClick}
-          style={{ cursor: currentTask ? 'pointer' : 'default' }}
-        >
+        <div style={{ cursor: currentTask ? 'pointer' : 'default' }}>
           <TrackingCard
-            currentTask={currentTask}
-            setCurrentTask={setCurrentTask}
             toggleAddTimeModal={toggleAddTimeModal}
             trayTrackingData={trayTrackingData}
           />

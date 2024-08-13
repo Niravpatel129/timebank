@@ -1,22 +1,12 @@
 import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
-import { FaCheck, FaCirclePause, FaCirclePlay, FaFeather } from 'react-icons/fa6';
-import { useTasksContext } from '../context/useTasksContext';
-import { useTimerHook } from '../hooks/useTimerHook';
+import React from 'react';
+import { FaCirclePause, FaCirclePlay, FaFeather } from 'react-icons/fa6';
 import PrimaryButton from './PrimaryButton';
 import TimeText from './TimeText';
 
-export default function Time({ onClick }) {
-  const { tasks, activeTaskId, getRemainingTime, pauseTask, finishTask, startTask } =
-    useTasksContext();
-
-  const [activeTask, setActiveTask] = useState(null);
-  const remainingTime = useTimerHook(activeTaskId);
-
-  useEffect(() => {
-    const task = tasks.find((task) => task?._id === activeTaskId);
-    setActiveTask(task);
-  }, [activeTaskId, tasks]);
+export default function Time({ trayTrackingData }) {
+  const { currentTask, status } = trayTrackingData;
+  const timeRemaining = currentTask?.timerState?.remainingTime;
 
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
@@ -25,24 +15,6 @@ export default function Time({ onClick }) {
     return `${hours.toString().padStart(2, '0')}:${minutes
       .toString()
       .padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
-  const toggleTimer = () => {
-    return;
-    if (activeTask) {
-      if (remainingTime > 0) {
-        if (activeTask.status === 'running') {
-          pauseTask(activeTask._id);
-        } else {
-          startTask(activeTask._id);
-        }
-      } else {
-        // alert the user to set the time on the task
-        return;
-      }
-    } else {
-      onClick();
-    }
   };
 
   return (
@@ -79,7 +51,7 @@ export default function Time({ onClick }) {
             border: '1px solid #40366d',
             cursor: 'pointer',
           }}
-          onClick={() => activeTask && finishTask(activeTask._id)}
+          // onClick={() => activeTask && finishTask(activeTask._id)}
         >
           <FaFeather style={{ color: '#c5c1f0', fontSize: '20px' }} />
         </motion.div>
@@ -98,7 +70,7 @@ export default function Time({ onClick }) {
               exit={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.2 }}
             >
-              <TimeText variation={2} time={formatTime(remainingTime)} />
+              <TimeText variation={2} time={formatTime(timeRemaining)} />
             </motion.div>
           </AnimatePresence>
         </motion.div>
@@ -111,22 +83,15 @@ export default function Time({ onClick }) {
         >
           <motion.div layout whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <PrimaryButton
-              onClick={toggleTimer}
               icon={
-                activeTask ? (
-                  activeTask.status === 'running' ? (
-                    <FaCirclePause />
-                  ) : (
-                    <FaCirclePlay />
-                  )
-                ) : null
+                currentTask ? status === 'running' ? <FaCirclePause /> : <FaCirclePlay /> : null
               }
             >
-              {activeTask ? (activeTask.status === 'running' ? 'Pause' : 'Start') : 'Select Task'}
+              {currentTask ? (status === 'running' ? 'Pause' : 'Start') : 'Select Task'}
             </PrimaryButton>
           </motion.div>
-          <AnimatePresence>
-            {activeTask && activeTask.status === 'running' && (
+          {/* <AnimatePresence>
+            {currentTask && status === 'running' && (
               <motion.div
                 layout
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -135,12 +100,12 @@ export default function Time({ onClick }) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <PrimaryButton onClick={() => finishTask(activeTask._id)} icon={<FaCheck />}>
+                <PrimaryButton onClick={() => finishTask(currentTask._id)} icon={<FaCheck />}>
                   Complete
                 </PrimaryButton>
               </motion.div>
             )}
-          </AnimatePresence>
+          </AnimatePresence> */}
         </motion.div>
       </motion.div>
     </LayoutGroup>
