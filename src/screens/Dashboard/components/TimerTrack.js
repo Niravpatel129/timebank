@@ -3,13 +3,13 @@ import { motion } from 'framer-motion';
 import React from 'react';
 import toast from 'react-hot-toast';
 import { FaPause, FaPlay } from 'react-icons/fa'; // Import play and pause icons
-import { IoSettingsOutline, IoTimerOutline } from 'react-icons/io5';
+import { IoNotifications, IoTimerOutline } from 'react-icons/io5';
 import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
 import { useTimerHook } from '../../../hooks/useTimerHook';
 import LastActivity from './LastActivity/LastActivity';
 
-export default function TimerTrack() {
+export default function TimerTrack({ openNotificationModal }) {
   const { tasks, activeTaskId, getRemainingTime, pauseTask, finishTask, startTask } =
     useTasksContext();
   const { colorGradients } = useProjectContext();
@@ -73,7 +73,10 @@ export default function TimerTrack() {
           }}
         >
           <div></div>
-          <IoSettingsOutline style={{ fontSize: '20px', color: '#bebfca', cursor: 'pointer' }} />
+          <IoNotifications
+            style={{ fontSize: '20px', color: '#bebfca', cursor: 'pointer' }}
+            onClick={openNotificationModal}
+          />
         </div>
         <div
           style={{

@@ -13,6 +13,7 @@ import {
   FaUserPlus,
 } from 'react-icons/fa';
 import DashboardInviteModal from '../../components/DashboardInviteModal';
+import NotificationModal from '../../components/NotificationModal';
 import { useProjectContext } from '../../context/useProjectContext';
 import { useTasksContext } from '../../context/useTasksContext';
 import { useUserContext } from '../../context/useUserContext';
@@ -37,6 +38,7 @@ const Dashboard = () => {
   const [isIntroModalOpen, setIsIntroModalOpen] = useState(false);
   const profileDropdownRef = useRef(null);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(true);
   const { logout } = useUserContext();
   const {
     projects,
@@ -288,7 +290,7 @@ const Dashboard = () => {
         {/* Right part of main content - 300px wide, full height */}
         <div style={{ width: '400px', height: '100%', backgroundColor: '#c0c0c0' }}>
           {/* Content for right column */}
-          <TimerTrack />
+          <TimerTrack openNotificationModal={() => setIsNotificationModalOpen(true)} />
         </div>
       </div>
 
@@ -313,6 +315,10 @@ const Dashboard = () => {
       {isModalOpen && <DashboardCreateProjectModal isOpen={isModalOpen} />}
 
       <IntroductionModal isOpen={isIntroModalOpen} onClose={() => setIsIntroModalOpen(false)} />
+      <NotificationModal
+        isOpen={isNotificationModalOpen}
+        onClose={() => setIsNotificationModalOpen(false)}
+      />
     </div>
   );
 };
