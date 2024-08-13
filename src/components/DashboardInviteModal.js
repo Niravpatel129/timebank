@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
+import newRequest from '../api/newReqest';
 import { useProjectContext } from '../context/useProjectContext';
 
 const TeamInviteModal = ({ isOpen, onClose }) => {
@@ -64,17 +65,25 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
 
   const handleSendInvites = useCallback(async () => {
     if (pendingInvites.length === 0) return;
+    if (!selectedProject) return;
+
     setIsLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      for (const invite of pendingInvites) {
+        await newRequest.post('/notification/project-invitation', {
+          projectId: selectedProject._id,
+          invitedUserEmail: invite.email,
+        });
+      }
       setPendingInvites([]);
       onClose();
     } catch (error) {
       console.error('Failed to send invites:', error);
+      alert('Failed to send invites. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  }, [pendingInvites, onClose]);
+  }, [pendingInvites, onClose, selectedProject?._id]);
 
   const getRandomColor = useCallback((key) => {
     if (!memberColorsRef.current[key]) {
