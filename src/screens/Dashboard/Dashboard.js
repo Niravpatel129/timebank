@@ -12,6 +12,7 @@ import {
   FaSync,
   FaUserPlus,
 } from 'react-icons/fa';
+import DashboardInviteModal from '../../components/DashboardInviteModal';
 import { useProjectContext } from '../../context/useProjectContext';
 import { useTasksContext } from '../../context/useTasksContext';
 import { useUserContext } from '../../context/useUserContext';
@@ -35,6 +36,7 @@ const Dashboard = () => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isIntroModalOpen, setIsIntroModalOpen] = useState(false);
   const profileDropdownRef = useRef(null);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(true);
   const { logout } = useUserContext();
   const {
     projects,
@@ -302,6 +304,10 @@ const Dashboard = () => {
           onDelete={handleDeleteTask}
         />
       )}
+      <DashboardInviteModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+      />
 
       {isModalOpen && <DashboardCreateProjectModal isOpen={isModalOpen} />}
 
