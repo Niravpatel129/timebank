@@ -14,24 +14,33 @@ export const useTimerHook = (taskId) => {
 
     setRemainingTime(task.timerState.remainingTime);
 
-    let intervalId;
+    // Start the timer in the main process
     if (task.timerState.isActive) {
-      intervalId = setInterval(() => {
-        const elapsedSeconds = Math.floor(
-          (Date.now() - new Date(task.timerState.startTime).getTime()) / 1000,
-        );
-        const newRemainingTime = Math.max(0, task.timerState.remainingTime - elapsedSeconds);
-        setRemainingTime(newRemainingTime);
-
-        // Send the updated time to the main process
-        ipcRenderer.send('update-tray-title', newRemainingTime);
-
-        if (newRemainingTime <= 0) {
-          finishTask(taskId);
-        }
-      }, 1000);
+      ipcRenderer.send('start-timer', task);
     }
-    return () => clearInterval(intervalId);
+
+    // Listen for timer updates from the main process
+    const handleTimerUpdate = (event, updatedTime) => {
+      setRemainingTime(updatedTime);
+    };
+
+    ipcRenderer.on('timer-update', handleTimerUpdate);
+
+    // Listen for timer finished event
+    const handleTimerFinished = (event, finishedTaskId) => {
+      if (finishedTaskId === taskId) {
+        finishTask(taskId);
+      }
+    };
+
+    ipcRenderer.on('timer-finished', handleTimerFinished);
+
+    // Clean up
+    return () => {
+      ipcRenderer.removeListener('timer-update', handleTimerUpdate);
+      ipcRenderer.removeListener('timer-finished', handleTimerFinished);
+      ipcRenderer.send('stop-timer', taskId);
+    };
   }, [task, taskId, finishTask]);
 
   return remainingTime;

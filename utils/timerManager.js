@@ -1,10 +1,9 @@
-const { ipcMain, Notification, BrowserWindow, app } = require('electron');
+const { ipcMain, Notification, BrowserWindow } = require('electron');
 
 class TimerManager {
   constructor(tray) {
-    this.time = 0;
     this.tray = tray;
-    this.timerInterval = null;
+    this.activeTimers = new Map();
     this.currentTask = null;
     this.uncompletedTasksCount = 0;
 
@@ -23,60 +22,47 @@ class TimerManager {
     ipcMain.on('pause-active-task', this.pauseActiveTask.bind(this));
   }
 
-  startActiveTask(event, task) {
-    // send the current task to all windows
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('start-active-task', this.currentTask);
-    });
-  }
-
-  pauseActiveTask(event, task) {
-    // reply with the current task
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('pause-active-task', { ...this.currentTask, time: this.time });
-    });
-  }
-
   startTimer(event, task) {
     this.currentTask = task;
-    clearInterval(this.timerInterval);
-    this.timerInterval = setInterval(() => {
-      if (this.currentTask.isCountingUp) {
-        this.currentTask.timeSpent += 1;
-      } else {
-        this.currentTask.timeRemaining = Math.max(0, this.currentTask.timeRemaining - 1);
-      }
+    if (this.activeTimers.has(task._id)) {
+      clearInterval(this.activeTimers.get(task._id));
+    }
 
-      // Broadcast timer update to all windows
+    const intervalId = setInterval(() => {
+      const elapsedSeconds = Math.floor(
+        (Date.now() - new Date(task.timerState.startTime).getTime()) / 1000,
+      );
+      const newRemainingTime = Math.max(0, task.timerState.remainingTime - elapsedSeconds);
+
+      this.updateTrayTitle(newRemainingTime);
+
       BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('timer-update', this.currentTask);
+        window.webContents.send('timer-update', newRemainingTime);
       });
 
-      this.updateTrayTitle();
-
-      if (this.currentTask.timeRemaining === 0 && !this.currentTask.isCountingUp) {
-        this.stopTimer();
-        this.showNotification("Time's up!", `Time's up for task: ${this.currentTask.name}`);
+      if (newRemainingTime <= 0) {
+        this.stopTimer(event, task._id);
+        this.showNotification("Time's up!", `Time's up for task: ${task.name}`);
+        BrowserWindow.getAllWindows().forEach((window) => {
+          window.webContents.send('timer-finished', task._id);
+        });
       }
     }, 1000);
+
+    this.activeTimers.set(task._id, intervalId);
   }
 
-  stopTimer() {
-    clearInterval(this.timerInterval);
-    this.timerInterval = null;
+  stopTimer(event, taskId) {
+    if (this.activeTimers.has(taskId)) {
+      clearInterval(this.activeTimers.get(taskId));
+      this.activeTimers.delete(taskId);
+    }
     this.updateTrayTitle();
-
-    // Broadcast stop timer to all windows
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('timer-stopped', this.currentTask);
-    });
   }
 
   resetTimer(event, task) {
+    this.stopTimer(event, task._id);
     this.currentTask = task;
-    this.stopTimer();
-
-    // Broadcast reset timer to all windows
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('timer-reset', this.currentTask);
     });
@@ -87,8 +73,8 @@ class TimerManager {
     this.updateTrayTitle();
   }
 
-  updateTrayTitle() {
-    if (!this.timerInterval) {
+  updateTrayTitle(time) {
+    if (time === undefined) {
       if (this.uncompletedTasksCount > 0) {
         this.tray.setTitle(
           `${this.uncompletedTasksCount} ${this.uncompletedTasksCount > 1 ? 'Tasks' : 'Task'}`,
@@ -97,9 +83,6 @@ class TimerManager {
         this.tray.setTitle('');
       }
     } else {
-      const time = this.currentTask.isCountingUp
-        ? this.currentTask.timeSpent
-        : this.currentTask.timeRemaining;
       const minutes = Math.floor(time / 60)
         .toString()
         .padStart(2, '0');
@@ -109,31 +92,10 @@ class TimerManager {
   }
 
   updateTrayTitleFromRenderer(event, time) {
-    // make sure valid time is passed
     if (typeof time !== 'number') {
       return;
     }
-
-    this.time = time;
-
-    const minutes = Math.floor(time / 60)
-      .toString()
-      .padStart(2, '0');
-    const seconds = (time % 60).toString().padStart(2, '0');
-    this.tray.setTitle(`${minutes}:${seconds}`);
-
-    // emit the time to all windows
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('timer-update', time);
-    });
-
-    if (time === 0) {
-      this.showNotification("Time's up!", `Time's up for task: ${this.currentTask.name}`);
-
-      // stop the timer
-      this.pauseActiveTask();
-      return;
-    }
+    this.updateTrayTitle(time);
   }
 
   getCurrentTask(event) {
@@ -143,34 +105,27 @@ class TimerManager {
   setCurrentTask(event, task) {
     this.currentTask = task;
     event.reply('current-task-set', this.currentTask);
-
-    // Broadcast current task update to all windows
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('current-task-updated', this.currentTask);
     });
   }
 
+  startActiveTask(event, task) {
+    this.startTimer(event, task);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('start-active-task', this.currentTask);
+    });
+  }
+
+  pauseActiveTask(event, task) {
+    this.stopTimer(event, task._id);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('pause-active-task', { ...this.currentTask, time: task.time });
+    });
+  }
+
   showNotification(title, body) {
     const notification = new Notification({ title, body });
-    notification.on('click', () => {
-      // When notification is clicked, focus or create the main window
-      let mainWindow = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
-      if (mainWindow) {
-        if (mainWindow.isMinimized()) mainWindow.restore();
-        mainWindow.focus();
-      } else {
-        // If no window exists, create a new one
-        mainWindow = new BrowserWindow({
-          width: 800,
-          height: 600,
-          webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-          },
-        });
-        mainWindow.loadFile('index.html'); // Adjust this to your app's entry point
-      }
-    });
     notification.show();
   }
 }
