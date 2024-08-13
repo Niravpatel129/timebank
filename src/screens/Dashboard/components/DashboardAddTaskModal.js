@@ -15,6 +15,7 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
   const [category, setCategory] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [assignee, setAssignee] = useState(null);
+  const [timerType, setTimerType] = useState('countdown'); // New state for timer type
   const modalRef = useRef(null);
   const { addTask } = useTasksContext();
 
@@ -42,6 +43,7 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
     setCategory('');
     setDate(new Date().toISOString().split('T')[0]);
     setAssignee(null);
+    setTimerType('countdown');
   };
 
   const handleSubmit = (e) => {
@@ -50,13 +52,14 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
     const newTask = {
       name: taskName,
       status: 'not-started',
-      taskDuration: taskDurationInSeconds,
+      taskDuration: timerType === 'countup' ? 0 : taskDurationInSeconds,
       hours: taskDurationInSeconds / 3600,
       category: category || null,
       dateDue: date,
       dateCreated: new Date().toISOString(),
       assignee: assignee?.value,
       assigneeDetails: assignee,
+      timerType: timerType,
     };
     addTask({ ...newTask, project: selectedProject._id });
     resetForm();
@@ -258,40 +261,81 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
                 </div>
               </div>
 
-              {/* Duration Selection */}
+              {/* Timer Type Selection */}
               <div style={{ marginBottom: '15px' }}>
-                <label>How long will this take?</label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
-                  {['5m', '15m', '30m', '45m', '1h', 'Other'].map((time) => (
-                    <motion.button
-                      key={time}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      type='button'
-                      onClick={() => handleDurationClick(time)}
-                      style={{
-                        padding: '8px 12px',
-                        border: 'none',
-                        borderRadius: '20px',
-                        backgroundColor:
-                          duration === time || (time === 'Other' && duration === 'custom')
-                            ? colorGradients[0]
-                            : '#e0e0e0',
-                        color:
-                          duration === time || (time === 'Other' && duration === 'custom')
-                            ? 'white'
-                            : 'black',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {time}
-                    </motion.button>
-                  ))}
+                <label>Do you know how long this task will take?</label>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    type='button'
+                    onClick={() => setTimerType('countdown')}
+                    style={{
+                      padding: '8px 12px',
+                      border: 'none',
+                      borderRadius: '20px',
+                      backgroundColor: timerType === 'countdown' ? colorGradients[0] : '#e0e0e0',
+                      color: timerType === 'countdown' ? 'white' : 'black',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Yes, I know
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    type='button'
+                    onClick={() => setTimerType('countup')}
+                    style={{
+                      padding: '8px 12px',
+                      border: 'none',
+                      borderRadius: '20px',
+                      backgroundColor: timerType === 'countup' ? colorGradients[0] : '#e0e0e0',
+                      color: timerType === 'countup' ? 'white' : 'black',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Not sure
+                  </motion.button>
                 </div>
               </div>
 
+              {/* Duration Selection */}
+              {timerType === 'countdown' && (
+                <div style={{ marginBottom: '15px' }}>
+                  <label>How long will this take?</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
+                    {['5m', '15m', '30m', '45m', '1h', 'Other'].map((time) => (
+                      <motion.button
+                        key={time}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        type='button'
+                        onClick={() => handleDurationClick(time)}
+                        style={{
+                          padding: '8px 12px',
+                          border: 'none',
+                          borderRadius: '20px',
+                          backgroundColor:
+                            duration === time || (time === 'Other' && duration === 'custom')
+                              ? colorGradients[0]
+                              : '#e0e0e0',
+                          color:
+                            duration === time || (time === 'Other' && duration === 'custom')
+                              ? 'white'
+                              : 'black',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {time}
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Custom Duration Input */}
-              {showCustomDuration && (
+              {showCustomDuration && timerType === 'countdown' && (
                 <div style={{ marginBottom: '15px' }}>
                   <label style={{ display: 'block', marginBottom: '5px' }}>Custom Duration</label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
