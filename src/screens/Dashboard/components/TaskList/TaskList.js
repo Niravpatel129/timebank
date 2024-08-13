@@ -29,6 +29,7 @@ const TaskList = ({ tasks, listType, moveTask, onEditTask }) => {
                   moveTask={moveTask}
                   disabled={listType === 'currentWeek' && task.status === 'completed'}
                   timerState={task.timerState}
+                  timerType={task.timerType}
                 />
               );
             })}

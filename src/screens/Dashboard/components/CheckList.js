@@ -1,8 +1,6 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
-import toast from 'react-hot-toast';
 import { FaCheck, FaPause, FaPlay } from 'react-icons/fa';
-import { GiCheckMark } from 'react-icons/gi';
 import { GrDrag } from 'react-icons/gr';
 import ScribbleText from '../../../components/ScribbleText';
 import { useProjectContext } from '../../../context/useProjectContext';
@@ -25,6 +23,7 @@ const Checklist = ({
   onEditTask,
   timerState,
   assignee,
+  timerType,
 }) => {
   const [currentAssignee, setCurrentAssignee] = useState(assignee);
   const [isHovered, setIsHovered] = useState(false);
@@ -59,16 +58,16 @@ const Checklist = ({
 
   const handlePlay = (e) => {
     // if there is no remaining time, show notification
-    if (timerState.remainingTime === 0) {
-      toast.error('Task has no remaining time, update the task duration!');
-      return;
-    }
+    // if (timerState.remainingTime === 0) {
+    //   toast.error('Task has no remaining time, update the task duration!');
+    //   return;
+    // }
 
     e.stopPropagation();
     if (timerState.isActive) {
-      pauseTask(id, remainingTime);
+      pauseTask(id, remainingTime, timerType);
     } else {
-      startTask(id, remainingTime);
+      startTask(id, remainingTime, timerType);
     }
   };
 
@@ -80,10 +79,6 @@ const Checklist = ({
       .toString()
       .padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
-
-  if (!taskDuration) {
-    return <>no task duration</>;
-  }
 
   const assignees = [
     ...selectedProject.members.map((member) => ({
@@ -198,7 +193,11 @@ const Checklist = ({
             textTransform: 'capitalize',
           }}
         >
-          {remainingTime === 0 && status !== 'completed' ? 'Out of Time' : status.replace('-', ' ')}
+          {timerType === 'countup'
+            ? 'Time'
+            : remainingTime === 0 && status !== 'completed'
+            ? 'Out of Time'
+            : status.replace('-', ' ')}
         </span>
         <span
           style={{
@@ -211,7 +210,7 @@ const Checklist = ({
         </span>
         <IconButton
           onClick={handlePlay}
-          Icon={remainingTime === 0 ? GiCheckMark : timerState.isActive ? FaPause : FaPlay}
+          Icon={timerState.isActive ? FaPause : FaPlay}
           color={isDisabled ? '#ffffff' : '#ffffff'}
           style={{
             backgroundColor: timerState.isActive
