@@ -13,14 +13,15 @@ const { ipcRenderer } = window.require('electron');
 export default function TrackingCard({ toggleAddTimeModal }) {
   const { isRunning, getDisplayTime } = useScreenContext();
   const [currentTask, setCurrentTask] = useState(null);
-  const displayTime = secondsToTime(getDisplayTime());
-  const status = currentTask ? (isRunning ? 'running' : 'paused') : 'not-started';
+  const displayTime = secondsToTime(currentTask?.taskDuration || 0);
+  const status = currentTask ? (currentTask.status ? 'running' : 'paused') : 'not-started';
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     ipcRenderer.send('get-current-task');
     ipcRenderer.on('current-task', (event, task) => {
       console.log('🚀  task:', task);
+
       setCurrentTask(task);
     });
 
@@ -189,7 +190,9 @@ export default function TrackingCard({ toggleAddTimeModal }) {
               data-tooltip-id='time-tooltip'
               data-tooltip-content={
                 currentTask
-                  ? `Created: ${new Date(currentTask.dateCreated).toLocaleString()}`
+                  ? `Created: ${new Date(
+                      currentTask.dateDue || currentTask.dateCreated,
+                    ).toLocaleString()}`
                   : 'No task'
               }
             >
