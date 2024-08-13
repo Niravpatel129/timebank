@@ -19,6 +19,16 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
     }
   };
 
+  const buttonStyle = {
+    transition: 'opacity 0.3s',
+    ':hover': {
+      opacity: 0.8,
+    },
+    ':active': {
+      opacity: 0.6,
+    },
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -71,6 +81,7 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
                   border: 'none',
                   cursor: 'pointer',
                   color: '#6B7280',
+                  ...buttonStyle,
                 }}
               >
                 <FaTimes />
@@ -134,6 +145,7 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
                       fontWeight: '500',
                       height: '100%',
                       borderRadius: '8px',
+                      ...buttonStyle,
                     }}
                   >
                     Send invite
@@ -194,6 +206,7 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
                     fontSize: '14px',
                     color: '#374151',
                     flex: 1,
+                    ...buttonStyle,
                   }}
                   onClick={onClose}
                 >
@@ -210,6 +223,7 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
                     fontSize: '14px',
                     fontWeight: '500',
                     flex: 1,
+                    ...buttonStyle,
                   }}
                   onClick={onClose}
                 >

@@ -18,7 +18,6 @@ const Checklist = ({
   title,
   tag,
   status,
-  taskDuration,
   profileImage,
   tagBackgroundColor,
   moveTask,
@@ -29,7 +28,6 @@ const Checklist = ({
   timerType,
   timeSpent,
 }) => {
-  console.log('🚀  timeSpent:', timeSpent);
   const [currentAssignee, setCurrentAssignee] = useState(assignee);
   const [isHovered, setIsHovered] = useState(false);
   const { selectedProject, colorGradients } = useProjectContext();
