@@ -31,7 +31,11 @@ export function useTrayTracking() {
   }, [trayOpenCount]);
 
   const displayTime = secondsToTime(currentTask?.taskDuration || 0);
-  const status = currentTask ? (currentTask.status ? 'running' : 'paused') : 'not-started';
+  const status = currentTask
+    ? currentTask?.timerState?.isActive
+      ? 'running'
+      : 'paused'
+    : 'not-started';
 
   const getStatusColor = () => {
     switch (status) {

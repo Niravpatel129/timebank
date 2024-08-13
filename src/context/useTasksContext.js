@@ -21,11 +21,12 @@ export const TasksProvider = ({ children }) => {
   useEffect(() => {
     if (!tasks.length || !activeTaskId) return;
     console.log('🚀  updated active tasks');
-    const activeTask = tasks.find((task) => task.timerState.isActive);
+    const activeTask = tasks.find((task) => task?._id === activeTaskId);
+
     if (!activeTask) return;
 
     ipcRenderer.send('set-current-task', activeTask);
-  }, [activeTaskId]);
+  }, [activeTaskId, tasks]);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -169,7 +170,6 @@ export const TasksProvider = ({ children }) => {
         remainingTime,
       });
       setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
-      // setActiveTaskId(null);
     } catch (error) {
       console.error('Error pausing task:', error);
       toast.error('Failed to pause task. Please try again.');
