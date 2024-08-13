@@ -6,6 +6,7 @@ import QuickAlarmModal from '../components/QuickAlarmModal';
 import Time from '../components/Time';
 import TrackingCard from '../components/TrackingCard';
 import { useScreenContext } from '../context/useScreenContext';
+import { useTrayTracking } from '../hooks/useTrayTracking';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -14,6 +15,7 @@ export default function Home({ currentTask, setCurrentTask }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAddTimeModalOpen, setIsAddTimeModalOpen] = useState(false);
   const menuRef = useRef(null);
+  const trayTrackingData = useTrayTracking();
 
   const toggleMenu = () => {
     // setIsMenuOpen(!isMenuOpen);
@@ -170,6 +172,7 @@ export default function Home({ currentTask, setCurrentTask }) {
             currentTask={currentTask}
             setCurrentTask={setCurrentTask}
             toggleAddTimeModal={toggleAddTimeModal}
+            trayTrackingData={trayTrackingData}
           />
         </div>
         {/* <TrackingCardsBeno /> */}

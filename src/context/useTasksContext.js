@@ -19,6 +19,15 @@ export const TasksProvider = ({ children }) => {
   const { addHistoryEntry } = useHistoryContext();
 
   useEffect(() => {
+    if (!tasks.length || !activeTaskId) return;
+    console.log('🚀  updated active tasks');
+    const activeTask = tasks.find((task) => task.timerState.isActive);
+    if (!activeTask) return;
+
+    ipcRenderer.send('set-current-task', activeTask);
+  }, [activeTaskId]);
+
+  useEffect(() => {
     const fetchInitialData = async () => {
       setIsLoading(true);
       try {
@@ -33,15 +42,13 @@ export const TasksProvider = ({ children }) => {
         setTasks(response.tasks);
         setTotalTimeSpent(response.totalTimeSpent);
 
-        // if any task is active, set it as active
-        const activeTask = response.tasks.find((task) => task.timerState.isActive);
-        if (activeTask) {
-          setActiveTaskId(activeTask._id);
-          // set the task as active in the timer manager
-          ipcRenderer.send('set-current-task', activeTask);
-        } else {
-          setActiveTaskId(null);
+        // Pause all active tasks on initial render
+        const activeTasks = response.tasks.filter((task) => task.timerState.isActive);
+        for (const task of activeTasks) {
+          await pauseTask(task._id, task.timerState.remainingTime);
         }
+
+        setActiveTaskId(null);
       } catch (error) {
         console.error('Error fetching initial data:', error);
         toast.error('Failed to load tasks. Please try again.');

@@ -210,6 +210,8 @@ function createTray() {
   ]);
 
   tray.on('click', (event, bounds) => {
+    mainWindow.webContents.send('tray-opened');
+
     const { x, y } = bounds;
     const { height, width } = mainWindow.getBounds();
 
