@@ -365,6 +365,7 @@ const DashboardCreateProjectModal = () => {
                   background: `linear-gradient(45deg, ${projectColor.gradient1}, ${projectColor.gradient2})`,
                   color: 'white',
                   border: 'none',
+                  cursor: 'pointer',
                 }}
               >
                 Create project
