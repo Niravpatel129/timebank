@@ -197,7 +197,7 @@ const Checklist = ({
             textTransform: 'capitalize',
           }}
         >
-          {remainingTime === 0 ? 'Out of Time' : status.replace('-', ' ')}
+          {remainingTime === 0 && status !== 'completed' ? 'Out of Time' : status.replace('-', ' ')}
         </span>
         <span
           style={{
@@ -230,7 +230,7 @@ const Checklist = ({
             cursor: 'pointer',
             marginRight: '10px',
             transition: 'background-color 0.3s ease',
-            cursor: remainingTime === 0 ? 'not-allowed' : 'pointer',
+            cursor: 'pointer',
           }}
           onMouseEnter={() => setIsPlayButtonHovered(true)}
           onMouseLeave={() => setIsPlayButtonHovered(false)}
