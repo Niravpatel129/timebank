@@ -3,11 +3,16 @@ import { useTasksContext } from '../context/useTasksContext';
 const { ipcRenderer } = window.require('electron');
 
 export const useTimerHook = (taskId) => {
-  const { tasks, finishTask } = useTasksContext();
+  const { tasks, finishTask, activeTaskId } = useTasksContext();
   const task = tasks.find((t) => t._id === taskId);
   const [remainingTime, setRemainingTime] = useState(task?.timerState.remainingTime || 0);
 
   useEffect(() => {
+    // if the taskId is the same as the active task, just return here
+    if (task && task._id !== activeTaskId) {
+      return;
+    }
+
     if (!task?.timerState.remainingTime) {
       return;
     }
@@ -41,7 +46,7 @@ export const useTimerHook = (taskId) => {
       ipcRenderer.removeListener('timer-finished', handleTimerFinished);
       ipcRenderer.send('stop-timer', taskId);
     };
-  }, [task, taskId, finishTask]);
+  }, [task, taskId, finishTask, activeTaskId]);
 
   return remainingTime;
 };
