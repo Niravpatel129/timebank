@@ -397,22 +397,9 @@ export default function EditTaskModal({ onClose, task, onSave, onDelete }) {
           </div>
 
           {/* Submit and Delete Buttons */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              type='submit'
-              style={{
-                padding: '10px',
-                backgroundColor: 'black',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-              }}
-            >
-              Save changes
-            </motion.button>
+          <div
+            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}
+          >
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -428,9 +415,29 @@ export default function EditTaskModal({ onClose, task, onSave, onDelete }) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '5px',
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}
             >
               <FaTrash /> Delete
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              type='submit'
+              style={{
+                padding: '10px',
+                backgroundColor: 'black',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                width: '100%',
+              }}
+            >
+              Save changes
             </motion.button>
           </div>
         </form>

@@ -32,6 +32,90 @@ const Bubble = ({ gradientColors, selected, onClick, onDelete, name, updatedAt }
     };
   }, []);
 
+  // Function to get a random shape
+  const getRandomShape = () => {
+    const shapes = ['circle', 'square', 'triangle', 'pentagon', 'hexagon', 'star'];
+    return shapes[Math.floor(Math.random() * shapes.length)];
+  };
+
+  // State to store the random shape
+  const [shape, setShape] = useState(getRandomShape());
+
+  // Function to render the shape
+  const renderShape = () => {
+    switch (shape) {
+      case 'circle':
+        return (
+          <div
+            style={{
+              width: '20px',
+              height: '20px',
+              backgroundColor: 'white',
+              borderRadius: '50%',
+            }}
+          ></div>
+        );
+      case 'square':
+        return (
+          <div
+            style={{
+              width: '20px',
+              height: '20px',
+              backgroundColor: 'white',
+            }}
+          ></div>
+        );
+      case 'triangle':
+        return (
+          <div
+            style={{
+              width: 0,
+              height: 0,
+              borderLeft: '10px solid transparent',
+              borderRight: '10px solid transparent',
+              borderBottom: '20px solid white',
+            }}
+          ></div>
+        );
+      case 'pentagon':
+        return (
+          <div
+            style={{
+              width: '20px',
+              height: '20px',
+              backgroundColor: 'white',
+              clipPath: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)',
+            }}
+          ></div>
+        );
+      case 'hexagon':
+        return (
+          <div
+            style={{
+              width: '20px',
+              height: '20px',
+              backgroundColor: 'white',
+              clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
+            }}
+          ></div>
+        );
+      case 'star':
+        return (
+          <div
+            style={{
+              width: '20px',
+              height: '20px',
+              backgroundColor: 'white',
+              clipPath:
+                'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)',
+            }}
+          ></div>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div>
       <motion.div
@@ -53,14 +137,7 @@ const Bubble = ({ gradientColors, selected, onClick, onDelete, name, updatedAt }
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
       >
-        <div
-          style={{
-            width: '20px',
-            height: '20px',
-            backgroundColor: 'white',
-            borderRadius: '50%',
-          }}
-        ></div>
+        {renderShape()}
         <AnimatePresence>
           {showDropdown && (
             <motion.div

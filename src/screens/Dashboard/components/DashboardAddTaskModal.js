@@ -6,7 +6,7 @@ import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
 
 export default function DashboardAddTaskModal({ onClose, isOpen }) {
-  const { selectedProject } = useProjectContext();
+  const { selectedProject, colorGradients } = useProjectContext();
   const [taskName, setTaskName] = useState('');
   const [duration, setDuration] = useState('30m');
   const [showCustomDuration, setShowCustomDuration] = useState(false);
@@ -275,7 +275,7 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
                         borderRadius: '20px',
                         backgroundColor:
                           duration === time || (time === 'Other' && duration === 'custom')
-                            ? 'black'
+                            ? colorGradients[0]
                             : '#e0e0e0',
                         color:
                           duration === time || (time === 'Other' && duration === 'custom')
@@ -432,12 +432,13 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
                 whileTap={{ scale: 0.95 }}
                 type='submit'
                 style={{
-                  padding: '10px',
-                  backgroundColor: 'black',
+                  padding: '15px',
+                  backgroundColor: colorGradients[0],
                   color: 'white',
                   border: 'none',
                   borderRadius: '5px',
                   cursor: 'pointer',
+                  width: '100%',
                 }}
               >
                 Add activity
