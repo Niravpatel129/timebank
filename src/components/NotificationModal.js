@@ -11,7 +11,7 @@ export default function NotificationModal({ isOpen, onClose }) {
       <motion.div
         initial={{ x: '100%' }}
         animate={{ x: isOpen ? 0 : '140%' }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        transition={{ type: 'spring', duration: 1 }}
         style={{
           position: 'fixed',
           top: '20px',

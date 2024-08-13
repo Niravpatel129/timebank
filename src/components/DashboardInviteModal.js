@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { FaTimes } from 'react-icons/fa';
 import newRequest from '../api/newReqest';
 import { useProjectContext } from '../context/useProjectContext';
@@ -58,14 +59,28 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
   );
 
   const handleAddInvite = useCallback(() => {
-    if (!inviteEmail) return;
+    if (!inviteEmail) {
+      toast.error('Please enter an email address');
+      return;
+    }
+    if (!/\S+@\S+\.\S+/.test(inviteEmail)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
     setPendingInvites((prevInvites) => [...prevInvites, { email: inviteEmail, role: 'member' }]);
     setInviteEmail('');
+    toast.success('Invite added successfully');
   }, [inviteEmail]);
 
   const handleSendInvites = useCallback(async () => {
-    if (pendingInvites.length === 0) return;
-    if (!selectedProject) return;
+    if (pendingInvites.length === 0) {
+      toast.error('No pending invites to send');
+      return;
+    }
+    if (!selectedProject) {
+      toast.error('No project selected');
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -77,9 +92,10 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
       }
       setPendingInvites([]);
       onClose();
+      toast.success('Invites sent successfully');
     } catch (error) {
       console.error('Failed to send invites:', error);
-      alert('Failed to send invites. Please try again.');
+      toast.error('Failed to send invites. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -151,6 +167,7 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
 
   const handleRemoveInvite = useCallback((index) => {
     setPendingInvites((prevInvites) => prevInvites.filter((_, i) => i !== index));
+    toast.success('Invite removed successfully');
   }, []);
 
   const renderPendingInvite = useCallback(
