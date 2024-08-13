@@ -11,7 +11,6 @@ export default function Time({ trayTrackingData }) {
 
   useEffect(() => {
     const handleTimerUpdate = (event, updatedTimeRemaining) => {
-      console.log('🚀  updatedTimeRemaining:', updatedTimeRemaining);
       setTimeRemaining(updatedTimeRemaining);
     };
 
