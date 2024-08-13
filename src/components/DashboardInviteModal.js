@@ -1,33 +1,180 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
+import { useProjectContext } from '../context/useProjectContext';
 
 const TeamInviteModal = ({ isOpen, onClose }) => {
-  const modalVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: { opacity: 1, scale: 1 },
-  };
+  const { selectedProject } = useProjectContext();
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [pendingInvites, setPendingInvites] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const memberColorsRef = useRef({});
 
-  const overlayVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-  };
+  const modalVariants = useMemo(
+    () => ({
+      hidden: { opacity: 0, scale: 0.8 },
+      visible: { opacity: 1, scale: 1 },
+    }),
+    [],
+  );
 
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
+  const overlayVariants = useMemo(
+    () => ({
+      hidden: { opacity: 0 },
+      visible: { opacity: 1 },
+    }),
+    [],
+  );
+
+  const handleOverlayClick = useCallback(
+    (e) => {
+      if (e.target === e.currentTarget) {
+        onClose();
+      }
+    },
+    [onClose],
+  );
+
+  const buttonStyle = useMemo(
+    () => ({
+      transition: 'opacity 0.3s',
+      ':hover': {
+        opacity: 0.8,
+      },
+      ':active': {
+        opacity: 0.6,
+      },
+    }),
+    [],
+  );
+
+  const handleAddInvite = useCallback(() => {
+    if (!inviteEmail) return;
+    setPendingInvites((prevInvites) => [...prevInvites, { email: inviteEmail, role: 'Editor' }]);
+    setInviteEmail('');
+  }, [inviteEmail]);
+
+  const handleSendInvites = useCallback(async () => {
+    if (pendingInvites.length === 0) return;
+    setIsLoading(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setPendingInvites([]);
       onClose();
+    } catch (error) {
+      console.error('Failed to send invites:', error);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [pendingInvites, onClose]);
 
-  const buttonStyle = {
-    transition: 'opacity 0.3s',
-    ':hover': {
-      opacity: 0.8,
+  const getRandomColor = useCallback((key) => {
+    if (!memberColorsRef.current[key]) {
+      memberColorsRef.current[key] = `#${Math.floor(Math.random() * 16777215)
+        .toString(16)
+        .padStart(6, '0')}`;
+    }
+    return memberColorsRef.current[key];
+  }, []);
+
+  const renderMember = useCallback(
+    (member, index) => {
+      const randomColor = getRandomColor(member.user.email);
+
+      return (
+        <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+          <div
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: randomColor,
+              marginRight: '12px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              fontSize: '14px',
+              color: 'white',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+            }}
+          >
+            {member.user.name[0]}
+          </div>
+
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '14px', fontWeight: '500' }}>{member.user.name}</div>
+            <div style={{ fontSize: '14px', color: '#6B7280' }}>{member.user.email}</div>
+          </div>
+          <select
+            style={{
+              padding: '6px 8px',
+              border: '1px solid #E5E7EB',
+              borderRadius: '4px',
+              fontSize: '14px',
+              color: '#374151',
+            }}
+            defaultValue={member.role}
+          >
+            <option value='Owner'>Owner</option>
+            <option value='Admin'>Admin</option>
+            <option value='Editor'>Editor</option>
+          </select>
+        </div>
+      );
     },
-    ':active': {
-      opacity: 0.6,
-    },
-  };
+    [getRandomColor],
+  );
+
+  const renderPendingInvite = useCallback(
+    (invite, index) => (
+      <div key={`pending-${index}`} style={{ display: 'flex', alignItems: 'center' }}>
+        <div
+          style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            backgroundColor: getRandomColor(invite.email),
+            marginRight: '12px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontSize: '14px',
+            color: 'white',
+            fontWeight: 'bold',
+            textTransform: 'uppercase',
+          }}
+        >
+          {invite.email[0]}
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: '14px', fontWeight: '500' }}>{invite.email}</div>
+          <div style={{ fontSize: '14px', color: '#6B7280' }}>Pending</div>
+        </div>
+        <select
+          style={{
+            padding: '6px 8px',
+            border: '1px solid #E5E7EB',
+            borderRadius: '4px',
+            fontSize: '14px',
+            color: '#374151',
+          }}
+          value={invite.role}
+          onChange={(e) => {
+            setPendingInvites((prevInvites) => {
+              const updatedInvites = [...prevInvites];
+              updatedInvites[index].role = e.target.value;
+              return updatedInvites;
+            });
+          }}
+        >
+          <option value='Admin'>Admin</option>
+          <option value='Editor'>Editor</option>
+        </select>
+      </div>
+    ),
+    [],
+  );
 
   return (
     <AnimatePresence>
@@ -96,13 +243,13 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
               >
                 <div style={{ color: '#0f1121' }}>
                   <h2 style={{ marginBottom: '8px', fontSize: '23px', fontWeight: '600' }}>
-                    Share your project
+                    Invite team members
                   </h2>
                   <p style={{ color: '#6B7280', marginBottom: '24px', fontSize: '14px' }}>
                     Invite your team to review & collaborate
                   </p>
                 </div>
-                <div style={{}}>
+                <div>
                   <img
                     src='https://cdni.iconscout.com/illustration/premium/thumb/mailbox-4550325-3779133.png?f=webp'
                     alt='Mailbox clipart'
@@ -124,8 +271,10 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
                 </label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <input
-                    type='text'
-                    placeholder='Search...'
+                    type='email'
+                    placeholder='Enter email address'
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
                     style={{
                       padding: '10px 12px',
                       border: '1px solid #E5E7EB',
@@ -147,8 +296,9 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
                       borderRadius: '8px',
                       ...buttonStyle,
                     }}
+                    onClick={handleAddInvite}
                   >
-                    Send invite
+                    Add
                   </button>
                 </div>
               </div>
@@ -157,42 +307,8 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
                   In this project
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {[
-                    { name: 'Olivia Rhye', email: '@olivia', role: 'Owner' },
-                    { name: 'Candice Wu', email: '@candice', role: 'Admin' },
-                    { name: 'Orlando Diggs', email: '@orlando', role: 'Editor' },
-                    { name: 'Andi Lane', email: '@andi', role: 'Editor' },
-                  ].map((member, index) => (
-                    <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
-                      <div
-                        style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '50%',
-                          backgroundColor: '#E5E7EB',
-                          marginRight: '12px',
-                        }}
-                      />
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: '14px', fontWeight: '500' }}>{member.name}</div>
-                        <div style={{ fontSize: '14px', color: '#6B7280' }}>{member.email}</div>
-                      </div>
-                      <select
-                        style={{
-                          padding: '6px 8px',
-                          border: '1px solid #E5E7EB',
-                          borderRadius: '4px',
-                          fontSize: '14px',
-                          color: '#374151',
-                        }}
-                        defaultValue={member.role}
-                      >
-                        <option value='Owner'>Owner</option>
-                        <option value='Admin'>Admin</option>
-                        <option value='Editor'>Editor</option>
-                      </select>
-                    </div>
-                  ))}
+                  {selectedProject?.members?.map(renderMember)}
+                  {pendingInvites.map(renderPendingInvite)}
                 </div>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
@@ -225,9 +341,10 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
                     flex: 1,
                     ...buttonStyle,
                   }}
-                  onClick={onClose}
+                  onClick={handleSendInvites}
+                  disabled={isLoading || pendingInvites.length === 0}
                 >
-                  Invite team members
+                  {isLoading ? 'Sending...' : 'Invite team members'}
                 </button>
               </div>
             </div>
@@ -238,4 +355,4 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
   );
 };
 
-export default TeamInviteModal;
+export default React.memo(TeamInviteModal);

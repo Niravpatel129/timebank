@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { BiPlus } from 'react-icons/bi';
 import { FaSearch } from 'react-icons/fa';
 import { Tooltip } from 'react-tooltip';
 import newRequest from '../../../api/newReqest';
@@ -13,7 +14,11 @@ import secondsToTimeObj from '../../../helpers/secondsToTimeObj';
 import { commonStyles } from './sharedStyles/commonStyles';
 import TaskList from './TaskList/TaskList';
 
-export default function DashboardComponent({ handleTriggerAddTaskButton, onEditTask }) {
+export default function DashboardComponent({
+  handleTriggerAddTaskButton,
+  onEditTask,
+  handleInviteClick,
+}) {
   const [searchQuery, setSearchQuery] = useState('');
   const { user } = useUserContext();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -24,8 +29,9 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   const [title, setTitle] = useState(selectedProject?.name);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [totalHoursLastTwoMonths, setTotalHoursLastTwoMonths] = useState(0);
-  const [lastTwoMonthsTimeSpent, setLastTwoMonthsTimeSpent] = useState(0);
+  const [lastTwoMonthsTimeSpent, setLastTwoMonthsTimeSpent] = useState({});
   const [hideCompleted, setHideCompleted] = useState(false);
+  const [showInviteButton, setShowInviteButton] = useState(false);
 
   useEffect(() => {
     const fetchTwoMonthsAgo = async () => {
@@ -34,15 +40,17 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
         const twoMonthsAgo = await newRequest.get(
           `/timeTrack/last-two-months/${selectedProject?._id}`,
         );
-        setLastTwoMonthsTimeSpent(twoMonthsAgo);
-      } catch (error) {}
+        setLastTwoMonthsTimeSpent(twoMonthsAgo.data || {});
+      } catch (error) {
+        console.error('Error fetching last two months data:', error);
+      }
     };
 
     fetchTwoMonthsAgo();
   }, [tasks, selectedProject]);
 
   const members = useMemo(() => {
-    return selectedProject?.members?.map((member) => member?.user?.name);
+    return selectedProject?.members?.map((member) => member?.user?.name) || [];
   }, [selectedProject]);
 
   useEffect(() => {
@@ -80,7 +88,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   };
 
   const currentWeekTasks = useMemo(() => {
-    let filteredTasks = tasks?.filter((task) => task?.listType === 'currentWeek');
+    let filteredTasks = tasks?.filter((task) => task?.listType === 'currentWeek') || [];
     if (hideCompleted) {
       filteredTasks = filteredTasks.filter((task) => task.status !== 'completed');
     }
@@ -94,7 +102,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
   }, [tasks, filterType, user?.name, hideCompleted]);
 
   const thingsToDoTasks = useMemo(() => {
-    let filteredTasks = tasks?.filter((task) => task?.listType === 'thingsToDo');
+    let filteredTasks = tasks?.filter((task) => task?.listType === 'thingsToDo') || [];
     if (hideCompleted) {
       filteredTasks = filteredTasks.filter((task) => task.status !== 'completed');
     }
@@ -279,27 +287,31 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
                     style={{ cursor: 'pointer' }}
                   >
                     {user?.profileImage ? (
-                      <img
+                      <motion.img
+                        whileHover={{ scale: 1.05, backgroundColor: colorGradients[0] }}
+                        whileTap={{ scale: 0.95 }}
                         src={user?.profileImage}
                         alt={`${user} profile`}
                         style={{
                           width: '30px',
                           height: '30px',
                           borderRadius: '50%',
-                          marginRight: index !== 2 ? '-10px' : '0',
+                          marginRight: '-5px',
                           border: '2px solid white',
-                          zIndex: 3 - index,
+                          zIndex: members.length - index,
                         }}
                       />
                     ) : (
-                      <div
+                      <motion.div
+                        whileHover={{ scale: 1.05, backgroundColor: colorGradients[0] }}
+                        whileTap={{ scale: 0.95 }}
                         style={{
                           width: '30px',
                           height: '30px',
                           borderRadius: '50%',
-                          marginRight: index !== 2 ? '-10px' : '0',
+                          marginRight: '-10px',
                           border: '2px solid white',
-                          zIndex: 3 - index,
+                          zIndex: members.length - index,
                           backgroundColor: '#ccc',
                           display: 'flex',
                           justifyContent: 'center',
@@ -310,11 +322,40 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
                         }}
                       >
                         {user?.charAt(0)?.toUpperCase()}
-                      </div>
+                      </motion.div>
                     )}
                   </div>
                 );
               })}
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <motion.div
+                  whileHover={{ scale: 1.05, backgroundColor: colorGradients[0], color: 'white' }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{
+                    width: '30px',
+                    height: '30px',
+                    borderRadius: '50%',
+                    border: '2px solid white',
+                    backgroundColor: '#f0f0f0',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    zIndex: members.length + 1,
+                    position: 'relative',
+                    marginLeft: '-10px', // Add negative margin to align with other avatars
+                  }}
+                  onMouseEnter={() => setShowInviteButton(true)}
+                  onMouseLeave={() => setShowInviteButton(false)}
+                  onClick={handleInviteClick}
+                >
+                  {showInviteButton ? (
+                    <BiPlus />
+                  ) : (
+                    <span style={{ fontSize: '16px', lineHeight: '30px' }}>...</span>
+                  )}
+                </motion.div>
+              </div>
             </div>
             <AnimatePresence>
               {isSearchOpen && (

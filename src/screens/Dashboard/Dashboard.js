@@ -36,7 +36,7 @@ const Dashboard = () => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isIntroModalOpen, setIsIntroModalOpen] = useState(false);
   const profileDropdownRef = useRef(null);
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(true);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const { logout } = useUserContext();
   const {
     projects,
@@ -281,6 +281,7 @@ const Dashboard = () => {
           <DashboardMiddleSection
             handleTriggerAddTaskButton={() => setAddTaskModalOpen(true)}
             onEditTask={handleEditTask}
+            handleInviteClick={() => setIsInviteModalOpen(true)}
           />
         </div>
 
