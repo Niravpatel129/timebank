@@ -188,7 +188,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
           padding: '20px',
           paddingBottom: '100px',
           height: '100vh',
-          overflowY: tasks.length >= 100 ? 'auto' : 'visible',
+          overflowY: tasks.length === 0 ? 'visible' : 'scroll',
           position: 'relative',
         }}
       >
