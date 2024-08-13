@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
+import { CiClock2 } from 'react-icons/ci';
 import { FaCheck, FaPause, FaPlay } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
+import { IoArrowUp } from 'react-icons/io5';
+import { Tooltip } from 'react-tooltip';
 import ScribbleText from '../../../components/ScribbleText';
 import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
@@ -24,7 +27,9 @@ const Checklist = ({
   timerState,
   assignee,
   timerType,
+  timeSpent,
 }) => {
+  console.log('🚀  timeSpent:', timeSpent);
   const [currentAssignee, setCurrentAssignee] = useState(assignee);
   const [isHovered, setIsHovered] = useState(false);
   const { selectedProject, colorGradients } = useProjectContext();
@@ -57,12 +62,6 @@ const Checklist = ({
   };
 
   const handlePlay = (e) => {
-    // if there is no remaining time, show notification
-    // if (timerState.remainingTime === 0) {
-    //   toast.error('Task has no remaining time, update the task duration!');
-    //   return;
-    // }
-
     e.stopPropagation();
     if (timerState.isActive) {
       pauseTask(id, remainingTime, timerType);
@@ -91,7 +90,6 @@ const Checklist = ({
   ];
 
   const handleTaskClick = (e) => {
-    // Only trigger onEditTask if the click is on the main task area and not dragging
     if ((e.target === e.currentTarget || e.target.tagName === 'SPAN') && !isDragging) {
       onEditTask(id);
     }
@@ -118,7 +116,7 @@ const Checklist = ({
       onDragStart={() => setIsDragging(true)}
       onDragEnd={(_, info) => {
         setIsDragging(false);
-        const threshold = 100; // Adjust this value as needed
+        const threshold = 100;
         if (Math.abs(info.offset.y) > threshold) {
           const newListType = listType === 'currentWeek' ? 'thingsToDo' : 'currentWeek';
           moveTask(id, newListType);
@@ -185,7 +183,7 @@ const Checklist = ({
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <span
+        {/* <span
           style={{
             color: commonStyles.secondaryColor,
             fontSize: '14px',
@@ -193,19 +191,24 @@ const Checklist = ({
             textTransform: 'capitalize',
           }}
         >
-          {timerType === 'countup'
-            ? 'Time'
-            : remainingTime === 0 && status !== 'completed'
-            ? 'Out of Time'
-            : status.replace('-', ' ')}
-        </span>
+          {status === 'completed' ? 'Completed' : ''}
+        </span> */}
         <span
           style={{
             fontSize: '18px',
-            fontWeight: 'bold',
-            color: timerState.isActive ? '#331db9' : '#d9dae3',
+            fontWeight: 400,
+            display: 'flex',
+            alignItems: 'center',
+            color: timerState.isActive ? colorGradients[0] : '#c3c4cc',
+            gap: '4px',
           }}
         >
+          {timerType === 'countup' ? (
+            <IoArrowUp data-tooltip-id={`timer-type-${id}`} data-tooltip-content='Time Elapsed' />
+          ) : (
+            <CiClock2 data-tooltip-id={`timer-type-${id}`} data-tooltip-content='Remaining Time' />
+          )}
+          <Tooltip id={`timer-type-${id}`} />
           {formatTime(remainingTime)}
         </span>
         <IconButton
@@ -215,8 +218,8 @@ const Checklist = ({
           style={{
             backgroundColor: timerState.isActive
               ? isPlayButtonHovered
-                ? '#4a34d3'
-                : '#331db9'
+                ? colorGradients[0]
+                : colorGradients[1]
               : isPlayButtonHovered
               ? '#c3c4cc'
               : '#d9dae3',
@@ -311,7 +314,6 @@ const Checklist = ({
                   }}
                   onClick={(e) => {
                     e.stopPropagation();
-                    // Handle assignee selection here
                     updateTaskAssignee(id, assignee.value);
                     setCurrentAssignee({
                       value: assignee.value,
