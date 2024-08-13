@@ -91,7 +91,7 @@ const Dashboard = () => {
 
     // Check if it's the first launch
     const isFirstLaunch = localStorage.getItem('isFirstLaunch') !== 'false';
-    if (true) {
+    if (isFirstLaunch) {
       setIsIntroModalOpen(true);
       localStorage.setItem('isFirstLaunch', 'false');
     }
