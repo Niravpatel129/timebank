@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CiClock2 } from 'react-icons/ci';
 import { FaCheck, FaPause, FaPlay } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
-import { IoArrowUp } from 'react-icons/io5';
 import { Tooltip } from 'react-tooltip';
 import ScribbleText from '../../../components/ScribbleText';
 import { useProjectContext } from '../../../context/useProjectContext';
@@ -202,9 +201,15 @@ const Checklist = ({
           }}
         >
           {timerType === 'countup' ? (
-            <IoArrowUp data-tooltip-id={`timer-type-${id}`} data-tooltip-content='Time Elapsed' />
+            <></>
           ) : (
-            <CiClock2 data-tooltip-id={`timer-type-${id}`} data-tooltip-content='Remaining Time' />
+            <CiClock2
+              data-tooltip-id={`timer-type-${id}`}
+              data-tooltip-content='Remaining Time'
+              style={{
+                fontSize: '15px',
+              }}
+            />
           )}
           <Tooltip id={`timer-type-${id}`} />
           {formatTime(remainingTime)}
