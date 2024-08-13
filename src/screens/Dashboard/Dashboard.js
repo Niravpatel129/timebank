@@ -38,7 +38,7 @@ const Dashboard = () => {
   const [isIntroModalOpen, setIsIntroModalOpen] = useState(false);
   const profileDropdownRef = useRef(null);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(true);
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const { logout } = useUserContext();
   const {
     projects,

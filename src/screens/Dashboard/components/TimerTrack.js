@@ -3,13 +3,15 @@ import { motion } from 'framer-motion';
 import React from 'react';
 import toast from 'react-hot-toast';
 import { FaPause, FaPlay } from 'react-icons/fa'; // Import play and pause icons
-import { IoNotifications, IoTimerOutline } from 'react-icons/io5';
+import { IoNotificationsOutline, IoTimerOutline } from 'react-icons/io5';
+import { useNotificationContext } from '../../../context/useNotificationContext';
 import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
 import { useTimerHook } from '../../../hooks/useTimerHook';
 import LastActivity from './LastActivity/LastActivity';
 
 export default function TimerTrack({ openNotificationModal }) {
+  const { notifications } = useNotificationContext();
   const { tasks, activeTaskId, getRemainingTime, pauseTask, finishTask, startTask } =
     useTasksContext();
   const { colorGradients } = useProjectContext();
@@ -73,10 +75,32 @@ export default function TimerTrack({ openNotificationModal }) {
           }}
         >
           <div></div>
-          <IoNotifications
-            style={{ fontSize: '20px', color: '#bebfca', cursor: 'pointer' }}
-            onClick={openNotificationModal}
-          />
+          <div style={{ position: 'relative' }}>
+            <IoNotificationsOutline
+              style={{ fontSize: '20px', color: '#bebfca', cursor: 'pointer' }}
+              onClick={openNotificationModal}
+            />
+            {notifications?.length > 0 && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '-6px',
+                  right: '-3px',
+                  background: colorGradients[0],
+                  color: 'white',
+                  borderRadius: '50%',
+                  width: '12px',
+                  height: '12px',
+                  fontSize: '12px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                {notifications?.length}
+              </span>
+            )}
+          </div>
         </div>
         <div
           style={{
