@@ -2,21 +2,14 @@ import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   FaBook,
-  FaCalendarAlt,
   FaChartLine,
-  FaCheck,
-  FaChevronRight,
-  FaClipboardList,
   FaCog,
   FaGift,
-  FaListAlt,
   FaPlus,
   FaPrint,
   FaSignOutAlt,
   FaStar,
   FaSync,
-  FaTags,
-  FaTrash,
   FaUserPlus,
 } from 'react-icons/fa';
 import { useProjectContext } from '../../context/useProjectContext';
@@ -27,6 +20,7 @@ import Bubble from './components/Bubble';
 import DashboardAddTaskModal from './components/DashboardAddTaskModal';
 import DashboardCreateProjectModal from './components/DashboardCreateProjectModal/DashboardCreateProjectModal';
 import DashboardMiddleSection from './components/DashboardMiddleSection';
+import DashboardSubbar from './components/DashboardSubbar/DashboardSubbar';
 import EditTaskModal from './components/EditTaskModal';
 import IntroductionModal from './components/IntroductionModal';
 import TimerTrack from './components/TimerTrack';
@@ -104,17 +98,6 @@ const Dashboard = () => {
 
   const handleAddTask = () => {
     console.log('Add new task');
-  };
-
-  const handleModalClose = () => {
-    console.log('Modal closed');
-  };
-
-  const iconStyle = {
-    fontSize: '24px',
-    color: '#ffffff',
-    opacity: 0.7,
-    cursor: 'pointer',
   };
 
   const profileDropdownItems = [
@@ -285,28 +268,8 @@ const Dashboard = () => {
       </motion.div>
 
       {/* Middle column - 80px wide, full height */}
-      <div
-        style={{
-          width: '80px',
-          height: '100%',
-          background: `linear-gradient(to top, ${colorGradients[1] || '#212d8b'}, ${
-            colorGradients[0] || '#1f2f8c'
-          })`,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          paddingTop: '20px',
-          gap: '30px',
-        }}
-      >
-        <FaChevronRight style={iconStyle} />
-        <FaListAlt style={iconStyle} /> {/* All Tasks */}
-        <FaCalendarAlt style={iconStyle} /> {/* Calendar View */}
-        <FaClipboardList style={iconStyle} /> {/* Projects or Lists */}
-        <FaTags style={iconStyle} /> {/* Tags or Categories */}
-        <FaCheck style={iconStyle} /> {/* Completed Tasks */}
-        <FaTrash style={iconStyle} /> {/* Trash or Deleted Tasks */}
-      </div>
+
+      <DashboardSubbar colorGradients={colorGradients} />
 
       {/* Main content area - remaining width, full height */}
       <div style={{ flex: 1, height: '100%', display: 'flex' }}>
