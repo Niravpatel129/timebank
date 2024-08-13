@@ -51,7 +51,6 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
 
   const handleSearch = () => {
     if (isSearchOpen) {
-      // Close the search
       setIsSearchOpen(false);
       setSearchQuery('');
     } else {
@@ -59,16 +58,39 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
     }
   };
 
+  const getTaskOrder = (listType) => {
+    const storedOrder = localStorage.getItem(`taskOrder_${listType}`);
+    return storedOrder ? JSON.parse(storedOrder) : [];
+  };
+
+  const setTaskOrder = (listType, order) => {
+    localStorage.setItem(`taskOrder_${listType}`, JSON.stringify(order));
+  };
+
+  const sortTasks = (tasksToSort, listType) => {
+    const order = getTaskOrder(listType);
+    return tasksToSort.sort((a, b) => {
+      const indexA = order.indexOf(a._id);
+      const indexB = order.indexOf(b._id);
+      if (indexA === -1 && indexB === -1) return 0;
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
+  };
+
   const currentWeekTasks = useMemo(() => {
     let filteredTasks = tasks?.filter((task) => task?.listType === 'currentWeek');
     if (hideCompleted) {
       filteredTasks = filteredTasks.filter((task) => task.status !== 'completed');
     }
-    return filterType === 'all'
-      ? filteredTasks
-      : filteredTasks.filter((task) => {
-          return task.assignee?.name === user?.name;
-        });
+    filteredTasks =
+      filterType === 'all'
+        ? filteredTasks
+        : filteredTasks.filter((task) => {
+            return task.assignee?.name === user?.name;
+          });
+    return sortTasks(filteredTasks, 'currentWeek');
   }, [tasks, filterType, user?.name, hideCompleted]);
 
   const thingsToDoTasks = useMemo(() => {
@@ -76,20 +98,28 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
     if (hideCompleted) {
       filteredTasks = filteredTasks.filter((task) => task.status !== 'completed');
     }
-    return filterType === 'all'
-      ? filteredTasks
-      : filteredTasks.filter((task) => task.assignee === user?.name);
+    filteredTasks =
+      filterType === 'all'
+        ? filteredTasks
+        : filteredTasks.filter((task) => task.assignee === user?.name);
+    return sortTasks(filteredTasks, 'thingsToDo');
   }, [tasks, filterType, user?.name, hideCompleted]);
 
   const moveTask = useCallback(
-    (id, targetList) => {
+    (id, targetList, newIndex) => {
       const task = tasks.find((t) => t?._id === id);
       if (task) {
         const updatedTask = { ...task, listType: targetList };
         updateTask(updatedTask);
 
-        // Immediately update local state
-        setTasks((prevTasks) => prevTasks.map((t) => (t?._id === id ? updatedTask : t)));
+        setTasks((prevTasks) => {
+          const newTasks = prevTasks.map((t) => (t?._id === id ? updatedTask : t));
+          const listTasks = newTasks.filter((t) => t.listType === targetList);
+          const newOrder = getTaskOrder(targetList).filter((taskId) => taskId !== id);
+          newOrder.splice(newIndex, 0, id);
+          setTaskOrder(targetList, newOrder);
+          return newTasks;
+        });
       }
     },
     [tasks, updateTask],
@@ -157,7 +187,6 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
           paddingBottom: '100px',
           height: '100vh',
           overflowY: tasks.length >= 100 ? 'auto' : 'visible',
-          // overflowX: 'visible',
           position: 'relative',
         }}
       >
@@ -237,7 +266,6 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
           </div>
           <div style={commonStyles.flexContainer}>
             <div style={{ display: 'flex', alignItems: 'center', marginRight: '30px' }}>
-              {/* profiles of 3 users, stacking like overlapping chips */}
               {members?.map((user, index) => {
                 if (!user) return null;
 

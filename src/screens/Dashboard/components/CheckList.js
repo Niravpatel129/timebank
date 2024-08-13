@@ -11,6 +11,7 @@ import { useTimerHook } from '../../../hooks/useTimerHook';
 import IconButton from './IconButton';
 import Tag from './Tag';
 import { commonStyles } from './sharedStyles/commonStyles';
+
 const Checklist = ({
   id,
   title,
