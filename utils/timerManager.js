@@ -12,7 +12,6 @@ class TimerManager {
   }
 
   setupIpcListeners() {
-    console.log('🚀  setupIpcListeners:');
     ipcMain.on('start-timer', this.startTimer.bind(this));
     ipcMain.on('stop-timer', this.stopTimer.bind(this));
     ipcMain.on('reset-timer', this.resetTimer.bind(this));

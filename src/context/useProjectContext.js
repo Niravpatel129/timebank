@@ -54,7 +54,6 @@ export const ProjectProvider = ({ children }) => {
   const addProject = useCallback(
     async (projectData) => {
       try {
-        console.log('🚀  projects:', projects);
         if (projects.length >= 7) {
           toast.error('Maximum of 7 projects allowed');
           return;

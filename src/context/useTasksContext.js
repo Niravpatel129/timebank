@@ -38,7 +38,6 @@ export const TasksProvider = ({ children }) => {
       if (!task) return;
 
       // get timeRemainging from task.timerState.startTime and now date
-      console.log('🚀  task time:', task.time);
 
       pauseTask(task._id, task.time);
     });

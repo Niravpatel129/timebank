@@ -5,7 +5,6 @@ const { ipcRenderer } = window.require('electron');
 
 export function useTrayTracking() {
   const [currentTask, setCurrentTask] = useState(null);
-  console.log('🚀  currentTask:', currentTask);
   const [trayOpenCount, setTrayOpenCount] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -50,7 +49,6 @@ export function useTrayTracking() {
   };
 
   const toggleTask = () => {
-    console.log('🚀  status:', status);
     if (status === 'running') {
       console.log('pausing');
       ipcRenderer.send('pause-active-task');

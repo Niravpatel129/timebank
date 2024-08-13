@@ -35,9 +35,7 @@ export default function DashboardComponent({ handleTriggerAddTaskButton, onEditT
           `/timeTrack/last-two-months/${selectedProject?._id}`,
         );
         setLastTwoMonthsTimeSpent(twoMonthsAgo);
-      } catch (error) {
-        console.log('🚀  error:', error);
-      }
+      } catch (error) {}
     };
 
     fetchTwoMonthsAgo();

@@ -9,7 +9,6 @@ export default function Time({ trayTrackingData }) {
   const { currentTask, status, toggleTask } = trayTrackingData;
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isToggling, setIsToggling] = useState(false);
-  console.log('🚀  currentTask tray:', currentTask);
 
   useEffect(() => {
     setTimeRemaining(currentTask?.timerState?.remainingTime || 0);

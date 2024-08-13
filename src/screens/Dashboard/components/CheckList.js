@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import { FaCheck, FaPause, FaPlay } from 'react-icons/fa';
+import { GiCheckMark } from 'react-icons/gi';
 import { GrDrag } from 'react-icons/gr';
 import ScribbleText from '../../../components/ScribbleText';
 import { useProjectContext } from '../../../context/useProjectContext';
@@ -81,6 +83,12 @@ const Checklist = ({
   };
 
   const handlePlay = (e) => {
+    // if there is no remaining time, show notification
+    if (timerState.remainingTime === 0) {
+      toast.error('Task has no remaining time, update the task duration!');
+      return;
+    }
+
     e.stopPropagation();
     if (timerState.isActive) {
       pauseTask(id, remainingTime);
@@ -215,7 +223,7 @@ const Checklist = ({
             textTransform: 'capitalize',
           }}
         >
-          {status.replace('-', ' ')}
+          {remainingTime === 0 ? 'Out of Time' : status.replace('-', ' ')}
         </span>
         <span
           style={{
@@ -228,7 +236,7 @@ const Checklist = ({
         </span>
         <IconButton
           onClick={handlePlay}
-          Icon={timerState.isActive ? FaPause : FaPlay}
+          Icon={remainingTime === 0 ? GiCheckMark : timerState.isActive ? FaPause : FaPlay}
           color={isDisabled ? '#ffffff' : '#ffffff'}
           style={{
             backgroundColor: timerState.isActive
@@ -248,10 +256,12 @@ const Checklist = ({
             cursor: 'pointer',
             marginRight: '10px',
             transition: 'background-color 0.3s ease',
+            cursor: remainingTime === 0 ? 'not-allowed' : 'pointer',
           }}
           onMouseEnter={() => setIsPlayButtonHovered(true)}
           onMouseLeave={() => setIsPlayButtonHovered(false)}
         />
+
         <div
           ref={assigneeSelectRef}
           style={{
