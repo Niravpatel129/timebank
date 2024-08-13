@@ -169,28 +169,31 @@ export const TasksProvider = ({ children }) => {
     }
   }, []);
 
-  const startTask = useCallback(async (taskId) => {
-    if (!taskId) return;
-    // toast error if another task is active
-    if (activeTaskId) {
-      toast.error('Another task is active. Please finish it before starting another one.');
-      return;
-    }
+  const startTask = useCallback(
+    async (taskId) => {
+      if (!taskId) return;
+      // toast error if another task is active
+      if (tasks.some((task) => task.timerState.isActive)) {
+        toast.error('Another task timer is active, please pause it before starting another one.');
+        return;
+      }
 
-    try {
-      const response = await newRequest.post(`/tasks/${taskId}/start`);
+      try {
+        const response = await newRequest.post(`/tasks/${taskId}/start`);
 
-      setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
-      setActiveTaskId(taskId);
+        setTasks((prevTasks) => prevTasks.map((task) => (task?._id === taskId ? response : task)));
+        setActiveTaskId(taskId);
 
-      const activeTask = tasks.find((task) => task?._id === activeTaskId);
+        const activeTask = tasks.find((task) => task?._id === activeTaskId);
 
-      ipcRenderer.send('set-current-task', activeTask);
-    } catch (error) {
-      console.error('Error starting task:', error);
-      toast.error('Failed to start task. Please try again.');
-    }
-  }, []);
+        ipcRenderer.send('set-current-task', activeTask);
+      } catch (error) {
+        console.error('Error starting task:', error);
+        toast.error('Failed to start task. Please try again.');
+      }
+    },
+    [tasks, activeTaskId],
+  );
 
   const pauseTask = useCallback(async (taskId, remainingTime) => {
     try {
