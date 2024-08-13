@@ -18,7 +18,9 @@ export default function Home({ currentTask, setCurrentTask }) {
   const trayTrackingData = useTrayTracking();
 
   const toggleMenu = () => {
-    // setIsMenuOpen(!isMenuOpen);
+    // ipcRenderer.send('show-dashboard');
+
+    setIsMenuOpen(!isMenuOpen);
   };
 
   const handleShowDashboard = () => {
@@ -35,22 +37,18 @@ export default function Home({ currentTask, setCurrentTask }) {
   };
 
   const handleShowSettings = () => {
-    ipcRenderer.send('show-settings');
+    ipcRenderer.send('show-dashboard');
     toggleMenu();
   };
 
   const handleShowAllTasks = () => {
     ipcRenderer.send('show-dashboard');
     return;
-    setScreen('tasks');
-  };
-
-  const handleTrackingCardClick = () => {
-    setScreen('tasks');
   };
 
   const handleShowResults = () => {
-    setScreen('results');
+    ipcRenderer.send('show-dashboard');
+    // setScreen('results');
   };
 
   useEffect(() => {
@@ -124,19 +122,6 @@ export default function Home({ currentTask, setCurrentTask }) {
               zIndex: 1000,
             }}
           >
-            <motion.div
-              whileHover={{ backgroundColor: '#2a1a5e' }}
-              style={{
-                color: 'white',
-                cursor: 'pointer',
-                marginBottom: '5px',
-                padding: '5px',
-                borderRadius: '4px',
-              }}
-              onClick={handleShowDashboard}
-            >
-              Dashboard
-            </motion.div>
             <motion.div
               whileHover={{ backgroundColor: '#2a1a5e' }}
               style={{

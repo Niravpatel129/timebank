@@ -190,7 +190,7 @@ export const TasksProvider = ({ children }) => {
                   startTime: new Date(),
                   remainingTime:
                     task.timerState.remainingTime === 0
-                      ? task.taskDuration * 60 * 1000
+                      ? task.taskDuration * 60 * 1000 + 1
                       : task.timerState.remainingTime,
                 },
                 status: 'in-progress',

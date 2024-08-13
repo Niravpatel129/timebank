@@ -1,7 +1,6 @@
 import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
-import { FaCirclePause, FaCirclePlay, FaFeather } from 'react-icons/fa6';
-import PrimaryButton from './PrimaryButton';
+import { FaFeather } from 'react-icons/fa6';
 import TimeText from './TimeText';
 const { ipcRenderer } = window.require('electron');
 
@@ -77,7 +76,9 @@ export default function Time({ trayTrackingData }) {
             border: '1px solid #40366d',
             cursor: 'pointer',
           }}
-          // onClick={() => activeTask && finishTask(activeTask._id)}
+          onClick={() => {
+            ipcRenderer.send('show-dashboard');
+          }}
         >
           <FaFeather style={{ color: '#c5c1f0', fontSize: '20px' }} />
         </motion.div>
@@ -107,22 +108,6 @@ export default function Time({ trayTrackingData }) {
             gap: '10px',
           }}
         >
-          <motion.div
-            layout
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            animate={isToggling ? { scale: 0.95 } : { scale: 1 }}
-          >
-            <PrimaryButton
-              onClick={handleToggleTask}
-              icon={
-                currentTask ? status === 'running' ? <FaCirclePause /> : <FaCirclePlay /> : null
-              }
-              disabled={isToggling}
-            >
-              {currentTask ? (status === 'running' ? 'Pause' : 'Start') : 'Select Task'}
-            </PrimaryButton>
-          </motion.div>
           {/* <AnimatePresence>
             {currentTask && status === 'running' && (
               <motion.div

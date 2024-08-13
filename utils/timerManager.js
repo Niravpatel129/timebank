@@ -32,15 +32,21 @@ class TimerManager {
       const elapsedSeconds = Math.floor(
         (Date.now() - new Date(task.timerState.startTime).getTime()) / 1000,
       );
-      const newRemainingTime = Math.max(0, task.timerState.remainingTime - elapsedSeconds);
 
-      this.updateTrayTitle(newRemainingTime);
+      let newTime;
+      if (task.timerType === 'countdown') {
+        newTime = Math.max(0, task.timerState.remainingTime - elapsedSeconds);
+      } else if (task.timerType === 'countup') {
+        newTime = task.timerState.remainingTime + elapsedSeconds;
+      }
+
+      this.updateTrayTitle(newTime);
 
       BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('timer-update', newRemainingTime);
+        window.webContents.send('timer-update', newTime);
       });
 
-      if (newRemainingTime <= 0) {
+      if (task.timerType === 'countdown' && newTime <= 0) {
         this.stopTimer(event, task._id);
         this.showNotification("Time's up!", `Time's up for task: ${task.name}`);
         BrowserWindow.getAllWindows().forEach((window) => {
