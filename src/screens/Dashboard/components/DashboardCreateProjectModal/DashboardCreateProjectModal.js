@@ -61,6 +61,19 @@ const DashboardCreateProjectModal = () => {
     }
   }, [searchTerm, members]);
 
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.keyCode === 27) {
+        closeModal();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+
+    return () => {
+      window.removeEventListener('keydown', handleEsc);
+    };
+  }, [closeModal]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!projectName.trim()) {
@@ -111,6 +124,7 @@ const DashboardCreateProjectModal = () => {
         alignItems: 'center',
         zIndex: 1000,
       }}
+      onClick={closeModal}
     >
       <motion.div
         initial={{ y: -50, opacity: 0 }}
@@ -127,6 +141,7 @@ const DashboardCreateProjectModal = () => {
           overflowY: 'auto',
           maxHeight: '90vh',
         }}
+        onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={closeModal}
