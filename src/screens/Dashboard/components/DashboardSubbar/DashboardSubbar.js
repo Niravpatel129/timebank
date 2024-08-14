@@ -7,14 +7,11 @@ import {
   FaChevronRight,
   FaClipboardList,
   FaListAlt,
-  FaTags,
   FaTrash,
 } from 'react-icons/fa';
 
 const iconStyle = {
   fontSize: '24px',
-  color: '#ffffff',
-  opacity: 0.7,
   width: '24px', // Fixed width for icons
   display: 'flex',
   justifyContent: 'center',
@@ -26,7 +23,11 @@ const labelStyle = {
   marginLeft: '10px',
 };
 
-export default function DashboardSubbar({ colorGradients }) {
+export default function DashboardSubbar({
+  colorGradients,
+  setSelectedDashboardScreen,
+  selectedDashboardScreen,
+}) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpand = () => {
@@ -41,12 +42,11 @@ export default function DashboardSubbar({ colorGradients }) {
       expandedLabel: 'Collapse',
       onClick: toggleExpand,
     },
-    { icon: FaListAlt, label: 'List' },
-    { icon: FaCalendarAlt, label: 'Calendar' },
-    { icon: FaClipboardList, label: 'Board' },
-    { icon: FaTags, label: 'Tags' },
-    { icon: FaCheck, label: 'Completed' },
-    { icon: FaTrash, label: 'Trash' },
+    { icon: FaListAlt, label: 'List', screen: 'list' },
+    { icon: FaClipboardList, label: 'Board', screen: 'board' },
+    { icon: FaCalendarAlt, label: 'Calendar', screen: 'calendar' },
+    { icon: FaCheck, label: 'Completed', screen: 'completed' },
+    { icon: FaTrash, label: 'Trash', screen: 'trash' },
   ];
 
   return (
@@ -56,7 +56,6 @@ export default function DashboardSubbar({ colorGradients }) {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        // alignItems: 'center',
         paddingTop: '20px',
         gap: '10px',
         height: '100%',
@@ -68,13 +67,18 @@ export default function DashboardSubbar({ colorGradients }) {
       {items.map((item, index) => (
         <motion.div
           key={index}
-          onClick={item.onClick}
+          onClick={() => {
+            if (item.onClick) {
+              item.onClick();
+            } else if (item.screen) {
+              setSelectedDashboardScreen(item.screen);
+            }
+          }}
           whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
           style={{
             display: 'flex',
             justifyContent: 'flex-start',
             alignItems: 'center',
-            // width: '100%',
             padding: '10px',
             paddingLeft: '20px',
             paddingRight: '10px',
@@ -83,9 +87,21 @@ export default function DashboardSubbar({ colorGradients }) {
           }}
         >
           {item.expandedIcon && isExpanded ? (
-            <item.expandedIcon style={iconStyle} />
+            <item.expandedIcon
+              style={{
+                ...iconStyle,
+                color:
+                  selectedDashboardScreen === item.screen ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+              }}
+            />
           ) : (
-            <item.icon style={iconStyle} />
+            <item.icon
+              style={{
+                ...iconStyle,
+                color:
+                  selectedDashboardScreen === item.screen ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+              }}
+            />
           )}
           <motion.span
             initial={false}

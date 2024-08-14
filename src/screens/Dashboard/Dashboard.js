@@ -39,6 +39,7 @@ const Dashboard = () => {
   const profileDropdownRef = useRef(null);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
+  const [selectedDashboardScreen, setSelectedDashboardScreen] = useState('list');
   const { logout } = useUserContext();
   const {
     projects,
@@ -273,7 +274,11 @@ const Dashboard = () => {
 
       {/* Middle column - 80px wide, full height */}
 
-      <DashboardSubbar colorGradients={colorGradients} />
+      <DashboardSubbar
+        colorGradients={colorGradients}
+        setSelectedDashboardScreen={setSelectedDashboardScreen}
+        selectedDashboardScreen={selectedDashboardScreen}
+      />
 
       {/* Main content area - remaining width, full height */}
       <div style={{ flex: 1, height: '100%', display: 'flex' }}>
