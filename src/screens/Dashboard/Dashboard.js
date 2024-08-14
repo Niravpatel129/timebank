@@ -287,6 +287,7 @@ const Dashboard = () => {
           setIsInviteModalOpen={setIsInviteModalOpen}
           setIsNotificationModalOpen={setIsNotificationModalOpen}
           handleEditTask={handleEditTask}
+          selectedDashboardScreen={selectedDashboardScreen}
         />
       </div>
 
