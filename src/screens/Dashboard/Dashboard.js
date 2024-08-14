@@ -21,11 +21,10 @@ import './Dashboard.css';
 import Bubble from './components/Bubble';
 import DashboardAddTaskModal from './components/DashboardAddTaskModal';
 import DashboardCreateProjectModal from './components/DashboardCreateProjectModal/DashboardCreateProjectModal';
-import DashboardMiddleSection from './components/DashboardMiddleSection';
+import DashboardScreenSwitch from './components/DashboardScreenSwitch/DashboardScreenSwitch';
 import DashboardSubbar from './components/DashboardSubbar/DashboardSubbar';
 import EditTaskModal from './components/EditTaskModal';
 import IntroductionModal from './components/IntroductionModal';
-import TimerTrack from './components/TimerTrack';
 const { ipcRenderer } = window.require('electron');
 
 const Dashboard = () => {
@@ -283,20 +282,12 @@ const Dashboard = () => {
       {/* Main content area - remaining width, full height */}
       <div style={{ flex: 1, height: '100%', display: 'flex' }}>
         {/* Left part of main content - flexible width */}
-        <div style={{ flex: 1, height: '100%' }}>
-          {/* Content for main area */}
-          <DashboardMiddleSection
-            handleTriggerAddTaskButton={() => setAddTaskModalOpen(true)}
-            onEditTask={handleEditTask}
-            handleInviteClick={() => setIsInviteModalOpen(true)}
-          />
-        </div>
-
-        {/* Right part of main content - 300px wide, full height */}
-        <div style={{ width: '400px', height: '100%', backgroundColor: '#c0c0c0' }}>
-          {/* Content for right column */}
-          <TimerTrack openNotificationModal={() => setIsNotificationModalOpen(true)} />
-        </div>
+        <DashboardScreenSwitch
+          setAddTaskModalOpen={setAddTaskModalOpen}
+          setIsInviteModalOpen={setIsInviteModalOpen}
+          setIsNotificationModalOpen={setIsNotificationModalOpen}
+          handleEditTask={handleEditTask}
+        />
       </div>
 
       <DashboardAddTaskModal
