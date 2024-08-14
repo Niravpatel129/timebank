@@ -6,21 +6,25 @@ const initialColumns = {
     id: 'created',
     title: 'Created',
     taskIds: ['task-1', 'task-2'],
+    color: '#00ff80',
   },
   inProgress: {
     id: 'inProgress',
     title: 'In Progress',
     taskIds: ['task-3'],
+    color: '#FF9800',
   },
   review: {
     id: 'review',
     title: 'Review',
     taskIds: ['task-4'],
+    color: '#ff001e',
   },
   done: {
     id: 'done',
     title: 'Done',
     taskIds: ['task-5'],
+    color: '#8c00ff',
   },
 };
 
@@ -67,7 +71,7 @@ export default function BoardTable() {
           justifyContent: 'space-between',
           width: '100%',
           height: containerHeight,
-          overflow: 'hidden',
+          //   overflow: 'hidden',
         }}
       >
         {Object.values(columns).map((column) => (
@@ -82,7 +86,52 @@ export default function BoardTable() {
               height: '100%',
             }}
           >
-            <h2 style={{ marginBottom: '16px' }}>{column.title}</h2>
+            <div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  width: '100%',
+                  marginBottom: '16px',
+                  gap: '8px',
+                  marginLeft: '7px',
+                }}
+              >
+                <h2
+                  style={{
+                    margin: 0,
+                    fontSize: '15px',
+                    fontWeight: '500',
+                    color: '#132137',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span
+                      style={{
+                        width: '10px',
+                        height: '10px',
+                        borderRadius: '50%',
+                        backgroundColor: column.color,
+                      }}
+                    ></span>
+                    <span>{column.title}</span>
+                  </div>
+                </h2>
+                <div
+                  style={{
+                    backgroundColor: '#ffffff',
+                    borderRadius: '12px',
+                    padding: '2px 8px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    color: '#132137',
+                  }}
+                >
+                  {column.taskIds.length}
+                </div>
+              </div>
+            </div>
             <Droppable droppableId={column.id}>
               {(provided, snapshot) => (
                 <div
