@@ -1,6 +1,6 @@
 {
   "name": "hourblock",
-  "version": "1.0.28",
+  "version": "1.0.29",
   "description": "A simple and efficient time tracking application for managing your daily tasks and projects.",
   "main": "main.js",
   "scripts": {

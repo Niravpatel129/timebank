@@ -84,6 +84,17 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+  const handleLoginVerificationCode = async ({ email, code }) => {
+    try {
+      const response = await newRequest.post('/user/verify-login-code', { email, loginCode: code });
+      handleLoginAndSetUser(response.user, response.authToken);
+      return response;
+    } catch (error) {
+      console.error('Error logging in:', error);
+      return null;
+    }
+  };
+
   const handleRegisterUser = async (data) => {
     return new Promise(async (resolve, reject) => {
       try {
@@ -111,6 +122,21 @@ export const UserProvider = ({ children }) => {
         reject(error);
       }
     });
+  };
+
+  const handleLoginUser = async (email) => {
+    try {
+      console.log('Sending login code');
+      if (!email) {
+        toast.error('Please enter your email');
+        return;
+      }
+      const response = await newRequest.post('/user/send-login-code', { email });
+      return response;
+    } catch (error) {
+      console.error('Error logging in:', error);
+      return null;
+    }
   };
 
   const logout = async () => {
@@ -141,6 +167,8 @@ export const UserProvider = ({ children }) => {
     registerUser,
     handleRegisterUser,
     handleAddVerificationCode,
+    handleLoginVerificationCode,
+    handleLoginUser,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

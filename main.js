@@ -363,20 +363,20 @@ autoUpdater.on('update-available', () => {
     });
 });
 
-autoUpdater.on('update-downloaded', () => {
-  dialog
-    .showMessageBox({
-      type: 'info',
-      title: 'Update ready',
-      message: 'Install and restart now?',
-      buttons: ['Yes', 'Later'],
-    })
-    .then((result) => {
-      if (result.response === 0) {
-        autoUpdater.quitAndInstall(false, true);
-      }
-    });
-});
+// autoUpdater.on('update-downloaded', () => {
+//   dialog
+//     .showMessageBox({
+//       type: 'info',
+//       title: 'Update ready',
+//       message: 'Install and restart now?',
+//       buttons: ['Yes', 'Later'],
+//     })
+//     .then((result) => {
+//       if (result.response === 0) {
+//         autoUpdater.quitAndInstall(false, true);
+//       }
+//     });
+// });
 
 autoUpdater.on('error', (err) => {
   dialog.showErrorBox('Error: ', err == null ? 'unknown' : (err.stack || err).toString());

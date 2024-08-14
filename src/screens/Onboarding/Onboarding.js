@@ -2,11 +2,15 @@ import { motion } from 'framer-motion';
 import React, { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaCheck, FaSpinner } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
 import { useUserContext } from '../../context/useUserContext';
 
 const Onboarding = () => {
-  const { handleRegisterUser, handleAddVerificationCode } = useUserContext();
+  const {
+    handleRegisterUser,
+    handleAddVerificationCode,
+    handleLoginUser,
+    handleLoginVerificationCode,
+  } = useUserContext();
   const [selectedTools, setSelectedTools] = useState([]);
   const [step, setStep] = useState(1);
   const [usageType, setUsageType] = useState('');
@@ -17,7 +21,9 @@ const Onboarding = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const codeInputRefs = [useRef(), useRef(), useRef(), useRef()];
-  const navigate = useNavigate();
+  const loginCodeInputRefs = [useRef(), useRef(), useRef(), useRef()];
+  const [loginVerificationCode, setLoginVerificationCode] = useState(['', '', '', '']);
+  const [isLoginVerifying, setIsLoginVerifying] = useState(false);
 
   const categories = [
     { id: 'work', name: 'Work', icon: '💼' },
@@ -27,6 +33,19 @@ const Onboarding = () => {
     { id: 'finance', name: 'Finance', icon: '💰' },
     { id: 'social', name: 'Social', icon: '🎉' },
   ];
+
+  const handleLoginVerify = async () => {
+    if (isLoginVerifying) return;
+    setIsLoginVerifying(true);
+    try {
+      await handleLoginVerificationCode({ email, code: loginVerificationCode.join('') });
+    } catch (error) {
+      console.error('Login failed:', error);
+      toast.error('Login failed. Please try again.');
+    } finally {
+      setIsLoginVerifying(false);
+    }
+  };
 
   const handleVerify = async () => {
     if (isVerifying) return;
@@ -86,15 +105,12 @@ const Onboarding = () => {
     if (isLoggingIn) return;
     setIsLoggingIn(true);
     try {
-      // Simulate sending login request to server
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Simulate successful login
-      alert('Check your email for the verification code!');
-      setStep(4); // Move to verification step
+      await handleLoginUser({ email });
+      toast.success('Check your email for the verification code!');
+      setStep(6); // Move to verification step
     } catch (error) {
       console.error('Login failed:', error);
-      // Handle login error (e.g., show error message)
+      toast.error('Login failed. Please try again.');
     } finally {
       setIsLoggingIn(false);
     }
@@ -121,6 +137,28 @@ const Onboarding = () => {
         codeInputRefs[index - 1].current.focus();
       }
     }
+  };
+
+  const handleLoginVerificationCodeChange = (index, value) => {
+    const newLoginVerificationCode = [...loginVerificationCode];
+
+    if (value.length === 4) {
+      // Handle pasting of 4 digits
+      for (let i = 0; i < 4; i++) {
+        newLoginVerificationCode[i] = value[i];
+      }
+      setLoginVerificationCode(newLoginVerificationCode);
+      codeInputRefs[3].current.focus();
+    } else if (value.length <= 1) {
+      // Handle single digit input and backspace
+      newLoginVerificationCode[index] = value;
+      if (value.length === 1 && index < 3) {
+        loginCodeInputRefs[index + 1].current.focus();
+      } else if (value.length === 0 && index > 0) {
+        loginCodeInputRefs[index - 1].current.focus();
+      }
+    }
+    setLoginVerificationCode(newLoginVerificationCode);
   };
 
   const renderStep1 = () => (
@@ -515,12 +553,114 @@ const Onboarding = () => {
       </div>
       <p style={{ marginTop: '20px', fontSize: '14px', color: '#555' }}>
         Didn't receive the code?{' '}
-        <span style={{ color: '#4a47ff', cursor: 'pointer' }}>Resend code</span>
+        <span style={{ color: '#4a47ff', cursor: 'pointer' }} onClick={() => handleRegister()}>
+          Resend code
+        </span>
       </p>
     </>
   );
 
-  const renderLoginStep = () => (
+  const renderStep6 = () => (
+    <>
+      <h1
+        style={{
+          marginBottom: '20px',
+          color: '#333',
+          fontSize: '2.5rem',
+          fontWeight: '700',
+          background: '#fff',
+          WebkitBackgroundClip: 'text',
+        }}
+      >
+        Verify Login
+      </h1>
+      <p style={{ fontSize: '16px', color: '#555', marginBottom: '20px' }}>
+        We've sent a verification code to your email. Please enter it below to complete the login
+        process:
+      </p>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px',
+          maxWidth: '400px',
+          width: '100%',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          {loginVerificationCode.map((digit, index) => (
+            <input
+              key={index}
+              type='text'
+              maxLength={4}
+              value={digit}
+              onChange={(e) => handleLoginVerificationCodeChange(index, e.target.value)}
+              ref={loginCodeInputRefs[index]}
+              style={{
+                width: '60px',
+                height: '60px',
+                fontSize: '24px',
+                textAlign: 'center',
+                border: '2px solid #e0e0e0',
+                borderRadius: '10px',
+                outline: 'none',
+              }}
+            />
+          ))}
+        </div>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          style={{
+            marginTop: '30px',
+            padding: '15px 40px',
+            background: 'linear-gradient(45deg, #4a47ff, #3230a6)',
+            color: '#ffffff',
+            border: 'none',
+            borderRadius: '30px',
+            cursor: 'pointer',
+            fontSize: '20px',
+            fontWeight: '600',
+            boxShadow: '0 10px 20px rgba(83, 57, 206, 0.2)',
+            transition: 'all 0.3s ease',
+          }}
+          onClick={handleLoginVerify}
+          disabled={isLoginVerifying}
+        >
+          {isLoginVerifying ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                style={{ marginRight: '10px' }}
+              >
+                <FaSpinner />
+              </motion.div>
+              Verifying...
+            </motion.div>
+          ) : (
+            'Verify'
+          )}
+        </motion.button>
+      </div>
+      <p style={{ marginTop: '20px', fontSize: '14px', color: '#555' }}>
+        Didn't receive the code?{' '}
+        <span
+          style={{ color: '#4a47ff', cursor: 'pointer' }}
+          onClick={() => handleLoginUser({ email: email })}
+        >
+          Resend code
+        </span>
+      </p>
+    </>
+  );
+
+  const renderStep5 = () => (
     <>
       <h1
         style={{
@@ -603,15 +743,24 @@ const Onboarding = () => {
         fontFamily: "'Poppins', sans-serif",
       }}
     >
-      {step === 1
-        ? renderStep1()
-        : step === 2
-        ? renderStep2()
-        : step === 3
-        ? renderStep3()
-        : step === 4
-        ? renderStep4()
-        : renderLoginStep()}
+      {(() => {
+        switch (step) {
+          case 1:
+            return renderStep1();
+          case 2:
+            return renderStep2();
+          case 3:
+            return renderStep3();
+          case 4:
+            return renderStep4();
+          case 5:
+            return renderStep5();
+          case 6:
+            return renderStep6();
+          default:
+            return renderStep1();
+        }
+      })()}
 
       <motion.div
         whileHover={{
@@ -634,7 +783,7 @@ const Onboarding = () => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {step === 5 ? 'Back to onboarding' : 'Already have an account?'}
+          {step === 5 || step === 6 ? 'Back to onboarding' : 'Already have an account?'}
         </motion.span>
       </motion.div>
     </div>
