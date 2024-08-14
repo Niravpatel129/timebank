@@ -21,7 +21,7 @@ let settingsWindow = null;
 let dashboardWindow = null;
 let timerManager = null;
 
-const widthMultiplier = 0.25;
+const widthMultiplier = 0.18;
 const heightMultiplier = 0.48;
 const dashboardAspectRatio = 16 / 9;
 
