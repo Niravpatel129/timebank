@@ -1,4 +1,5 @@
 import React from 'react';
+import BoardingHeader from '../../BoardHeader/BoardHeader';
 
 export default function BoardScreen() {
   const projects = [
@@ -34,8 +35,11 @@ export default function BoardScreen() {
         display: 'flex',
         flexDirection: 'column',
         padding: '20px',
+        width: '100%',
+        backgroundColor: '#fff',
       }}
     >
+      <BoardingHeader />
       <h1
         style={{
           fontSize: '24px',
