@@ -8,7 +8,11 @@ const Header = () => (
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: '10px 0px',
-      borderBottom: '1px solid #e0e0e0',
+      borderBottom: '1px solid #f2f2f2',
+      marginLeft: '-20px', // Adjust based on parent padding
+      marginRight: '-20px', // Adjust based on parent padding
+      paddingLeft: '20px', // Add padding to maintain content alignment
+      paddingRight: '20px', // Add padding to maintain content alignment
     }}
   >
     <div
@@ -62,7 +66,6 @@ const ProjectHeader = () => (
   <div
     style={{
       paddingTop: '20px',
-      //   borderBottom: '1px solid #e0e0e0',
     }}
   >
     <div
@@ -159,7 +162,11 @@ const Navigation = () => (
       fontSize: '14px',
       fontWeight: 500,
       marginTop: '20px',
-      borderBottom: '1px solid #e0e0e0',
+      borderBottom: '1px solid #f2f2f2',
+      marginLeft: '-20px', // Adjust based on parent padding
+      marginRight: '-20px', // Adjust based on parent padding
+      paddingLeft: '20px', // Add padding to maintain content alignment
+      paddingRight: '20px', // Add padding to maintain content alignment
     }}
   >
     {['Overview', 'Tasks', 'Notes', 'Questions'].map((item, index) => (
@@ -231,17 +238,6 @@ const BoardingHeader = () => (
   >
     <Header />
     <ProjectHeader />
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '10px 0px',
-      }}
-    >
-      Main Content
-    </div>
-    <ViewOptions />
   </div>
 );
 

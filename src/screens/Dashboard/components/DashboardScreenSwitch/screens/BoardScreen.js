@@ -1,5 +1,6 @@
 import React from 'react';
 import BoardingHeader from '../../BoardHeader/BoardHeader';
+import BoardTable from '../../BoardTable/BoardTable';
 
 export default function BoardScreen() {
   const projects = [
@@ -34,70 +35,15 @@ export default function BoardScreen() {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        padding: '20px',
         width: '100%',
-        backgroundColor: '#fff',
+        height: '100vh',
       }}
     >
-      <BoardingHeader />
-      <h1
-        style={{
-          fontSize: '24px',
-          marginBottom: '20px',
-        }}
-      >
-        All Projects
-      </h1>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-          gap: '20px',
-        }}
-      >
-        {projects.map((project) => (
-          <div
-            key={project.id}
-            style={{
-              backgroundColor: '#fff',
-              borderRadius: '8px',
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-              padding: '16px',
-            }}
-          >
-            <h2
-              style={{
-                fontSize: '18px',
-                marginBottom: '10px',
-              }}
-            >
-              {project.title}
-            </h2>
-            <p
-              style={{
-                fontSize: '14px',
-                color: '#666',
-              }}
-            >
-              {project.description}
-            </p>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginTop: '10px',
-                fontSize: '12px',
-                color: '#999',
-              }}
-            >
-              <span>{project.status}</span>
-              <span>
-                {project.members} members • {project.comments} comments
-              </span>
-            </div>
-          </div>
-        ))}
+      <div style={{ padding: '20px', paddingBottom: '0px' }}>
+        <BoardingHeader />
+      </div>
+      <div style={{ backgroundColor: '#f7f7f7', padding: '20px', flex: 1 }}>
+        <BoardTable />
       </div>
     </div>
   );
