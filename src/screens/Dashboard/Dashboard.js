@@ -12,6 +12,8 @@ import {
   FaSync,
   FaUserPlus,
 } from 'react-icons/fa';
+import packageInfo from '../../../package.json';
+
 import DashboardInviteModal from '../../components/DashboardInviteModal';
 import NotificationModal from '../../components/NotificationModal';
 import { useProjectContext } from '../../context/useProjectContext';
@@ -203,6 +205,10 @@ const Dashboard = () => {
             marginBottom: '40px',
             position: 'relative',
           }}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            setIsProfileDropdownOpen(!isProfileDropdownOpen);
+          }}
           onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
         >
           <img
@@ -264,7 +270,7 @@ const Dashboard = () => {
                 </motion.div>
               ))}
               <div style={{ padding: '10px', color: '#888', fontSize: '0.9em' }}>
-                v6494 · Changelog
+                v{packageInfo.version} · Changelog
               </div>
             </motion.div>
           )}
