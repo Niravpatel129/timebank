@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { FaTimes } from 'react-icons/fa';
 import Select from 'react-select';
 import { useProjectContext } from '../../../../context/useProjectContext';
@@ -62,6 +63,11 @@ const DashboardCreateProjectModal = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!projectName.trim()) {
+      toast.error('Project name is required');
+      return;
+    }
+
     if (projectName.trim()) {
       await addProject({ name: projectName.trim(), projectColor, members });
       closeModal();

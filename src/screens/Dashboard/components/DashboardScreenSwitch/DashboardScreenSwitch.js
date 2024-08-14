@@ -5,16 +5,10 @@ import CompletedScreen from './screens/CompletedScreen';
 import ListScreen from './screens/ListScreen';
 import TrashScreen from './screens/TrashScreen';
 
-const DashboardScreenSwitch = ({
-  setAddTaskModalOpen,
-  setIsInviteModalOpen,
-  setIsNotificationModalOpen,
-  handleEditTask,
-  selectedDashboardScreen,
-}) => {
-  switch (selectedDashboardScreen) {
+const DashboardScreenSwitch = (props) => {
+  switch (props.selectedDashboardScreen) {
     case 'list':
-      return <ListScreen />;
+      return <ListScreen {...props} />;
     case 'board':
       return <BoardScreen />;
     case 'calendar':
