@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { BiPlus } from 'react-icons/bi';
 import {
   FaRegChartBar,
@@ -13,11 +13,22 @@ import { useTasksContext } from '../../../../context/useTasksContext';
 
 const TableView = () => {
   const { tasks, updateTask } = useTasksContext();
-  console.log('🚀  tasks:', tasks);
   const { colorGradients } = useProjectContext();
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
-  const renderHeader = () => {
+  const groupedTasks = useMemo(() => {
+    const grouped = tasks.reduce((acc, task) => {
+      const boardOrder = task.taskBoardOrder || 0;
+      if (!acc[boardOrder]) {
+        acc[boardOrder] = [];
+      }
+      acc[boardOrder].push(task);
+      return acc;
+    }, {});
+    return Object.entries(grouped).sort(([a], [b]) => Number(a) - Number(b));
+  }, [tasks]);
+
+  const renderHeader = (boardOrder, tasksCount) => {
     return (
       <div
         style={{
@@ -30,6 +41,7 @@ const TableView = () => {
           color: '#191731',
           alignItems: 'center',
           justifyContent: 'space-between',
+          marginTop: '20px',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
@@ -42,7 +54,9 @@ const TableView = () => {
               height: '100%',
             }}
           />
-          <span style={{ fontWeight: 500, fontSize: '15px' }}>To-do</span>
+          <span style={{ fontWeight: 500, fontSize: '15px' }}>
+            Tasks (Board Order: {boardOrder})
+          </span>
           <span
             style={{
               fontSize: '12px',
@@ -59,7 +73,7 @@ const TableView = () => {
               fontWeight: 500,
             }}
           >
-            3
+            {tasksCount}
           </span>
         </div>
         <div
@@ -77,9 +91,10 @@ const TableView = () => {
     );
   };
 
-  const renderTableContentRow = () => {
+  const renderTableContentRow = (task) => {
     return (
       <div
+        key={task._id}
         style={{
           display: 'flex',
           flexDirection: 'row',
@@ -87,36 +102,45 @@ const TableView = () => {
           color: '#484560',
           fontWeight: 500,
           fontSize: '14px',
+          alignItems: 'center',
         }}
       >
         <div style={{ width: '20px', padding: '10px', borderRight: '1px solid #e0e0e0' }}>
           <input type='checkbox' />
         </div>
         <div style={{ flex: 2, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
-          Do something
+          {task.name}
         </div>
         <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
-          some estimation
+          {task.taskDuration / 60} minutes
+        </div>
+        <div
+          style={{
+            flex: 1,
+            padding: '10px',
+            borderRight: '1px solid #e0e0e0',
+            textTransform: 'capitalize',
+          }}
+        >
+          {task.status.split('-').join(' ')}
         </div>
         <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
-          {getStatusColor('not-started')}
+          {renderUserCircle(task.user.name[0])}
         </div>
         <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
-          {renderUserCircle('J')}
-        </div>
-        <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
-          {renderPriorityBadge('high')}
+          {renderPriorityBadge(task.taskPriority)}
         </div>
         <div style={{ width: '40px', padding: '10px' }}>...</div>
       </div>
     );
   };
 
-  const renderTable = () => {
+  const renderTable = (tasks, boardOrder) => {
     return (
-      <div>
+      <div key={boardOrder}>
+        {renderHeader(boardOrder, tasks.length)}
         {renderTableHeading()}
-        {renderTableContents()}
+        <div>{tasks.map((task) => renderTableContentRow(task))}</div>
       </div>
     );
   };
@@ -138,13 +162,13 @@ const TableView = () => {
           <FaRegClipboard /> Task Name
         </div>
         <div style={{ flex: 1, padding: '10px' }}>
-          <FaRegClock /> Task Estimation
+          <FaRegClock /> Duration
         </div>
         <div style={{ flex: 1, padding: '10px' }}>
-          <FaRegChartBar /> Task Status
+          <FaRegChartBar /> Status
         </div>
         <div style={{ flex: 1, padding: '10px' }}>
-          <FaRegUserCircle /> Task People
+          <FaRegUserCircle /> Assigned To
         </div>
         <div style={{ flex: 1, padding: '10px' }}>
           <FaRegFlag /> Priority
@@ -156,21 +180,17 @@ const TableView = () => {
     );
   };
 
-  const renderTableContents = () => {
-    return (
-      <div>
-        {renderTableContentRow()}
-        {renderTableContentRow()}
-        {renderTableContentRow()}
-      </div>
-    );
-  };
-
   const renderPriorityBadge = (priority) => {
     const priorityColors = {
-      low: '#00C853',
-      medium: '#FFA000',
-      high: '#D50000',
+      1: '#00C853',
+      2: '#FFA000',
+      3: '#D50000',
+    };
+
+    const priorityLabels = {
+      1: 'Low',
+      2: 'Medium',
+      3: 'High',
     };
 
     return (
@@ -185,7 +205,7 @@ const TableView = () => {
           textTransform: 'capitalize',
         }}
       >
-        {priority}
+        {priorityLabels[priority] || 'Unknown'}
       </span>
     );
   };
@@ -212,16 +232,9 @@ const TableView = () => {
   };
 
   return (
-    <div style={{ overflowX: 'auto', width: '100%', color: '#484560' }}>
+    <div style={{ overflowX: 'auto', width: '100%', color: '#484560', marginBottom: '100px' }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
-          {renderHeader()}
-          {renderTable()}
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
-          {renderHeader()}
-          {renderTable()}
-        </div>
+        {groupedTasks.map(([boardOrder, tasks]) => renderTable(tasks, boardOrder))}
       </div>
     </div>
   );

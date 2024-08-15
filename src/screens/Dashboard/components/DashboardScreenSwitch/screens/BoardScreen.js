@@ -23,6 +23,7 @@ export default function BoardScreen() {
           backgroundColor: selectedView !== 'table' ? '#f7f7f7' : '#fff',
           padding: '20px',
           flex: 1,
+          overflow: 'auto',
         }}
       >
         {selectedView === 'board' && <BoardKanban />}
