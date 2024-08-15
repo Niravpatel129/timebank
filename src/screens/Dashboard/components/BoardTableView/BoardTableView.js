@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { BiDotsVerticalRounded, BiPlus } from 'react-icons/bi';
 import {
   FaRegChartBar,
@@ -33,6 +33,7 @@ const TableView = () => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [expandedSections, setExpandedSections] = useState({});
   const [openDropdown, setOpenDropdown] = useState(null);
+  const dropdownRef = useRef(null);
 
   const groupedTasks = useMemo(() => {
     const grouped = tasks.reduce((acc, task) => {
@@ -54,6 +55,19 @@ const TableView = () => {
     }, {});
     setExpandedSections(initialExpandedState);
   }, [groupedTasks]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenDropdown(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const toggleSection = (boardOrder) => {
     setExpandedSections((prev) => ({
@@ -233,15 +247,17 @@ const TableView = () => {
           />
           {openDropdown === task._id && (
             <div
+              ref={dropdownRef}
               style={{
                 position: 'absolute',
-                top: '100%',
-                right: '0',
+                bottom: '100%',
+                right: '-8px', // Adjusted to prevent cut-off
                 backgroundColor: 'white',
                 boxShadow: '0px 8px 16px 0px rgba(0,0,0,0.2)',
                 zIndex: 1,
                 borderRadius: '4px',
                 padding: '8px',
+                minWidth: '100px', // Added to ensure menu width
               }}
             >
               <div
