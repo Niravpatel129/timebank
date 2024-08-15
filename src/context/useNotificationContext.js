@@ -23,7 +23,6 @@ export const NotificationProvider = ({ children }) => {
   const fetchNotifications = useCallback(async () => {
     try {
       const response = await newRequest.get('/notification');
-      console.log('🚀  response:', response);
       setNotifications(response);
     } catch (error) {
       console.error('Error fetching notifications:', error);

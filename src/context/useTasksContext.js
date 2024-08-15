@@ -123,6 +123,7 @@ export const TasksProvider = ({ children }) => {
       setTasks((prevTasks) =>
         prevTasks.map((task) => (task?._id === updatedTask._id ? response : task)),
       );
+      toast.success('Task updated successfully');
     } catch (error) {
       console.error('Error updating task:', error);
       toast.error('Failed to update task. Please try again.');

@@ -32,8 +32,7 @@ const initialColumns = {
 };
 
 export default function BoardTable() {
-  const { tasks } = useTasksContext();
-  console.log('🚀  tasks:', tasks);
+  const { tasks, updateTask } = useTasksContext();
   const { colorGradients } = useProjectContext();
   const [columns, setColumns] = useState(initialColumns);
   const [containerHeight, setContainerHeight] = useState('100vh');
@@ -56,11 +55,18 @@ export default function BoardTable() {
   }, []);
 
   useEffect(() => {
-    const newColumns = { ...initialColumns };
+    const newColumns = JSON.parse(JSON.stringify(initialColumns));
     tasks.forEach((task) => {
       if (newColumns[task.status]) {
         newColumns[task.status].taskIds.push(task._id);
       }
+    });
+    Object.keys(newColumns).forEach((columnId) => {
+      newColumns[columnId].taskIds.sort((a, b) => {
+        const taskA = tasks.find((t) => t._id === a);
+        const taskB = tasks.find((t) => t._id === b);
+        return (taskA?.taskBoardOrder || 0) - (taskB?.taskBoardOrder || 0);
+      });
     });
     setColumns(newColumns);
   }, [tasks]);
@@ -79,45 +85,36 @@ export default function BoardTable() {
     const start = columns[source.droppableId];
     const finish = columns[destination.droppableId];
 
-    if (start === finish) {
-      const newTaskIds = Array.from(start.taskIds);
-      newTaskIds.splice(source.index, 1);
-      newTaskIds.splice(destination.index, 0, draggableId);
-
-      const newColumn = {
-        ...start,
-        taskIds: newTaskIds,
-      };
-
-      const newColumns = {
-        ...columns,
-        [newColumn.id]: newColumn,
-      };
-
-      setColumns(newColumns);
-    } else {
-      const startTaskIds = Array.from(start.taskIds);
-      startTaskIds.splice(source.index, 1);
-      const newStart = {
-        ...start,
-        taskIds: startTaskIds,
-      };
-
-      const finishTaskIds = Array.from(finish.taskIds);
-      finishTaskIds.splice(destination.index, 0, draggableId);
-      const newFinish = {
-        ...finish,
-        taskIds: finishTaskIds,
-      };
-
-      const newColumns = {
-        ...columns,
-        [newStart.id]: newStart,
-        [newFinish.id]: newFinish,
-      };
-
-      setColumns(newColumns);
+    if (!start || !finish) {
+      console.error('Invalid source or destination column');
+      return;
     }
+
+    const newColumns = JSON.parse(JSON.stringify(columns));
+
+    if (start === finish) {
+      const column = newColumns[source.droppableId];
+      column.taskIds.splice(source.index, 1);
+      column.taskIds.splice(destination.index, 0, draggableId);
+    } else {
+      const startColumn = newColumns[source.droppableId];
+      const finishColumn = newColumns[destination.droppableId];
+      startColumn.taskIds.splice(source.index, 1);
+      finishColumn.taskIds.splice(destination.index, 0, draggableId);
+    }
+
+    setColumns(newColumns);
+
+    const updatedTasks = newColumns[destination.droppableId].taskIds
+      .map((taskId, index) => {
+        const task = tasks.find((t) => t._id === taskId);
+        return task ? { ...task, taskBoardOrder: index, status: destination.droppableId } : null;
+      })
+      .filter(Boolean);
+
+    updatedTasks.forEach((task) => {
+      updateTask(task);
+    });
   };
 
   return (
@@ -206,6 +203,7 @@ export default function BoardTable() {
                 >
                   {column.taskIds.map((taskId, index) => {
                     const task = tasks.find((t) => t._id === taskId);
+                    if (!task) return null;
                     return (
                       <Draggable key={taskId} draggableId={taskId} index={index}>
                         {(provided, snapshot) => (
@@ -215,6 +213,7 @@ export default function BoardTable() {
                             {...provided.dragHandleProps}
                             style={{
                               ...provided.draggableProps.style,
+                              marginBottom: '8px',
                             }}
                           >
                             <BoardCard

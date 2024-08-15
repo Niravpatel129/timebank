@@ -5,7 +5,6 @@ import { FaCheck, FaPause, FaPlay } from 'react-icons/fa';
 import { FiTrash } from 'react-icons/fi';
 
 const BoardCard = ({ task, onEditTask, colorGradients }) => {
-  console.log('🚀  task:', task);
   const [isHovered, setIsHovered] = useState(false);
 
   const handleDelete = () => {
