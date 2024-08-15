@@ -130,15 +130,17 @@ const Dashboard = () => {
       {/* Left column - 80px wide, full height */}
       <motion.div
         style={{
-          width: '80px',
+          // width: '90px',
           height: '100%',
           background: 'linear-gradient(to top, #212d8b, #1f2f8c)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'space-between',
-          paddingTop: '20px',
+          paddingTop: '24px',
           paddingBottom: '20px',
+          paddingRight: '8px',
+          paddingLeft: '8px',
         }}
       >
         {/* Top section */}
