@@ -37,6 +37,7 @@ export default function BoardTable() {
   const [columns, setColumns] = useState(initialColumns);
   const [containerHeight, setContainerHeight] = useState('100vh');
   const containerRef = useRef(null);
+  const [hoveredColumn, setHoveredColumn] = useState(null);
 
   useEffect(() => {
     const updateHeight = () => {
@@ -141,6 +142,8 @@ export default function BoardTable() {
               height: '100%',
               marginRight: '16px',
             }}
+            onMouseEnter={() => setHoveredColumn(column.id)}
+            onMouseLeave={() => setHoveredColumn(null)}
           >
             <div>
               <div
@@ -199,6 +202,7 @@ export default function BoardTable() {
                     width: '100%',
                     flexGrow: 1,
                     overflowY: 'auto',
+                    position: 'relative',
                   }}
                 >
                   {column.taskIds.map((taskId, index) => {
@@ -229,6 +233,19 @@ export default function BoardTable() {
                     );
                   })}
                   {provided.placeholder}
+                  {hoveredColumn === column.id && (
+                    <div
+                      style={{
+                        padding: '8px 16px',
+                        backgroundColor: '#f0f0f0',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        marginTop: '8px',
+                      }}
+                    >
+                      Add Card
+                    </div>
+                  )}
                 </div>
               )}
             </Droppable>
