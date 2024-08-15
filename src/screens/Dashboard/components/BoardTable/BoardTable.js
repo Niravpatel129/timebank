@@ -1,45 +1,41 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { useProjectContext } from '../../../../context/useProjectContext';
+import { useTasksContext } from '../../../../context/useTasksContext';
 import BoardCard from '../BoardCard/BoardCard';
 
 const initialColumns = {
-  created: {
-    id: 'created',
-    title: 'Created',
-    taskIds: ['task-1', 'task-2'],
+  'not-started': {
+    id: 'not-started',
+    title: 'Not Started',
+    taskIds: [],
     color: '#00ff80',
   },
-  inProgress: {
-    id: 'inProgress',
+  'in-progress': {
+    id: 'in-progress',
     title: 'In Progress',
-    taskIds: ['task-3'],
+    taskIds: [],
     color: '#FF9800',
   },
   review: {
     id: 'review',
     title: 'Review',
-    taskIds: ['task-4'],
+    taskIds: [],
     color: '#ff001e',
   },
-  done: {
-    id: 'done',
-    title: 'Done',
-    taskIds: ['task-5'],
+  completed: {
+    id: 'completed',
+    title: 'Completed',
+    taskIds: [],
     color: '#8c00ff',
   },
 };
 
-const initialTasks = {
-  'task-1': { id: 'task-1', content: 'Wireframing', stage: 'UX stages', progress: '0/8' },
-  'task-2': { id: 'task-2', content: 'Task 2' },
-  'task-3': { id: 'task-3', content: 'Task 3' },
-  'task-4': { id: 'task-4', content: 'Task 4' },
-  'task-5': { id: 'task-5', content: 'Task 5' },
-};
-
 export default function BoardTable() {
+  const { tasks } = useTasksContext();
+  console.log('🚀  tasks:', tasks);
+  const { colorGradients } = useProjectContext();
   const [columns, setColumns] = useState(initialColumns);
-  const [tasks, setTasks] = useState(initialTasks);
   const [containerHeight, setContainerHeight] = useState('100vh');
   const containerRef = useRef(null);
 
@@ -59,8 +55,69 @@ export default function BoardTable() {
     return () => window.removeEventListener('resize', updateHeight);
   }, []);
 
+  useEffect(() => {
+    const newColumns = { ...initialColumns };
+    tasks.forEach((task) => {
+      if (newColumns[task.status]) {
+        newColumns[task.status].taskIds.push(task._id);
+      }
+    });
+    setColumns(newColumns);
+  }, [tasks]);
+
   const onDragEnd = (result) => {
-    // ... (keep the existing onDragEnd logic)
+    const { destination, source, draggableId } = result;
+
+    if (!destination) {
+      return;
+    }
+
+    if (destination.droppableId === source.droppableId && destination.index === source.index) {
+      return;
+    }
+
+    const start = columns[source.droppableId];
+    const finish = columns[destination.droppableId];
+
+    if (start === finish) {
+      const newTaskIds = Array.from(start.taskIds);
+      newTaskIds.splice(source.index, 1);
+      newTaskIds.splice(destination.index, 0, draggableId);
+
+      const newColumn = {
+        ...start,
+        taskIds: newTaskIds,
+      };
+
+      const newColumns = {
+        ...columns,
+        [newColumn.id]: newColumn,
+      };
+
+      setColumns(newColumns);
+    } else {
+      const startTaskIds = Array.from(start.taskIds);
+      startTaskIds.splice(source.index, 1);
+      const newStart = {
+        ...start,
+        taskIds: startTaskIds,
+      };
+
+      const finishTaskIds = Array.from(finish.taskIds);
+      finishTaskIds.splice(destination.index, 0, draggableId);
+      const newFinish = {
+        ...finish,
+        taskIds: finishTaskIds,
+      };
+
+      const newColumns = {
+        ...columns,
+        [newStart.id]: newStart,
+        [newFinish.id]: newFinish,
+      };
+
+      setColumns(newColumns);
+    }
   };
 
   return (
@@ -148,9 +205,9 @@ export default function BoardTable() {
                   }}
                 >
                   {column.taskIds.map((taskId, index) => {
-                    const task = tasks[taskId];
+                    const task = tasks.find((t) => t._id === taskId);
                     return (
-                      <Draggable key={task.id} draggableId={task.id} index={index}>
+                      <Draggable key={taskId} draggableId={taskId} index={index}>
                         {(provided, snapshot) => (
                           <div
                             ref={provided.innerRef}
@@ -160,7 +217,13 @@ export default function BoardTable() {
                               ...provided.draggableProps.style,
                             }}
                           >
-                            <BoardCard task={task} />
+                            <BoardCard
+                              task={task}
+                              colorGradients={colorGradients}
+                              onEditTask={() => {
+                                console.log('edit task');
+                              }}
+                            />
                           </div>
                         )}
                       </Draggable>

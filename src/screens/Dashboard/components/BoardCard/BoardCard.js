@@ -1,13 +1,27 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+import { CiClock2 } from 'react-icons/ci';
+import { FaCheck, FaPause, FaPlay } from 'react-icons/fa';
 import { FiTrash } from 'react-icons/fi';
 
-const BoardCard = () => {
+const BoardCard = ({ task, onEditTask, colorGradients }) => {
+  console.log('🚀  task:', task);
   const [isHovered, setIsHovered] = useState(false);
 
   const handleDelete = () => {
     toast.success('Coming soon!');
   };
+
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes
+      .toString()
+      .padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  if (!task) return null;
 
   return (
     <div
@@ -24,6 +38,7 @@ const BoardCard = () => {
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => onEditTask(task._id)}
     >
       {isHovered && (
         <div
@@ -33,15 +48,18 @@ const BoardCard = () => {
             right: '8px',
             cursor: 'pointer',
           }}
-          onClick={handleDelete}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDelete();
+          }}
         >
           <FiTrash color='#c9c9c9' />
         </div>
       )}
       <div
         style={{
-          backgroundColor: '#FFF3E0',
-          color: '#FF9800',
+          backgroundColor: colorGradients[0],
+          color: '#FFFFFF',
           padding: '6px 12px',
           borderRadius: '16px',
           fontSize: '13px',
@@ -50,14 +68,13 @@ const BoardCard = () => {
           fontWeight: 500,
         }}
       >
-        UX stages
+        {task.category || 'Uncategorized'}
       </div>
       <div style={{ fontSize: '16px', fontWeight: 400, marginBottom: '8px', color: '#16213a' }}>
-        Wireframing
+        {task.name}
       </div>
       <div style={{ fontSize: '14px', color: '#666', marginBottom: '12px' }}>
-        Create low-fidelity designs that outline the basic structure and layout of the product or
-        service...
+        {task.description || 'No description'}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', color: '#aeb2c2' }}>
         <div
@@ -74,10 +91,9 @@ const BoardCard = () => {
           }}
         >
           <span style={{ marginRight: '4px' }}>☰</span>
-          0/8
+          {task.status}
         </div>
       </div>
-      {/* line across */}
       <div style={{ borderBottom: '1px solid #c5c9d9', margin: '8px -16px' }} />
       <div
         style={{
@@ -96,50 +112,33 @@ const BoardCard = () => {
           }}
         >
           <div style={{ display: 'flex', marginRight: '8px' }}>
-            {['#87deb8', '#2d1ed2', '#cd3fb8'].map((color, index) => (
-              <div
-                key={index}
-                style={{
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '50%',
-                  backgroundColor: color,
-                  border: '2px solid white',
-                  marginLeft: index > 0 ? '-8px' : '0',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  fontSize: '10px',
-                  fontWeight: 'bold',
-                  color: 'white',
-                }}
-              >
-                A
-              </div>
-            ))}
             <div
               style={{
                 width: '24px',
                 height: '24px',
                 borderRadius: '50%',
-                backgroundColor: '#6200EA',
-                color: 'white',
-                fontSize: '10px',
+                backgroundColor: colorGradients[0],
+                border: '2px solid white',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                marginLeft: '-8px',
-                border: '2px solid white',
-                fontWeight: 500,
+                fontSize: '10px',
+                fontWeight: 'bold',
+                color: 'white',
               }}
             >
-              +2
+              {task.assignee?.name?.[0].toUpperCase() || 'U'}
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', fontSize: '12px', color: '#666' }}>
-            <span style={{ marginRight: '8px' }}>👁 2</span>
-            <span style={{ marginRight: '8px' }}>💬 0</span>
-            <span>🔗 0</span>
+            <span style={{ marginRight: '8px', display: 'flex', alignItems: 'center' }}>
+              <CiClock2 style={{ marginRight: '4px' }} />
+              {formatTime(task.timerState.remainingTime)}
+            </span>
+            <span style={{ marginRight: '8px' }}>
+              {task.timerState.isActive ? <FaPause /> : <FaPlay />}
+            </span>
+            <span>{task.status === 'completed' ? <FaCheck /> : null}</span>
           </div>
         </div>
       </div>
