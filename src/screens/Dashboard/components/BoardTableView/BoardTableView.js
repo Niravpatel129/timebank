@@ -11,6 +11,21 @@ import { FaPlus } from 'react-icons/fa6';
 import { useProjectContext } from '../../../../context/useProjectContext';
 import { useTasksContext } from '../../../../context/useTasksContext';
 
+const getboardOrderName = (boardOrder) => {
+  switch (boardOrder) {
+    case '0':
+      return 'not started';
+    case '1':
+      return 'in progress';
+    case '2':
+      return 'review';
+    case '3':
+      return 'completed';
+    default:
+      return 'Tasks';
+  }
+};
+
 const TableView = () => {
   const { tasks, updateTask } = useTasksContext();
   const { colorGradients } = useProjectContext();
@@ -54,8 +69,8 @@ const TableView = () => {
               height: '100%',
             }}
           />
-          <span style={{ fontWeight: 500, fontSize: '15px' }}>
-            Tasks (Board Order: {boardOrder})
+          <span style={{ fontWeight: 500, fontSize: '15px', textTransform: 'capitalize' }}>
+            {getboardOrderName(boardOrder)}
           </span>
           <span
             style={{
