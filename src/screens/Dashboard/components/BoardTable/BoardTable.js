@@ -246,6 +246,13 @@ export default function BoardTable() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
+                        whileHover={{
+                          opacity: 0.9,
+                          scale: 1.01,
+                        }}
+                        whileTap={{
+                          scale: 0.99,
+                        }}
                         style={{
                           padding: '16px 16px',
                           backgroundColor: '#ffffff',
