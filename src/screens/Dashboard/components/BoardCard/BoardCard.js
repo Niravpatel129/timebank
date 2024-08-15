@@ -3,12 +3,15 @@ import toast from 'react-hot-toast';
 import { CiClock2 } from 'react-icons/ci';
 import { FaCheck, FaPause, FaPlay } from 'react-icons/fa';
 import { FiTrash } from 'react-icons/fi';
+import { useTasksContext } from '../../../../context/useTasksContext';
 
 const BoardCard = ({ task, onEditTask, colorGradients }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const { deleteTask } = useTasksContext();
 
   const handleDelete = () => {
     toast.success('Coming soon!');
+    deleteTask(task._id);
   };
 
   const formatTime = (seconds) => {
