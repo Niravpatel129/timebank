@@ -1,5 +1,6 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import newRequest from '../api/newReqest';
 import { useUserContext } from './useUserContext';
 
@@ -8,107 +9,108 @@ const ProjectContext = createContext();
 export const useProjectContext = () => useContext(ProjectContext);
 
 export const ProjectProvider = ({ children }) => {
-  const [projects, setProjects] = useState([]);
-  const { user } = useUserContext();
   const [selectedProject, setSelectedProject] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newProjectName, setNewProjectName] = useState('');
+  const { user } = useUserContext();
+  const queryClient = useQueryClient();
+
   const colorGradients = [
     selectedProject?.projectColor?.gradient1 || '',
     selectedProject?.projectColor?.gradient2 || '',
   ];
 
+  const { data: projects = [] } = useQuery(
+    'projects',
+    async () => {
+      const response = await newRequest.get('/projects');
+      return response;
+    },
+    {
+      onSuccess: (data) => {
+        const storedSelectedProjectId = localStorage.getItem('selectedProjectId');
+        if (storedSelectedProjectId && data.length > 0) {
+          const project = data.find((p) => p._id === storedSelectedProjectId);
+          if (project) {
+            setSelectedProject(project);
+          } else {
+            setSelectedProject(data[0]);
+            localStorage.setItem('selectedProjectId', data[0]._id);
+          }
+        } else if (data.length > 0) {
+          setSelectedProject(data[0]);
+          localStorage.setItem('selectedProjectId', data[0]._id);
+        }
+      },
+      enabled: !!user,
+    },
+  );
+
   const members = useMemo(() => {
     return selectedProject?.members?.map((member) => member.user?.name);
   }, [selectedProject]);
 
-  useEffect(() => {
-    fetchProjects();
-  }, [user]);
-
-  useEffect(() => {
-    const storedSelectedProjectId = localStorage.getItem('selectedProjectId');
-    if (storedSelectedProjectId && projects.length > 0) {
-      const project = projects.find((p) => p._id === storedSelectedProjectId);
-      if (project) {
-        setSelectedProject(project);
-      } else {
-        setSelectedProject(projects[0]);
-        localStorage.setItem('selectedProjectId', projects[0]._id);
-      }
-    } else if (projects.length > 0) {
-      setSelectedProject(projects[0]);
-      localStorage.setItem('selectedProjectId', projects[0]._id);
-    }
-  }, [projects]);
-
-  const fetchProjects = useCallback(async () => {
-    try {
-      const response = await newRequest.get('/projects');
-      setProjects(response);
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-    }
-  }, []);
-
-  const addProject = useCallback(
+  const addProjectMutation = useMutation(
     async (projectData) => {
-      try {
-        if (projects.length >= 7) {
-          toast.error('Maximum of 7 projects allowed');
-          return;
-        }
-
-        const response = await newRequest.post('/projects', projectData);
-        setProjects((prevProjects) => [...prevProjects, response]);
-        // update the selected project
-        setSelectedProject(response);
-
-        toast.success('Project created successfully');
-        return response;
-      } catch (error) {
-        console.error('Error adding project:', error);
-        throw error;
+      if (projects.length >= 7) {
+        throw new Error('Maximum of 7 projects allowed');
       }
+      const response = await newRequest.post('/projects', projectData);
+      return response;
     },
-    [projects],
+    {
+      onSuccess: (response) => {
+        queryClient.setQueryData('projects', (oldData) => [...oldData, response]);
+        setSelectedProject(response);
+        toast.success('Project created successfully');
+      },
+      onError: (error) => {
+        console.error('Error adding project:', error);
+        toast.error(error.message);
+      },
+    },
   );
 
-  const updateProject = useCallback(async (projectId, updatedData) => {
-    try {
+  const updateProjectMutation = useMutation(
+    async ({ projectId, updatedData }) => {
       const response = await newRequest.put(`/projects/${projectId}`, updatedData);
-      setProjects((prevProjects) =>
-        prevProjects.map((project) => (project._id === projectId ? response : project)),
-      );
       return response;
-    } catch (error) {
-      console.error('Error updating project:', error);
-      throw error;
-    }
-  }, []);
+    },
+    {
+      onSuccess: (response) => {
+        queryClient.setQueryData('projects', (oldData) =>
+          oldData.map((project) => (project._id === response._id ? response : project)),
+        );
+      },
+      onError: (error) => {
+        console.error('Error updating project:', error);
+      },
+    },
+  );
 
-  const deleteProject = useCallback(
+  const deleteProjectMutation = useMutation(
     async (projectId) => {
-      try {
-        if (projects.length <= 1) {
-          toast.error('Cannot delete the last project');
-          return;
-        }
-
-        await newRequest.delete(`/projects/${projectId}`);
-        setProjects((prevProjects) => prevProjects.filter((project) => project._id !== projectId));
-
-        if (selectedProject && selectedProject._id === projectId) {
-          const newSelectedProject = projects.find((p) => p._id !== projectId);
+      if (projects.length <= 1) {
+        throw new Error('Cannot delete the last project');
+      }
+      await newRequest.delete(`/projects/${projectId}`);
+      return projectId;
+    },
+    {
+      onSuccess: (deletedProjectId) => {
+        queryClient.setQueryData('projects', (oldData) =>
+          oldData.filter((project) => project._id !== deletedProjectId),
+        );
+        if (selectedProject && selectedProject._id === deletedProjectId) {
+          const newSelectedProject = projects.find((p) => p._id !== deletedProjectId);
           setSelectedProject(newSelectedProject);
           localStorage.setItem('selectedProjectId', newSelectedProject._id);
         }
-      } catch (error) {
+      },
+      onError: (error) => {
         console.error('Error deleting project:', error);
-        throw error;
-      }
+        toast.error(error.message);
+      },
     },
-    [projects, selectedProject],
   );
 
   const setSelectedProjectAndSave = useCallback((project) => {
@@ -121,15 +123,14 @@ export const ProjectProvider = ({ children }) => {
 
   const value = {
     projects,
-    fetchProjects,
-    updateProject,
-    deleteProject,
+    addProject: addProjectMutation.mutate,
+    updateProject: updateProjectMutation.mutate,
+    deleteProject: deleteProjectMutation.mutate,
     selectedProject,
     setSelectedProject: setSelectedProjectAndSave,
     openModal,
     isModalOpen,
     closeModal,
-    addProject,
     members,
     colorGradients,
   };

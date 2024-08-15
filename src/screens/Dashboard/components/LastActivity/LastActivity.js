@@ -128,7 +128,7 @@ export default function LastActivity({ colorGradients }) {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 10 }}
               transition={{ duration: 0.2 }}
-              style={{ fontSize: '14px', color: '#8f8f9d' }}
+              style={{ fontSize: '1px', color: '#8f8f9d' }}
             >
               {filter.charAt(0).toUpperCase() + filter.slice(1)}
             </motion.span>
@@ -170,16 +170,17 @@ export default function LastActivity({ colorGradients }) {
                 <div
                   style={{
                     color: colorGradients[0],
-                    fontSize: '16px',
+                    fontSize: '14px',
                     fontWeight: 400,
                     display: 'flex',
                     alignItems: 'center',
+                    textWrap: 'nowrap',
                   }}
                 >
                   <span
                     style={{
                       marginRight: '5px',
-                      fontSize: '16px',
+                      fontSize: '12px',
                       paddingTop: '2px',
                       color: '#cbccd5',
                     }}
