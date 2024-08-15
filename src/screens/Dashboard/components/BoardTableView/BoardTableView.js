@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { FaSort, FaSortDown, FaSortUp } from 'react-icons/fa';
+import { BiPlus } from 'react-icons/bi';
+import {
+  FaRegChartBar,
+  FaRegClipboard,
+  FaRegClock,
+  FaRegFlag,
+  FaRegUserCircle,
+} from 'react-icons/fa';
 import { FaPlus } from 'react-icons/fa6';
 import { useProjectContext } from '../../../../context/useProjectContext';
 import { useTasksContext } from '../../../../context/useTasksContext';
@@ -9,51 +16,18 @@ const TableView = () => {
   const { colorGradients } = useProjectContext();
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
-  const sortedTasks = React.useMemo(() => {
-    let sortableTasks = [...tasks];
-    if (sortConfig.key !== null) {
-      sortableTasks.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-    return sortableTasks;
-  }, [tasks, sortConfig]);
-
-  const requestSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
-  };
-
-  const getSortIcon = (columnName) => {
-    if (sortConfig.key === columnName) {
-      return sortConfig.direction === 'ascending' ? <FaSortUp /> : <FaSortDown />;
-    }
-    return <FaSort />;
-  };
-
   const renderHeader = () => {
     return (
       <div
         style={{
           display: 'flex',
           flexDirection: 'row',
-          backgroundColor: '#fff',
-          // width: '100%',
+          backgroundColor: '#f5f7fb',
           padding: '10px',
           overflow: 'hidden',
-          borderRadius: '5px',
+          borderRadius: '7px',
           color: '#191731',
           alignItems: 'center',
-          // height: '18px',
           justifyContent: 'space-between',
         }}
       >
@@ -77,9 +51,6 @@ const TableView = () => {
               marginLeft: '10px',
               gap: '5px',
               backgroundColor: '#e7e8fb',
-              // padding: '5px',
-              display: 'flex',
-              alignItems: 'center',
               justifyContent: 'center',
               width: '20px',
               height: '20px',
@@ -105,68 +76,110 @@ const TableView = () => {
     );
   };
 
+  const renderTableContentRow = () => {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          borderBottom: '1px solid #e0e0e0',
+          color: '#484560',
+          fontWeight: 500,
+          fontSize: '14px',
+        }}
+      >
+        <div style={{ width: '40px', padding: '10px', borderRight: '1px solid #e0e0e0' }}>
+          <input type='checkbox' />
+        </div>
+        <div style={{ flex: 2, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
+          Do something
+        </div>
+        <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
+          some estimation
+        </div>
+        <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
+          some status
+        </div>
+        <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
+          some people
+        </div>
+        <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
+          some priority
+        </div>
+        <div style={{ width: '40px', padding: '10px' }}>...</div>
+      </div>
+    );
+  };
+
+  const renderTable = () => {
+    return (
+      <div>
+        {renderTableHeading()}
+        {renderTableContents()}
+      </div>
+    );
+  };
+
+  const renderTableHeading = () => {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          borderBottom: '1px solid #e0e0e0',
+          backgroundColor: '#f9f9f9',
+        }}
+      >
+        <div style={{ width: '40px', padding: '10px' }}>
+          <input type='checkbox' />
+        </div>
+        <div style={{ flex: 2, padding: '10px' }}>
+          <FaRegClipboard /> Task Name
+        </div>
+        <div style={{ flex: 1, padding: '10px' }}>
+          <FaRegClock /> Task Estimation
+        </div>
+        <div style={{ flex: 1, padding: '10px' }}>
+          <FaRegChartBar /> Task Status
+        </div>
+        <div style={{ flex: 1, padding: '10px' }}>
+          <FaRegUserCircle /> Task People
+        </div>
+        <div style={{ flex: 1, padding: '10px' }}>
+          <FaRegFlag /> Priority
+        </div>
+        <div style={{ width: '40px', padding: '10px' }}>
+          <BiPlus />
+        </div>
+      </div>
+    );
+  };
+
+  const renderTableContents = () => {
+    return (
+      <div>
+        {renderTableContentRow()}
+        {renderTableContentRow()}
+        {renderTableContentRow()}
+      </div>
+    );
+  };
+
   return (
-    <div style={{ overflowX: 'auto', width: '100%' }}>
-      {renderHeader()}
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #dee2e6' }}>
-            <th onClick={() => requestSort('name')} style={tableHeaderStyle}>
-              Task Name {getSortIcon('name')}
-            </th>
-            <th onClick={() => requestSort('status')} style={tableHeaderStyle}>
-              Status {getSortIcon('status')}
-            </th>
-            <th onClick={() => requestSort('category')} style={tableHeaderStyle}>
-              Category {getSortIcon('category')}
-            </th>
-            <th onClick={() => requestSort('assignee')} style={tableHeaderStyle}>
-              Assignee {getSortIcon('assignee')}
-            </th>
-            <th onClick={() => requestSort('timerState.remainingTime')} style={tableHeaderStyle}>
-              Time Remaining {getSortIcon('timerState.remainingTime')}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedTasks.map((task) => (
-            <tr key={task._id} style={{ borderBottom: '1px solid #dee2e6' }}>
-              <td style={tableCellStyle}>{task.name}</td>
-              <td style={tableCellStyle}>
-                <span style={getStatusStyle(task.status)}>{task.status}</span>
-              </td>
-              <td style={tableCellStyle}>
-                <span style={getCategoryStyle(task.category, colorGradients)}>{task.category}</span>
-              </td>
-              <td style={tableCellStyle}>{task.assignee?.name || 'Unassigned'}</td>
-              <td style={tableCellStyle}>{formatTime(task.timerState.remainingTime)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div style={{ overflowX: 'auto', width: '100%', color: '#484560' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
+          {renderHeader()}
+          {renderTable()}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
+          {renderHeader()}
+          {renderTable()}
+        </div>
+      </div>
     </div>
   );
 };
-
-const tableHeaderStyle = {
-  padding: '12px 15px',
-  textAlign: 'left',
-  fontWeight: 'bold',
-  cursor: 'pointer',
-};
-
-const tableCellStyle = {
-  padding: '12px 15px',
-};
-
-const getStatusStyle = (status) => ({
-  padding: '4px 8px',
-  borderRadius: '4px',
-  fontSize: '12px',
-  fontWeight: 'bold',
-  backgroundColor: getStatusColor(status),
-  color: '#fff',
-});
 
 const getStatusColor = (status) => {
   switch (status) {
@@ -181,24 +194,6 @@ const getStatusColor = (status) => {
     default:
       return '#gray';
   }
-};
-
-const getCategoryStyle = (category, colorGradients) => ({
-  padding: '4px 8px',
-  borderRadius: '4px',
-  fontSize: '12px',
-  fontWeight: 'bold',
-  backgroundColor: colorGradients[0],
-  color: '#fff',
-});
-
-const formatTime = (seconds) => {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const remainingSeconds = seconds % 60;
-  return `${hours.toString().padStart(2, '0')}:${minutes
-    .toString()
-    .padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
 export default TableView;

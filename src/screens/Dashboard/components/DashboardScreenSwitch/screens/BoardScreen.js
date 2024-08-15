@@ -18,7 +18,13 @@ export default function BoardScreen() {
       <div style={{ padding: '20px', paddingBottom: '0px' }}>
         <BoardingHeader setSelectedView={setSelectedView} selectedView={selectedView} />
       </div>
-      <div style={{ backgroundColor: '#f7f7f7', padding: '20px', flex: 1 }}>
+      <div
+        style={{
+          backgroundColor: selectedView !== 'table' ? '#f7f7f7' : '#fff',
+          padding: '20px',
+          flex: 1,
+        }}
+      >
         {selectedView === 'board' && <BoardKanban />}
         {selectedView === 'table' && <BoardTableView />}
         {selectedView === 'matrix' && <BoardMatrix />}
