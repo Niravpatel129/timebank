@@ -33,7 +33,7 @@ const initialColumns = {
   },
 };
 
-export default function BoardTable() {
+export default function BoardKanban() {
   const { tasks, updateTask } = useTasksContext();
   const { colorGradients } = useProjectContext();
   const [columns, setColumns] = useState(initialColumns);

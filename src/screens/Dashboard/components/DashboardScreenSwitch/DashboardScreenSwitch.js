@@ -20,17 +20,6 @@ const DashboardScreenSwitch = (props) => {
     default:
       return <ListScreen />;
   }
-
-  return (
-    <>
-      <ListScreen
-        setAddTaskModalOpen={setAddTaskModalOpen}
-        setIsInviteModalOpen={setIsInviteModalOpen}
-        setIsNotificationModalOpen={setIsNotificationModalOpen}
-        handleEditTask={handleEditTask}
-      />
-    </>
-  );
 };
 
 export default DashboardScreenSwitch;

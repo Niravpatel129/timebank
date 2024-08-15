@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import BoardingHeader from '../../BoardHeader/BoardHeader';
+import BoardKanban from '../../BoardKanban/BoardKanban';
 import BoardMatrix from '../../BoardMatrix/BoardMatrix';
-import BoardTable from '../../BoardTable/BoardTable';
 import BoardTableView from '../../BoardTableView/BoardTableView';
 export default function BoardScreen() {
   const [selectedView, setSelectedView] = useState('board');
@@ -18,7 +18,7 @@ export default function BoardScreen() {
         <BoardingHeader setSelectedView={setSelectedView} selectedView={selectedView} />
       </div>
       <div style={{ backgroundColor: '#f7f7f7', padding: '20px', flex: 1 }}>
-        {selectedView === 'board' && <BoardTable />}
+        {selectedView === 'board' && <BoardKanban />}
         {selectedView === 'table' && <BoardTableView />}
         {selectedView === 'matrix' && <BoardMatrix />}
       </div>
