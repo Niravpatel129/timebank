@@ -5,7 +5,7 @@ import { FaTimes } from 'react-icons/fa';
 import newRequest from '../api/newReqest';
 import { useProjectContext } from '../context/useProjectContext';
 
-const TeamInviteModal = ({ isOpen, onClose }) => {
+const DashboardInviteModal = ({ isOpen, onClose }) => {
   const { selectedProject } = useProjectContext();
   const [inviteEmail, setInviteEmail] = useState('');
   const [pendingInvites, setPendingInvites] = useState([]);
@@ -458,4 +458,4 @@ const TeamInviteModal = ({ isOpen, onClose }) => {
   );
 };
 
-export default React.memo(TeamInviteModal);
+export default React.memo(DashboardInviteModal);

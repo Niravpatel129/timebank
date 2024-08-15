@@ -6,7 +6,8 @@ export const ModalsProvider = ({ children }) => {
   const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
   const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const openCreateTaskModal = () => setIsCreateTaskModalOpen(true);
   const closeCreateTaskModal = () => setIsCreateTaskModalOpen(false);
 
@@ -29,6 +30,10 @@ export const ModalsProvider = ({ children }) => {
         openEditTaskModal,
         closeEditTaskModal,
         selectedTask,
+        isInviteModalOpen,
+        setIsInviteModalOpen,
+        isNotificationModalOpen,
+        setIsNotificationModalOpen,
       }}
     >
       {children}

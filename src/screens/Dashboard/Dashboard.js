@@ -36,8 +36,7 @@ const Dashboard = () => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isIntroModalOpen, setIsIntroModalOpen] = useState(false);
   const profileDropdownRef = useRef(null);
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
+  // const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const [selectedDashboardScreen, setSelectedDashboardScreen] = useState('list');
   const {
     isCreateTaskModalOpen,
@@ -47,6 +46,10 @@ const Dashboard = () => {
     openEditTaskModal,
     closeEditTaskModal,
     selectedTask,
+    isInviteModalOpen,
+    setIsInviteModalOpen,
+    isNotificationModalOpen,
+    setIsNotificationModalOpen,
   } = useModalsContext();
   const { logout } = useUserContext();
   const {

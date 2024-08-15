@@ -1,9 +1,10 @@
 import React from 'react';
 import { IoNotificationsOutline } from 'react-icons/io5';
+import { useModalsContext } from '../../../../context/useModalsContext';
 import { useProjectContext } from '../../../../context/useProjectContext';
 import { useTasksContext } from '../../../../context/useTasksContext';
 
-const Header = () => (
+const Header = ({ setIsNotificationModalOpen, setIsInviteModalOpen }) => (
   <div
     style={{
       display: 'flex',
@@ -38,6 +39,7 @@ const Header = () => (
     </div>
     <div style={{ display: 'flex', alignItems: 'center' }}>
       <IoNotificationsOutline
+        onClick={() => setIsNotificationModalOpen(true)}
         style={{
           marginRight: '15px',
           fontSize: '20px',
@@ -64,7 +66,7 @@ const Header = () => (
   </div>
 );
 
-const ProjectHeader = ({ setSelectedView, selectedView }) => {
+const ProjectHeader = ({ setSelectedView, selectedView, setIsInviteModalOpen }) => {
   const { selectedProject } = useProjectContext();
   const { tasks } = useTasksContext();
 
@@ -150,7 +152,7 @@ const ProjectHeader = ({ setSelectedView, selectedView }) => {
         <div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <MemberAvatars />
-            <AddMemberButton />
+            <AddMemberButton setIsInviteModalOpen={setIsInviteModalOpen} />
           </div>
         </div>
       </div>
@@ -222,8 +224,9 @@ const Navigation = ({ setSelectedView, selectedView }) => (
   </div>
 );
 
-const AddMemberButton = () => (
+const AddMemberButton = ({ setIsInviteModalOpen }) => (
   <button
+    onClick={() => setIsInviteModalOpen(true)}
     style={{
       backgroundColor: '#4285f4',
       color: 'white',
@@ -242,7 +245,7 @@ const AddMemberButton = () => (
 );
 
 const BoardingHeader = ({ setSelectedView, selectedView }) => {
-  const { selectedProject } = useProjectContext();
+  const { setIsNotificationModalOpen, setIsInviteModalOpen } = useModalsContext();
 
   return (
     <div
@@ -252,8 +255,15 @@ const BoardingHeader = ({ setSelectedView, selectedView }) => {
         backgroundColor: '#fff',
       }}
     >
-      <Header />
-      <ProjectHeader setSelectedView={setSelectedView} selectedView={selectedView} />
+      <Header
+        setIsNotificationModalOpen={setIsNotificationModalOpen}
+        setIsInviteModalOpen={setIsInviteModalOpen}
+      />
+      <ProjectHeader
+        setSelectedView={setSelectedView}
+        selectedView={selectedView}
+        setIsInviteModalOpen={setIsInviteModalOpen}
+      />
     </div>
   );
 };
