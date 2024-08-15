@@ -268,7 +268,7 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
       <form onSubmit={handleSubmit}>
         {renderInputField(
           'taskName',
-          'Add task',
+          'Task name',
           taskData.taskName,
           (value) => handleInputChange('taskName', value),
           'Morning check-in',
