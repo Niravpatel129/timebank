@@ -169,7 +169,7 @@ const Navigation = () => (
       paddingRight: '20px', // Add padding to maintain content alignment
     }}
   >
-    {['Overview', 'Tasks', 'Notes', 'Questions'].map((item, index) => (
+    {['Board', 'Table', 'List'].map((item, index) => (
       <div
         key={index}
         style={{
