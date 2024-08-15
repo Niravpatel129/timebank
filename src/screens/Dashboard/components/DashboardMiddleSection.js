@@ -517,7 +517,14 @@ export default function DashboardComponent({
           >
             {/* button here to toggle hide completed tasks */}
 
-            <div style={{ ...commonStyles.flexContainer, gap: '20px' }}>
+            <div
+              style={{
+                ...commonStyles.flexContainer,
+                gap: '20px',
+                textWrap: 'nowrap',
+                textTransform: 'capitalize',
+              }}
+            >
               {['All Tasks', `${user?.name}'s Tasks`].map((text, index) => (
                 <motion.div
                   key={index}
