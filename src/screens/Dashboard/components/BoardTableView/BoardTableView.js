@@ -1,12 +1,13 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useMemo, useState } from 'react';
-import { BiPlus } from 'react-icons/bi';
+import { BiDotsVerticalRounded, BiPlus } from 'react-icons/bi';
 import {
   FaRegChartBar,
   FaRegClipboard,
   FaRegClock,
   FaRegFlag,
   FaRegUserCircle,
+  FaTrash,
 } from 'react-icons/fa';
 import { useProjectContext } from '../../../../context/useProjectContext';
 import { useTasksContext } from '../../../../context/useTasksContext';
@@ -27,10 +28,11 @@ const getboardOrderName = (boardOrder) => {
 };
 
 const TableView = () => {
-  const { tasks, updateTask } = useTasksContext();
+  const { tasks, updateTask, deleteTask } = useTasksContext();
   const { colorGradients } = useProjectContext();
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [expandedSections, setExpandedSections] = useState({});
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   const groupedTasks = useMemo(() => {
     const grouped = tasks.reduce((acc, task) => {
@@ -58,6 +60,15 @@ const TableView = () => {
       ...prev,
       [boardOrder]: !prev[boardOrder],
     }));
+  };
+
+  const toggleDropdown = (taskId) => {
+    setOpenDropdown(openDropdown === taskId ? null : taskId);
+  };
+
+  const handleDeleteTask = (taskId) => {
+    deleteTask(taskId);
+    setOpenDropdown(null);
   };
 
   const renderHeader = (boardOrder, tasksCount) => {
@@ -150,17 +161,6 @@ const TableView = () => {
       >
         <div
           style={{
-            width: '20px',
-            padding: '10px',
-            borderRight: '1px solid #f4f3f6',
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          <input type='checkbox' />
-        </div>
-        <div
-          style={{
             flex: 2,
             padding: '10px',
             borderRight: '1px solid #f4f3f6',
@@ -215,8 +215,48 @@ const TableView = () => {
         >
           {renderPriorityBadge(task.taskPriority)}
         </div>
-        <div style={{ width: '40px', padding: '10px', display: 'flex', alignItems: 'center' }}>
-          ...
+        <div
+          style={{
+            width: '40px',
+            padding: '10px',
+            display: 'flex',
+            alignItems: 'center',
+            position: 'relative',
+          }}
+        >
+          <BiDotsVerticalRounded
+            style={{ cursor: 'pointer' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleDropdown(task._id);
+            }}
+          />
+          {openDropdown === task._id && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '100%',
+                right: '0',
+                backgroundColor: 'white',
+                boxShadow: '0px 8px 16px 0px rgba(0,0,0,0.2)',
+                zIndex: 1,
+                borderRadius: '4px',
+                padding: '8px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  padding: '4px',
+                }}
+                onClick={() => handleDeleteTask(task._id)}
+              >
+                <FaTrash style={{ marginRight: '8px' }} /> Delete
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
     );
@@ -252,11 +292,11 @@ const TableView = () => {
           flexDirection: 'row',
           borderBottom: '1px solid #f4f3f6',
           marginTop: '10px',
+          fontWeight: 500,
+          fontSize: '14px',
+          color: '#848590',
         }}
       >
-        <div style={{ width: '20px', padding: '10px' }}>
-          <input type='checkbox' />
-        </div>
         <div style={{ flex: 2, padding: '10px' }}>
           <FaRegClipboard /> Task Name
         </div>
@@ -280,10 +320,10 @@ const TableView = () => {
   };
 
   const renderPriorityBadge = (priority) => {
-    const priorityColors = {
-      1: '#00C853',
-      2: '#FFA000',
-      3: '#D50000',
+    const priorityGradients = {
+      1: 'linear-gradient(135deg, #00C853, #4CAF50)',
+      2: 'linear-gradient(135deg, #FFA000, #FF6F00)',
+      3: 'linear-gradient(135deg, #D50000, #B71C1C)',
     };
 
     const priorityLabels = {
@@ -295,16 +335,31 @@ const TableView = () => {
     return (
       <span
         style={{
-          backgroundColor: priorityColors[priority] || '#757575',
+          background: priorityGradients[priority] || 'linear-gradient(135deg, #757575, #424242)',
           color: 'white',
-          padding: '2px 8px',
-          borderRadius: '12px',
+          padding: '2px 8px 2px 20px',
+          borderRadius: '4px',
           fontSize: '12px',
           fontWeight: 'bold',
           textTransform: 'capitalize',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          position: 'relative',
         }}
       >
-        {priorityLabels[priority] || 'Unknown'}
+        <span
+          style={{
+            content: '""',
+            position: 'absolute',
+            left: '8px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '4px',
+            height: '4px',
+            borderRadius: '50%',
+            backgroundColor: 'white',
+          }}
+        />
+        {priorityLabels[priority] || 'Not Set'}
       </span>
     );
   };
