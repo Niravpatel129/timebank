@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { CiClock2 } from 'react-icons/ci';
-import { FaCheck, FaPause, FaPlay } from 'react-icons/fa';
+import { FaCheck, FaFire, FaPause, FaPlay } from 'react-icons/fa';
 import { FiTrash } from 'react-icons/fi';
+import { Tooltip } from 'react-tooltip';
 import { useTasksContext } from '../../../../context/useTasksContext';
 
 const BoardCard = ({ task, onEditTask, colorGradients }) => {
@@ -21,6 +22,16 @@ const BoardCard = ({ task, onEditTask, colorGradients }) => {
     return `${hours.toString().padStart(2, '0')}:${minutes
       .toString()
       .padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  const getPriorityLabel = (priority) => {
+    const priorityLabels = {
+      3: 'High',
+      2: 'Medium',
+      1: 'Low',
+      0: 'None',
+    };
+    return priorityLabels[priority];
   };
 
   if (!task) return null;
@@ -42,22 +53,48 @@ const BoardCard = ({ task, onEditTask, colorGradients }) => {
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => onEditTask(task._id)}
     >
-      {isHovered && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '8px',
-            right: '8px',
-            cursor: 'pointer',
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleDelete();
-          }}
-        >
-          <FiTrash color='#c9c9c9' />
-        </div>
-      )}
+      <div
+        style={{
+          position: 'absolute',
+          top: '8px',
+          right: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+        }}
+      >
+        {task.taskPriority > 0 && (
+          <div
+            data-tooltip-id={`priority-${task._id}`}
+            data-tooltip-content={getPriorityLabel(task.taskPriority)}
+          >
+            <FaFire
+              color={
+                task.taskPriority === 3
+                  ? '#ff4d4d'
+                  : task.taskPriority === 2
+                  ? '#ffa64d'
+                  : '#ffff4d'
+              }
+              size={16}
+            />
+          </div>
+        )}
+        {isHovered && (
+          <div
+            style={{
+              cursor: 'pointer',
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDelete();
+            }}
+          >
+            <FiTrash color='#c9c9c9' />
+          </div>
+        )}
+      </div>
+      <Tooltip id={`priority-${task._id}`} />
       <div
         style={{
           backgroundColor: colorGradients[0],

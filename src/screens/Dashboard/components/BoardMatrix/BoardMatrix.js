@@ -1,70 +1,94 @@
-import React from 'react';
-import { useProjectContext } from '../../../../context/useProjectContext';
+import React, { useEffect, useState } from 'react';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useTasksContext } from '../../../../context/useTasksContext';
 
 const PriorityMatrixView = () => {
   const { tasks, updateTask } = useTasksContext();
-  const { colorGradients } = useProjectContext();
+  const [localTasks, setLocalTasks] = useState(tasks);
+
+  useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks]);
 
   const matrices = {
-    'urgent-important': { title: 'Urgent & Important', color: '#FF4136' },
-    'not-urgent-important': { title: 'Important, Not Urgent', color: '#FF851B' },
-    'urgent-not-important': { title: 'Urgent, Not Important', color: '#FFDC00' },
-    'not-urgent-not-important': { title: 'Neither Urgent Nor Important', color: '#2ECC40' },
+    'urgent-important': { title: 'Urgent & Important', priority: 3 },
+    'not-urgent-important': { title: 'Important, Not Urgent', priority: 2 },
+    'urgent-not-important': { title: 'Urgent, Not Important', priority: 1 },
+    'not-urgent-not-important': { title: 'Neither Urgent Nor Important', priority: 0 },
   };
 
-  const categorizedTasks = tasks.reduce((acc, task) => {
-    const category = `${task.urgent ? 'urgent' : 'not-urgent'}-${
-      task.important ? 'important' : 'not-important'
-    }`;
-    if (!acc[category]) acc[category] = [];
-    acc[category].push(task);
-    return acc;
-  }, {});
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const newTasks = Array.from(localTasks);
+    const [reorderedItem] = newTasks.splice(result.source.index, 1);
+    newTasks.splice(result.destination.index, 0, reorderedItem);
+
+    setLocalTasks(newTasks);
+    updateTask({
+      ...reorderedItem,
+      taskPriority: matrices[result.destination.droppableId].priority,
+    });
+  };
+
+  const getTasksForQuadrant = (quadrant) => {
+    return localTasks.filter((task) => task.taskPriority === matrices[quadrant].priority);
+  };
 
   const renderQuadrant = (key) => (
     <div style={styles.quadrant} key={key}>
-      <h3 style={{ ...styles.quadrantTitle, backgroundColor: matrices[key].color }}>
-        {matrices[key].title}
-      </h3>
-      <div style={styles.taskList}>
-        {(categorizedTasks[key] || []).map((task) => (
-          <div key={task._id} style={styles.task}>
-            <input
-              type='checkbox'
-              checked={task.status === 'completed'}
-              onChange={() =>
-                updateTask({
-                  ...task,
-                  status: task.status === 'completed' ? 'in-progress' : 'completed',
-                })
-              }
-            />
-            <span
-              style={{
-                marginLeft: '10px',
-                textDecoration: task.status === 'completed' ? 'line-through' : 'none',
-              }}
-            >
-              {task.name}
-            </span>
+      <h3 style={styles.quadrantTitle}>{matrices[key].title}</h3>
+      <Droppable droppableId={key}>
+        {(provided) => (
+          <div {...provided.droppableProps} ref={provided.innerRef} style={styles.taskList}>
+            {getTasksForQuadrant(key).map((task, index) => (
+              <Draggable key={task._id} draggableId={task._id} index={index}>
+                {(provided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    style={{
+                      ...styles.task,
+                      ...provided.draggableProps.style,
+                    }}
+                  >
+                    <input
+                      type='checkbox'
+                      checked={task.status === 'completed'}
+                      onChange={() =>
+                        updateTask({
+                          ...task,
+                          status: task.status === 'completed' ? 'in-progress' : 'completed',
+                        })
+                      }
+                      style={styles.checkbox}
+                    />
+                    <span style={styles.taskText}>{task.name}</span>
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
           </div>
-        ))}
-      </div>
+        )}
+      </Droppable>
     </div>
   );
 
   return (
-    <div style={styles.container}>
-      <div style={styles.row}>
-        {renderQuadrant('urgent-important')}
-        {renderQuadrant('not-urgent-important')}
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div style={styles.container}>
+        <div style={styles.row}>
+          {renderQuadrant('urgent-important')}
+          {renderQuadrant('not-urgent-important')}
+        </div>
+        <div style={styles.row}>
+          {renderQuadrant('urgent-not-important')}
+          {renderQuadrant('not-urgent-not-important')}
+        </div>
       </div>
-      <div style={styles.row}>
-        {renderQuadrant('urgent-not-important')}
-        {renderQuadrant('not-urgent-not-important')}
-      </div>
-    </div>
+    </DragDropContext>
   );
 };
 
@@ -74,31 +98,50 @@ const styles = {
     flexDirection: 'column',
     height: '100%',
     width: '100%',
+    gap: '20px',
   },
   row: {
     display: 'flex',
     flex: 1,
+    gap: '20px',
   },
   quadrant: {
     flex: 1,
-    margin: '10px',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
+    display: 'flex',
+    flexDirection: 'column',
     overflow: 'hidden',
   },
   quadrantTitle: {
-    padding: '10px',
+    padding: '15px',
     margin: 0,
-    color: 'white',
-    textAlign: 'center',
+    backgroundColor: '#f5f5f5',
+    borderBottom: '1px solid #e0e0e0',
+    fontSize: '16px',
+    fontWeight: '500',
   },
   taskList: {
-    padding: '10px',
+    padding: '15px',
+    flex: 1,
+    overflowY: 'auto',
   },
   task: {
-    marginBottom: '5px',
+    marginBottom: '10px',
     display: 'flex',
     alignItems: 'center',
+    padding: '10px',
+    backgroundColor: '#fff',
+    borderRadius: '4px',
+    boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+  },
+  checkbox: {
+    marginRight: '10px',
+  },
+  taskText: {
+    flex: 1,
+    fontSize: '14px',
   },
 };
 
