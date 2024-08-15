@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useEffect, useMemo, useState } from 'react';
 import { BiPlus } from 'react-icons/bi';
 import {
   FaRegChartBar,
@@ -7,7 +8,6 @@ import {
   FaRegFlag,
   FaRegUserCircle,
 } from 'react-icons/fa';
-import { FaPlus } from 'react-icons/fa6';
 import { useProjectContext } from '../../../../context/useProjectContext';
 import { useTasksContext } from '../../../../context/useTasksContext';
 
@@ -30,6 +30,7 @@ const TableView = () => {
   const { tasks, updateTask } = useTasksContext();
   const { colorGradients } = useProjectContext();
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+  const [expandedSections, setExpandedSections] = useState({});
 
   const groupedTasks = useMemo(() => {
     const grouped = tasks.reduce((acc, task) => {
@@ -43,13 +44,32 @@ const TableView = () => {
     return Object.entries(grouped).sort(([a], [b]) => Number(a) - Number(b));
   }, [tasks]);
 
+  useEffect(() => {
+    // Set all sections to expanded by default
+    const initialExpandedState = groupedTasks.reduce((acc, [boardOrder]) => {
+      acc[boardOrder] = true;
+      return acc;
+    }, {});
+    setExpandedSections(initialExpandedState);
+  }, [groupedTasks]);
+
+  const toggleSection = (boardOrder) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [boardOrder]: !prev[boardOrder],
+    }));
+  };
+
   const renderHeader = (boardOrder, tasksCount) => {
+    const isExpanded = expandedSections[boardOrder];
     return (
-      <div
+      <motion.div
+        initial={false}
+        animate={{ backgroundColor: isExpanded ? '#f5f7fb' : '#ffffff' }}
+        transition={{ duration: 0.3 }}
         style={{
           display: 'flex',
           flexDirection: 'row',
-          backgroundColor: '#f5f7fb',
           padding: '10px',
           overflow: 'hidden',
           borderRadius: '7px',
@@ -57,7 +77,9 @@ const TableView = () => {
           alignItems: 'center',
           justifyContent: 'space-between',
           marginTop: '20px',
+          cursor: 'pointer',
         }}
+        onClick={() => toggleSection(boardOrder)}
       >
         <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
           <span
@@ -91,25 +113,31 @@ const TableView = () => {
             {tasksCount}
           </span>
         </div>
-        <div
+        <motion.div
+          animate={{ rotate: isExpanded ? 180 : 0 }}
+          transition={{ duration: 0.3 }}
           style={{
             display: 'flex',
             alignItems: 'center',
             height: '100%',
             marginTop: '2px',
-            cursor: 'pointer',
+            marginRight: '25px',
           }}
         >
-          <FaPlus />
-        </div>
-      </div>
+          ▼
+        </motion.div>
+      </motion.div>
     );
   };
 
   const renderTableContentRow = (task) => {
     return (
-      <div
+      <motion.div
         key={task._id}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
         style={{
           display: 'flex',
           flexDirection: 'row',
@@ -190,16 +218,28 @@ const TableView = () => {
         <div style={{ width: '40px', padding: '10px', display: 'flex', alignItems: 'center' }}>
           ...
         </div>
-      </div>
+      </motion.div>
     );
   };
 
   const renderTable = (tasks, boardOrder) => {
+    const isExpanded = expandedSections[boardOrder];
     return (
       <div key={boardOrder}>
         {renderHeader(boardOrder, tasks.length)}
-        {renderTableHeading()}
-        <div>{tasks.map((task) => renderTableContentRow(task))}</div>
+        <AnimatePresence>
+          {isExpanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {renderTableHeading()}
+              <div>{tasks.map((task) => renderTableContentRow(task))}</div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     );
   };
