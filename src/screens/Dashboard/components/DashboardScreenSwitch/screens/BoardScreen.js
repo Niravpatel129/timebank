@@ -5,6 +5,7 @@ import BoardMatrix from '../../BoardMatrix/BoardMatrix';
 import BoardTableView from '../../BoardTableView/BoardTableView';
 export default function BoardScreen() {
   const [selectedView, setSelectedView] = useState('board');
+
   return (
     <div
       style={{

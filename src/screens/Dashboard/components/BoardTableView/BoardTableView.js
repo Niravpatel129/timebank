@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FaSort, FaSortDown, FaSortUp } from 'react-icons/fa';
+import { FaPlus } from 'react-icons/fa6';
 import { useProjectContext } from '../../../../context/useProjectContext';
 import { useTasksContext } from '../../../../context/useTasksContext';
 
@@ -39,8 +40,74 @@ const TableView = () => {
     return <FaSort />;
   };
 
+  const renderHeader = () => {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          backgroundColor: '#fff',
+          // width: '100%',
+          padding: '10px',
+          overflow: 'hidden',
+          borderRadius: '5px',
+          color: '#191731',
+          alignItems: 'center',
+          // height: '18px',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+          <span
+            style={{
+              width: '5px',
+              backgroundImage: 'linear-gradient(to right, white, #acacac)',
+              borderRadius: '20%',
+              marginRight: '7px',
+              height: '100%',
+            }}
+          />
+          <span style={{ fontWeight: 500, fontSize: '15px' }}>To-do</span>
+          <span
+            style={{
+              fontSize: '12px',
+              color: '#6a62e9',
+              display: 'flex',
+              alignItems: 'center',
+              marginLeft: '10px',
+              gap: '5px',
+              backgroundColor: '#e7e8fb',
+              // padding: '5px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '20px',
+              height: '20px',
+              borderRadius: '5px',
+              fontWeight: 500,
+            }}
+          >
+            3
+          </span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            height: '100%',
+            marginTop: '2px',
+            cursor: 'pointer',
+          }}
+        >
+          <FaPlus />
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div style={{ overflowX: 'auto', width: '100%' }}>
+      {renderHeader()}
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #dee2e6' }}>
