@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
+import { FaWandMagicSparkles } from 'react-icons/fa6';
 import Select from 'react-select';
 import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
@@ -9,6 +10,7 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
   const { selectedProject, colorGradients } = useProjectContext();
   const { addTask } = useTasksContext();
   const modalRef = useRef(null);
+  const [showAI, setShowAI] = useState(false);
 
   const [taskData, setTaskData] = useState({
     taskName: '',
@@ -196,6 +198,7 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
             padding: '8px',
           }}
         />
+
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
@@ -213,6 +216,203 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
       </div>
     </div>
   );
+
+  const renderRegularForm = () => {
+    return (
+      <form onSubmit={handleSubmit}>
+        {renderInputField(
+          'taskName',
+          'Add task',
+          taskData.taskName,
+          (value) => handleInputChange('taskName', value),
+          'Morning check-in',
+        )}
+
+        <div style={{ marginBottom: '15px' }}>
+          <label>Do you know how long this task will take?</label>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
+            {['countdown', 'countup'].map((type) => (
+              <motion.button
+                key={type}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type='button'
+                onClick={() => handleInputChange('timerType', type)}
+                style={{
+                  padding: '8px 12px',
+                  border: 'none',
+                  borderRadius: '20px',
+                  backgroundColor: taskData.timerType === type ? colorGradients[0] : '#e0e0e0',
+                  color: taskData.timerType === type ? 'white' : 'black',
+                  cursor: 'pointer',
+                }}
+              >
+                {type === 'countdown' ? 'Yes, I know' : 'Not sure'}
+              </motion.button>
+            ))}
+          </div>
+        </div>
+
+        {taskData.timerType === 'countdown' && (
+          <div style={{ marginBottom: '15px' }}>
+            <label>How long will this take?</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
+              {['5m', '15m', '30m', '45m', '1h', 'Other'].map((time) => (
+                <motion.button
+                  key={time}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  type='button'
+                  onClick={() => handleDurationClick(time)}
+                  style={{
+                    padding: '8px 12px',
+                    border: 'none',
+                    borderRadius: '20px',
+                    backgroundColor:
+                      taskData.duration === time ||
+                      (time === 'Other' && taskData.duration === 'custom')
+                        ? colorGradients[0]
+                        : '#e0e0e0',
+                    color:
+                      taskData.duration === time ||
+                      (time === 'Other' && taskData.duration === 'custom')
+                        ? 'white'
+                        : 'black',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {time}
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {taskData.showCustomDuration && taskData.timerType === 'countdown' && (
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px' }}>Custom Duration</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <input
+                type='number'
+                min='0'
+                value={taskData.customHours}
+                onChange={(e) => handleCustomDurationChange('hours', e.target.value)}
+                style={{ width: '50px', padding: '5px' }}
+              />
+              <span>h</span>
+              <input
+                type='number'
+                min='0'
+                max='59'
+                value={taskData.customMinutes}
+                onChange={(e) => handleCustomDurationChange('minutes', e.target.value)}
+                style={{ width: '50px', padding: '5px' }}
+              />
+              <span>m</span>
+            </div>
+          </div>
+        )}
+
+        {renderInputField(
+          'category',
+          'Category',
+          taskData.category,
+          (value) => handleInputChange('category', value),
+          'e.g. Development, Design',
+        )}
+        {renderInputField('date', 'Date Due', taskData.date, (value) =>
+          handleInputChange('date', value),
+        )}
+
+        {selectedProject?.members.length > 0 && (
+          <div style={{ marginBottom: '15px' }}>
+            <label htmlFor='assignee'>Assignee</label>
+            <Select
+              id='assignee'
+              value={taskData.assignee}
+              onChange={(value) => handleInputChange('assignee', value)}
+              options={[
+                ...selectedProject?.members.map((member) => ({
+                  value: member.user?._id,
+                  label: member.user?.name,
+                  name: member.user?.name,
+                  avatar: null,
+                })),
+                { value: null, label: 'Unassigned', name: 'Unassigned' },
+              ]}
+              styles={customStyles}
+              formatOptionLabel={formatOptionLabel}
+              placeholder='Select an assignee'
+              isClearable
+            />
+          </div>
+        )}
+
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          type='submit'
+          style={{
+            padding: '15px',
+            backgroundColor: colorGradients[0],
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            width: '100%',
+          }}
+        >
+          Add activity
+        </motion.button>
+      </form>
+    );
+  };
+
+  const renderAIForm = () => {
+    return (
+      <div style={{ width: '100%' }}>
+        <div
+          style={{
+            marginBottom: '15px',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px',
+          }}
+        >
+          <label htmlFor='aiTaskDescription'>Describe your task</label>
+          <textarea
+            id='aiTaskDescription'
+            rows='4'
+            style={{
+              // width: '100%',
+              padding: '8px',
+              border: '1px solid #ccc',
+              borderRadius: '4px',
+              resize: 'vertical',
+            }}
+            placeholder='Enter your task description here...'
+          ></textarea>
+        </div>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          type='button'
+          style={{
+            padding: '15px',
+            backgroundColor: colorGradients[0],
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            width: '100%',
+          }}
+        >
+          Generate with AI
+        </motion.button>
+      </div>
+    );
+  };
 
   return (
     <AnimatePresence>
@@ -257,163 +457,27 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
                 marginBottom: '20px',
               }}
             >
-              <h2 style={{ margin: 0 }}>Add activity</h2>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={onClose}
-                style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-              >
-                <FaTimes />
-              </motion.button>
-            </div>
-            <form onSubmit={handleSubmit}>
-              {renderInputField(
-                'taskName',
-                'Add task',
-                taskData.taskName,
-                (value) => handleInputChange('taskName', value),
-                'Morning check-in',
-              )}
-
-              <div style={{ marginBottom: '15px' }}>
-                <label>Do you know how long this task will take?</label>
-                <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
-                  {['countdown', 'countup'].map((type) => (
-                    <motion.button
-                      key={type}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      type='button'
-                      onClick={() => handleInputChange('timerType', type)}
-                      style={{
-                        padding: '8px 12px',
-                        border: 'none',
-                        borderRadius: '20px',
-                        backgroundColor:
-                          taskData.timerType === type ? colorGradients[0] : '#e0e0e0',
-                        color: taskData.timerType === type ? 'white' : 'black',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {type === 'countdown' ? 'Yes, I know' : 'Not sure'}
-                    </motion.button>
-                  ))}
-                </div>
+              <h2 style={{ margin: 0 }}>Add Task</h2>
+              <div>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowAI(!showAI)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                >
+                  <FaWandMagicSparkles />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={onClose}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                >
+                  <FaTimes />
+                </motion.button>
               </div>
-
-              {taskData.timerType === 'countdown' && (
-                <div style={{ marginBottom: '15px' }}>
-                  <label>How long will this take?</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
-                    {['5m', '15m', '30m', '45m', '1h', 'Other'].map((time) => (
-                      <motion.button
-                        key={time}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        type='button'
-                        onClick={() => handleDurationClick(time)}
-                        style={{
-                          padding: '8px 12px',
-                          border: 'none',
-                          borderRadius: '20px',
-                          backgroundColor:
-                            taskData.duration === time ||
-                            (time === 'Other' && taskData.duration === 'custom')
-                              ? colorGradients[0]
-                              : '#e0e0e0',
-                          color:
-                            taskData.duration === time ||
-                            (time === 'Other' && taskData.duration === 'custom')
-                              ? 'white'
-                              : 'black',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {time}
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {taskData.showCustomDuration && taskData.timerType === 'countdown' && (
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px' }}>Custom Duration</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <input
-                      type='number'
-                      min='0'
-                      value={taskData.customHours}
-                      onChange={(e) => handleCustomDurationChange('hours', e.target.value)}
-                      style={{ width: '50px', padding: '5px' }}
-                    />
-                    <span>h</span>
-                    <input
-                      type='number'
-                      min='0'
-                      max='59'
-                      value={taskData.customMinutes}
-                      onChange={(e) => handleCustomDurationChange('minutes', e.target.value)}
-                      style={{ width: '50px', padding: '5px' }}
-                    />
-                    <span>m</span>
-                  </div>
-                </div>
-              )}
-
-              {renderInputField(
-                'category',
-                'Category',
-                taskData.category,
-                (value) => handleInputChange('category', value),
-                'e.g. Development, Design',
-              )}
-              {renderInputField('date', 'Date Due', taskData.date, (value) =>
-                handleInputChange('date', value),
-              )}
-
-              {selectedProject?.members.length > 0 && (
-                <div style={{ marginBottom: '15px' }}>
-                  <label htmlFor='assignee'>Assignee</label>
-                  <Select
-                    id='assignee'
-                    value={taskData.assignee}
-                    onChange={(value) => handleInputChange('assignee', value)}
-                    options={[
-                      ...selectedProject?.members.map((member) => ({
-                        value: member.user?._id,
-                        label: member.user?.name,
-                        name: member.user?.name,
-                        avatar: null,
-                      })),
-                      { value: null, label: 'Unassigned', name: 'Unassigned' },
-                    ]}
-                    styles={customStyles}
-                    formatOptionLabel={formatOptionLabel}
-                    placeholder='Select an assignee'
-                    isClearable
-                  />
-                </div>
-              )}
-
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                type='submit'
-                style={{
-                  padding: '15px',
-                  backgroundColor: colorGradients[0],
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '5px',
-                  cursor: 'pointer',
-                  width: '100%',
-                }}
-              >
-                Add activity
-              </motion.button>
-            </form>
+            </div>
+            {showAI ? renderAIForm() : renderRegularForm()}
           </motion.div>
         </motion.div>
       )}
