@@ -201,12 +201,14 @@ export default function BoardTable() {
                   {...provided.droppableProps}
                   ref={provided.innerRef}
                   style={{
-                    background: snapshot.isDraggingOver ? '#f0f0f0' : 'transparent',
+                    background: snapshot.isDraggingOver ? '#ffffff77' : 'transparent',
                     padding: 4,
                     width: '100%',
                     flexGrow: 1,
                     overflowY: 'auto',
                     position: 'relative',
+                    borderRadius: '12px',
+                    border: snapshot.isDraggingOver ? '2px dashed #ccc' : 'none',
                   }}
                 >
                   {column.taskIds.map((taskId, index) => {
@@ -245,7 +247,7 @@ export default function BoardTable() {
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
                         style={{
-                          padding: '8px 16px',
+                          padding: '16px 16px',
                           backgroundColor: '#ffffff',
                           borderRadius: '4px',
                           cursor: 'pointer',
@@ -253,12 +255,15 @@ export default function BoardTable() {
                           display: 'flex',
                           alignItems: 'center',
                           gap: '8px',
-                          fontWeight: '500',
+                          fontWeight: '400',
                           fontSize: '14px',
                           borderRadius: '10px',
+                          color: '#3e5dff',
+                          border: '1px solid #edecf1',
+                          justifyContent: 'center',
                         }}
                       >
-                        <FaPlus /> <span>New</span>
+                        <FaPlus /> <span>Add New Task</span>
                       </motion.div>
                     )}
                   </AnimatePresence>
