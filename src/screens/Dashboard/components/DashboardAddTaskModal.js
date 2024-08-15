@@ -7,59 +7,67 @@ import { useTasksContext } from '../../../context/useTasksContext';
 
 export default function DashboardAddTaskModal({ onClose, isOpen }) {
   const { selectedProject, colorGradients } = useProjectContext();
-  const [taskName, setTaskName] = useState('');
-  const [duration, setDuration] = useState('30m');
-  const [showCustomDuration, setShowCustomDuration] = useState(false);
-  const [customHours, setCustomHours] = useState(0);
-  const [customMinutes, setCustomMinutes] = useState(0);
-  const [category, setCategory] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [assignee, setAssignee] = useState(null);
-  const [timerType, setTimerType] = useState('countdown'); // New state for timer type
-  const modalRef = useRef(null);
   const { addTask } = useTasksContext();
+  const modalRef = useRef(null);
+
+  const [taskData, setTaskData] = useState({
+    taskName: '',
+    duration: '30m',
+    showCustomDuration: false,
+    customHours: 0,
+    customMinutes: 0,
+    category: '',
+    date: new Date().toISOString().split('T')[0],
+    assignee: null,
+    timerType: 'countdown',
+  });
 
   useEffect(() => {
-    // pick the first assignee
     if (selectedProject?.members.length > 0) {
-      if (selectedProject.members[0].user._id && selectedProject.members[0].user.name) {
-        setAssignee({
-          value: selectedProject.members[0].user._id,
-          _id: selectedProject.members[0].user._id,
-          name: selectedProject.members[0].user.name,
-          email: selectedProject.members[0].user.email,
-          avatar: null,
-        });
+      const firstMember = selectedProject.members[0].user;
+      if (firstMember._id && firstMember.name) {
+        setTaskData((prev) => ({
+          ...prev,
+          assignee: {
+            value: firstMember._id,
+            _id: firstMember._id,
+            name: firstMember.name,
+            email: firstMember.email,
+            avatar: null,
+          },
+        }));
       }
     }
   }, [selectedProject]);
 
   const resetForm = () => {
-    setTaskName('');
-    setDuration('30m');
-    setShowCustomDuration(false);
-    setCustomHours(0);
-    setCustomMinutes(0);
-    setCategory('');
-    setDate(new Date().toISOString().split('T')[0]);
-    setAssignee(null);
-    setTimerType('countdown');
+    setTaskData({
+      taskName: '',
+      duration: '30m',
+      showCustomDuration: false,
+      customHours: 0,
+      customMinutes: 0,
+      category: '',
+      date: new Date().toISOString().split('T')[0],
+      assignee: null,
+      timerType: 'countdown',
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const taskDurationInSeconds = calculateDurationInSeconds(duration);
+    const taskDurationInSeconds = calculateDurationInSeconds(taskData.duration);
     const newTask = {
-      name: taskName,
+      name: taskData.taskName,
       status: 'not-started',
-      taskDuration: timerType === 'countup' ? 0 : taskDurationInSeconds,
+      taskDuration: taskData.timerType === 'countup' ? 0 : taskDurationInSeconds,
       hours: taskDurationInSeconds / 3600,
-      category: category || null,
-      dateDue: date,
+      category: taskData.category || null,
+      dateDue: taskData.date,
       dateCreated: new Date().toISOString(),
-      assignee: assignee?.value,
-      assigneeDetails: assignee,
-      timerType: timerType,
+      assignee: taskData.assignee?.value,
+      assigneeDetails: taskData.assignee,
+      timerType: taskData.timerType,
     };
     addTask({ ...newTask, project: selectedProject._id });
     resetForm();
@@ -68,7 +76,7 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
 
   const calculateDurationInSeconds = (durationString) => {
     if (durationString === 'custom') {
-      return parseInt(customHours) * 3600 + parseInt(customMinutes) * 60;
+      return parseInt(taskData.customHours) * 3600 + parseInt(taskData.customMinutes) * 60;
     }
     const match = durationString.match(/(\d+)([hm])/);
     if (match) {
@@ -92,23 +100,23 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
     };
   }, [onClose]);
 
+  const handleInputChange = (field, value) => {
+    setTaskData((prev) => ({ ...prev, [field]: value }));
+  };
+
   const handleDurationClick = (time) => {
     if (time === 'Other') {
-      setShowCustomDuration(true);
-      setDuration('custom');
+      handleInputChange('showCustomDuration', true);
+      handleInputChange('duration', 'custom');
     } else {
-      setShowCustomDuration(false);
-      setDuration(time);
+      handleInputChange('showCustomDuration', false);
+      handleInputChange('duration', time);
     }
   };
 
   const handleCustomDurationChange = (type, value) => {
-    if (type === 'hours') {
-      setCustomHours(value);
-    } else {
-      setCustomMinutes(value);
-    }
-    setDuration('custom');
+    handleInputChange(type === 'hours' ? 'customHours' : 'customMinutes', value);
+    handleInputChange('duration', 'custom');
   };
 
   const customStyles = {
@@ -132,37 +140,79 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
     }),
   };
 
-  const formatOptionLabel = ({ name, avatar }) => {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        {avatar ? (
-          <img
-            src={avatar}
-            alt={name}
-            style={{ width: '24px', height: '24px', borderRadius: '50%', marginRight: '8px' }}
-          />
-        ) : (
-          <div
-            style={{
-              width: '24px',
-              height: '24px',
-              borderRadius: '50%',
-              backgroundColor: '#ccc',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginRight: '8px',
-              fontSize: '12px',
-              fontWeight: 'bold',
-            }}
-          >
-            {name?.charAt(0).toUpperCase()}
-          </div>
-        )}
-        <span>{name}</span>
+  const formatOptionLabel = ({ name, avatar }) => (
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      {avatar ? (
+        <img
+          src={avatar}
+          alt={name}
+          style={{ width: '24px', height: '24px', borderRadius: '50%', marginRight: '8px' }}
+        />
+      ) : (
+        <div
+          style={{
+            width: '24px',
+            height: '24px',
+            borderRadius: '50%',
+            backgroundColor: '#ccc',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: '8px',
+            fontSize: '12px',
+            fontWeight: 'bold',
+          }}
+        >
+          {name?.charAt(0).toUpperCase()}
+        </div>
+      )}
+      <span>{name}</span>
+    </div>
+  );
+
+  const renderInputField = (id, label, value, onChange, placeholder = '') => (
+    <div style={{ marginBottom: '15px' }}>
+      <label htmlFor={id}>{label}</label>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          border: '1px solid #ccc',
+          borderRadius: '4px',
+          padding: '4px',
+          marginTop: '5px',
+        }}
+      >
+        <input
+          type={id === 'date' ? 'date' : 'text'}
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          style={{
+            flex: 1,
+            border: 'none',
+            outline: 'none',
+            padding: '8px',
+          }}
+        />
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          type='button'
+          onClick={() => onChange('')}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '4px',
+          }}
+        >
+          <FaTimes />
+        </motion.button>
       </div>
-    );
-  };
+    </div>
+  );
 
   return (
     <AnimatePresence>
@@ -218,90 +268,41 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
               </motion.button>
             </div>
             <form onSubmit={handleSubmit}>
-              {/* Task Name Input */}
-              <div style={{ marginBottom: '15px' }}>
-                <label htmlFor='taskName'>Add task</label>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    padding: '4px',
-                    marginTop: '5px',
-                  }}
-                >
-                  <input
-                    type='text'
-                    id='taskName'
-                    value={taskName}
-                    onChange={(e) => setTaskName(e.target.value)}
-                    placeholder='Morning check-in'
-                    style={{
-                      flex: 1,
-                      border: 'none',
-                      outline: 'none',
-                      padding: '8px',
-                    }}
-                  />
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    type='button'
-                    onClick={() => setTaskName('')}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: '4px',
-                    }}
-                  >
-                    <FaTimes />
-                  </motion.button>
-                </div>
-              </div>
+              {renderInputField(
+                'taskName',
+                'Add task',
+                taskData.taskName,
+                (value) => handleInputChange('taskName', value),
+                'Morning check-in',
+              )}
 
-              {/* Timer Type Selection */}
               <div style={{ marginBottom: '15px' }}>
                 <label>Do you know how long this task will take?</label>
                 <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    type='button'
-                    onClick={() => setTimerType('countdown')}
-                    style={{
-                      padding: '8px 12px',
-                      border: 'none',
-                      borderRadius: '20px',
-                      backgroundColor: timerType === 'countdown' ? colorGradients[0] : '#e0e0e0',
-                      color: timerType === 'countdown' ? 'white' : 'black',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Yes, I know
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    type='button'
-                    onClick={() => setTimerType('countup')}
-                    style={{
-                      padding: '8px 12px',
-                      border: 'none',
-                      borderRadius: '20px',
-                      backgroundColor: timerType === 'countup' ? colorGradients[0] : '#e0e0e0',
-                      color: timerType === 'countup' ? 'white' : 'black',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Not sure
-                  </motion.button>
+                  {['countdown', 'countup'].map((type) => (
+                    <motion.button
+                      key={type}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      type='button'
+                      onClick={() => handleInputChange('timerType', type)}
+                      style={{
+                        padding: '8px 12px',
+                        border: 'none',
+                        borderRadius: '20px',
+                        backgroundColor:
+                          taskData.timerType === type ? colorGradients[0] : '#e0e0e0',
+                        color: taskData.timerType === type ? 'white' : 'black',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {type === 'countdown' ? 'Yes, I know' : 'Not sure'}
+                    </motion.button>
+                  ))}
                 </div>
               </div>
 
-              {/* Duration Selection */}
-              {timerType === 'countdown' && (
+              {taskData.timerType === 'countdown' && (
                 <div style={{ marginBottom: '15px' }}>
                   <label>How long will this take?</label>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
@@ -317,11 +318,13 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
                           border: 'none',
                           borderRadius: '20px',
                           backgroundColor:
-                            duration === time || (time === 'Other' && duration === 'custom')
+                            taskData.duration === time ||
+                            (time === 'Other' && taskData.duration === 'custom')
                               ? colorGradients[0]
                               : '#e0e0e0',
                           color:
-                            duration === time || (time === 'Other' && duration === 'custom')
+                            taskData.duration === time ||
+                            (time === 'Other' && taskData.duration === 'custom')
                               ? 'white'
                               : 'black',
                           cursor: 'pointer',
@@ -334,15 +337,14 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
                 </div>
               )}
 
-              {/* Custom Duration Input */}
-              {showCustomDuration && timerType === 'countdown' && (
+              {taskData.showCustomDuration && taskData.timerType === 'countdown' && (
                 <div style={{ marginBottom: '15px' }}>
                   <label style={{ display: 'block', marginBottom: '5px' }}>Custom Duration</label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <input
                       type='number'
                       min='0'
-                      value={customHours}
+                      value={taskData.customHours}
                       onChange={(e) => handleCustomDurationChange('hours', e.target.value)}
                       style={{ width: '50px', padding: '5px' }}
                     />
@@ -351,7 +353,7 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
                       type='number'
                       min='0'
                       max='59'
-                      value={customMinutes}
+                      value={taskData.customMinutes}
                       onChange={(e) => handleCustomDurationChange('minutes', e.target.value)}
                       style={{ width: '50px', padding: '5px' }}
                     />
@@ -360,99 +362,24 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
                 </div>
               )}
 
-              {/* Category Input */}
-              <div style={{ marginBottom: '15px' }}>
-                <label htmlFor='category'>Category</label>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    padding: '4px',
-                    marginTop: '5px',
-                  }}
-                >
-                  <input
-                    type='text'
-                    id='category'
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    placeholder='e.g. Development, Design'
-                    style={{
-                      flex: 1,
-                      border: 'none',
-                      outline: 'none',
-                      padding: '8px',
-                    }}
-                  />
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    type='button'
-                    onClick={() => setCategory('')}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: '4px',
-                    }}
-                  >
-                    <FaTimes />
-                  </motion.button>
-                </div>
-              </div>
+              {renderInputField(
+                'category',
+                'Category',
+                taskData.category,
+                (value) => handleInputChange('category', value),
+                'e.g. Development, Design',
+              )}
+              {renderInputField('date', 'Date Due', taskData.date, (value) =>
+                handleInputChange('date', value),
+              )}
 
-              {/* Date Input */}
-              <div style={{ marginBottom: '15px' }}>
-                <label htmlFor='date'>Date Due</label>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    padding: '4px',
-                    marginTop: '5px',
-                  }}
-                >
-                  <input
-                    type='date'
-                    id='date'
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    style={{
-                      flex: 1,
-                      border: 'none',
-                      outline: 'none',
-                      padding: '8px',
-                    }}
-                  />
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    type='button'
-                    onClick={() => setDate('')}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: '4px',
-                    }}
-                  >
-                    <FaTimes />
-                  </motion.button>
-                </div>
-              </div>
-
-              {/* Assignee Select Dropdown */}
               {selectedProject?.members.length > 0 && (
                 <div style={{ marginBottom: '15px' }}>
                   <label htmlFor='assignee'>Assignee</label>
                   <Select
                     id='assignee'
-                    value={assignee}
-                    onChange={setAssignee}
+                    value={taskData.assignee}
+                    onChange={(value) => handleInputChange('assignee', value)}
                     options={[
                       ...selectedProject?.members.map((member) => ({
                         value: member.user?._id,
@@ -470,7 +397,6 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
                 </div>
               )}
 
-              {/* Submit Button */}
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
