@@ -5,6 +5,7 @@ import { HashRouter as Router } from 'react-router-dom';
 import 'react-tooltip/dist/react-tooltip.css';
 import App from './App';
 import { HistoryProvider } from './context/useHistoryContext';
+import { ModalsProvider } from './context/useModalsContext';
 import { NotificationProvider } from './context/useNotificationContext';
 import { ProjectProvider } from './context/useProjectContext';
 import { ScreenProvider } from './context/useScreenContext';
@@ -36,7 +37,9 @@ root.render(
               <ScreenProvider>
                 <TasksProvider>
                   <NotificationProvider>
-                    <App />
+                    <ModalsProvider>
+                      <App />
+                    </ModalsProvider>
                   </NotificationProvider>
                 </TasksProvider>
               </ScreenProvider>

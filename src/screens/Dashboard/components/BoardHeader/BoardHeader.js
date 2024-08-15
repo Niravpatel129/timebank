@@ -1,5 +1,7 @@
 import React from 'react';
 import { IoNotificationsOutline } from 'react-icons/io5';
+import { useProjectContext } from '../../../../context/useProjectContext';
+import { useTasksContext } from '../../../../context/useTasksContext';
 
 const Header = () => (
   <div
@@ -62,97 +64,130 @@ const Header = () => (
   </div>
 );
 
-const ProjectHeader = ({ setSelectedView, selectedView }) => (
-  <div
-    style={{
-      paddingTop: '20px',
-    }}
-  >
+const ProjectHeader = ({ setSelectedView, selectedView }) => {
+  const { selectedProject } = useProjectContext();
+  const { tasks } = useTasksContext();
+
+  const calculateCompletion = () => {
+    if (!tasks || tasks.length === 0) return 0;
+    const completedTasks = tasks.filter((task) => task.status === 'completed').length;
+    return Math.round((completedTasks / tasks.length) * 100);
+  };
+
+  const completionPercentage = calculateCompletion();
+
+  return (
     <div
       style={{
-        display: 'flex',
-        width: '100%',
-        justifyContent: 'space-between',
+        paddingTop: '20px',
       }}
     >
       <div
         style={{
-          width: '100%',
-          maxWidth: '600px',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-          <div
-            style={{
-              width: '40px',
-              height: '40px',
-              backgroundColor: '#eaf2fd',
-              borderRadius: '8px',
-              marginRight: '10px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              fontSize: '24px',
-            }}
-          >
-            🗂️
-          </div>
-          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 400, color: '#141b35' }}>
-            Piper Enterprise
-          </h2>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div
-            style={{
-              width: '60%',
-              backgroundColor: '#f1f1f1',
-              height: '8px',
-              borderRadius: '4px',
-              overflow: 'hidden',
-            }}
-          >
-            <div style={{ width: '13%', backgroundColor: '#4285f4', height: '100%' }}></div>
-          </div>
-          <span style={{ color: '#8d97a3', fontSize: '11px', fontWeight: 500 }}>13% complete</span>
-        </div>
-      </div>
-
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <MemberAvatars />
-          <AddMemberButton />
-        </div>
-      </div>
-    </div>
-    <Navigation setSelectedView={setSelectedView} selectedView={selectedView} />
-  </div>
-);
-
-const MemberAvatars = () => (
-  <div style={{ display: 'flex', alignItems: 'center' }}>
-    {[1, 2, 3, 4].map((_, index) => (
-      <div
-        key={index}
-        style={{
-          width: '32px',
-          height: '32px',
-          borderRadius: '50%',
-          backgroundColor: ['#ff9800', '#4caf50', '#2196f3', '#9c27b0'][index],
-          marginRight: '-8px',
-          border: '2px solid white',
           display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          color: 'white',
-          fontSize: '12px',
-          fontWeight: 'bold',
+          width: '100%',
+          justifyContent: 'space-between',
         }}
       >
-        {index < 3 ? 'N' : '+3'}
+        <div
+          style={{
+            width: '100%',
+            maxWidth: '600px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+            <div
+              style={{
+                width: '40px',
+                height: '40px',
+                backgroundColor: '#eaf2fd',
+                borderRadius: '8px',
+                marginRight: '10px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                fontSize: '24px',
+              }}
+            >
+              🗂️
+            </div>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: '18px',
+                fontWeight: 400,
+                color: '#141b35',
+                textTransform: 'capitalize',
+              }}
+            >
+              {selectedProject?.name || 'No Project Selected'}
+            </h2>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div
+              style={{
+                width: '60%',
+                backgroundColor: '#f1f1f1',
+                height: '8px',
+                borderRadius: '4px',
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  width: `${completionPercentage}%`,
+                  backgroundColor: '#4285f4',
+                  height: '100%',
+                }}
+              ></div>
+            </div>
+            <span style={{ color: '#8d97a3', fontSize: '11px', fontWeight: 500 }}>
+              {completionPercentage}% complete
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <MemberAvatars />
+            <AddMemberButton />
+          </div>
+        </div>
       </div>
-    ))}
-  </div>
-);
+      <Navigation setSelectedView={setSelectedView} selectedView={selectedView} />
+    </div>
+  );
+};
+
+const MemberAvatars = () => {
+  const { selectedProject } = useProjectContext();
+  const members = selectedProject?.members || [];
+  return (
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      {members.slice(0, 4).map((member, index) => (
+        <div
+          key={index}
+          style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            backgroundColor: ['#ff9800', '#4caf50', '#2196f3', '#9c27b0'][index],
+            marginRight: '-8px',
+            border: '2px solid white',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            color: 'white',
+            fontSize: '12px',
+            fontWeight: 'bold',
+          }}
+        >
+          {index < 3 ? member.user?.name?.charAt(0) : `+${members.length - 3}`}
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const Navigation = ({ setSelectedView, selectedView }) => (
   <div
@@ -205,17 +240,21 @@ const AddMemberButton = () => (
   </button>
 );
 
-const BoardingHeader = ({ setSelectedView, selectedView }) => (
-  <div
-    style={{
-      margin: '0 auto',
-      width: '100%',
-      backgroundColor: '#fff',
-    }}
-  >
-    <Header />
-    <ProjectHeader setSelectedView={setSelectedView} selectedView={selectedView} />
-  </div>
-);
+const BoardingHeader = ({ setSelectedView, selectedView }) => {
+  const { selectedProject } = useProjectContext();
+
+  return (
+    <div
+      style={{
+        margin: '0 auto',
+        width: '100%',
+        backgroundColor: '#fff',
+      }}
+    >
+      <Header />
+      <ProjectHeader setSelectedView={setSelectedView} selectedView={selectedView} />
+    </div>
+  );
+};
 
 export default BoardingHeader;

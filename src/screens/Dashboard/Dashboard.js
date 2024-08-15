@@ -16,6 +16,7 @@ import packageInfo from '../../../package.json';
 
 import DashboardInviteModal from '../../components/DashboardInviteModal';
 import NotificationModal from '../../components/NotificationModal';
+import { useModalsContext } from '../../context/useModalsContext';
 import { useProjectContext } from '../../context/useProjectContext';
 import { useTasksContext } from '../../context/useTasksContext';
 import { useUserContext } from '../../context/useUserContext';
@@ -30,17 +31,23 @@ import IntroductionModal from './components/IntroductionModal';
 const { ipcRenderer } = window.require('electron');
 
 const Dashboard = () => {
-  const [addTaskModalOpen, setAddTaskModalOpen] = useState(false);
   const { tasks, editTask, deleteTask } = useTasksContext();
   const [data, setData] = useState(null);
-  const [taskToEdit, setTaskToEdit] = useState(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isIntroModalOpen, setIsIntroModalOpen] = useState(false);
   const profileDropdownRef = useRef(null);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const [selectedDashboardScreen, setSelectedDashboardScreen] = useState('list');
+  const {
+    isCreateTaskModalOpen,
+    openCreateTaskModal,
+    closeCreateTaskModal,
+    isEditTaskModalOpen,
+    openEditTaskModal,
+    closeEditTaskModal,
+    selectedTask,
+  } = useModalsContext();
   const { logout } = useUserContext();
   const {
     projects,
@@ -55,23 +62,17 @@ const Dashboard = () => {
 
   const handleEditTask = (taskId) => {
     const task = tasks.find((t) => t._id === taskId);
-    setTaskToEdit(task);
-    setIsEditModalOpen(true);
-  };
-
-  const handleCloseEditModal = () => {
-    setIsEditModalOpen(false);
-    setTaskToEdit(null);
+    openEditTaskModal(task);
   };
 
   const handleSaveEditedTask = (editedTask) => {
     editTask(editedTask);
-    handleCloseEditModal();
+    closeEditTaskModal();
   };
 
   const handleDeleteTask = (taskId) => {
     deleteTask(taskId);
-    handleCloseEditModal();
+    closeEditTaskModal();
   };
 
   useEffect(() => {
@@ -291,7 +292,7 @@ const Dashboard = () => {
       <div style={{ flex: 1, height: '100%', display: 'flex' }}>
         {/* Left part of main content - flexible width */}
         <DashboardScreenSwitch
-          setAddTaskModalOpen={setAddTaskModalOpen}
+          setAddTaskModalOpen={openCreateTaskModal}
           setIsInviteModalOpen={setIsInviteModalOpen}
           setIsNotificationModalOpen={setIsNotificationModalOpen}
           handleEditTask={handleEditTask}
@@ -300,14 +301,14 @@ const Dashboard = () => {
       </div>
 
       <DashboardAddTaskModal
-        isOpen={addTaskModalOpen}
-        onClose={() => setAddTaskModalOpen(false)}
+        isOpen={isCreateTaskModalOpen}
+        onClose={closeCreateTaskModal}
         onAddTask={handleAddTask}
       />
-      {isEditModalOpen && taskToEdit && (
+      {isEditTaskModalOpen && selectedTask && (
         <EditTaskModal
-          task={taskToEdit}
-          onClose={handleCloseEditModal}
+          task={selectedTask}
+          onClose={closeEditTaskModal}
           onSave={handleSaveEditedTask}
           onDelete={handleDeleteTask}
         />
