@@ -40,6 +40,7 @@ export default function BoardTable() {
   const [containerHeight, setContainerHeight] = useState('100vh');
   const containerRef = useRef(null);
   const [hoveredColumn, setHoveredColumn] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     const updateHeight = () => {
@@ -75,6 +76,7 @@ export default function BoardTable() {
   }, [tasks]);
 
   const onDragEnd = (result) => {
+    setIsDragging(false);
     const { destination, source, draggableId } = result;
 
     if (!destination) {
@@ -121,7 +123,7 @@ export default function BoardTable() {
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext onDragEnd={onDragEnd} onDragStart={() => setIsDragging(true)}>
       <div
         ref={containerRef}
         style={{
@@ -236,7 +238,7 @@ export default function BoardTable() {
                   })}
                   {provided.placeholder}
                   <AnimatePresence>
-                    {hoveredColumn === column.id && (
+                    {hoveredColumn === column.id && !isDragging && (
                       <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
