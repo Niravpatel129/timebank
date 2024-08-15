@@ -180,6 +180,7 @@ const MemberAvatars = () => {
             color: 'white',
             fontSize: '12px',
             fontWeight: 'bold',
+            textTransform: 'capitalize',
           }}
         >
           {index < 3 ? member.user?.name?.charAt(0) : `+${members.length - 3}`}

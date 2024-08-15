@@ -130,7 +130,7 @@ export default function BoardKanban() {
           display: 'flex',
           justifyContent: 'space-between',
           width: '100%',
-          height: containerHeight,
+          // height: containerHeight,
           overflowX: 'auto',
         }}
       >
@@ -203,6 +203,7 @@ export default function BoardKanban() {
                   style={{
                     background: snapshot.isDraggingOver ? '#ffffff77' : 'transparent',
                     padding: 4,
+                    height: '100vh',
                     width: '100%',
                     flexGrow: 1,
                     overflowY: 'auto',
