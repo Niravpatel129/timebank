@@ -13,6 +13,7 @@ import { useTasksContext } from '../../../../context/useTasksContext';
 
 const TableView = () => {
   const { tasks, updateTask } = useTasksContext();
+  console.log('🚀  tasks:', tasks);
   const { colorGradients } = useProjectContext();
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
@@ -98,13 +99,13 @@ const TableView = () => {
           some estimation
         </div>
         <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
-          some status
+          {getStatusColor('not-started')}
         </div>
         <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
-          some people
+          {renderUserCircle('J')}
         </div>
         <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
-          some priority
+          {renderPriorityBadge('high')}
         </div>
         <div style={{ width: '40px', padding: '10px' }}>...</div>
       </div>
@@ -161,6 +162,51 @@ const TableView = () => {
         {renderTableContentRow()}
         {renderTableContentRow()}
         {renderTableContentRow()}
+      </div>
+    );
+  };
+
+  const renderPriorityBadge = (priority) => {
+    const priorityColors = {
+      low: '#00C853',
+      medium: '#FFA000',
+      high: '#D50000',
+    };
+
+    return (
+      <span
+        style={{
+          backgroundColor: priorityColors[priority] || '#757575',
+          color: 'white',
+          padding: '2px 8px',
+          borderRadius: '12px',
+          fontSize: '12px',
+          fontWeight: 'bold',
+          textTransform: 'capitalize',
+        }}
+      >
+        {priority}
+      </span>
+    );
+  };
+
+  const renderUserCircle = (letter) => {
+    return (
+      <div
+        style={{
+          width: '30px',
+          height: '30px',
+          borderRadius: '50%',
+          backgroundColor: '#6a62e9',
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontWeight: 'bold',
+          fontSize: '14px',
+        }}
+      >
+        {letter}
       </div>
     );
   };
