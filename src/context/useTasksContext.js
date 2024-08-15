@@ -117,16 +117,25 @@ export const TasksProvider = ({ children }) => {
     [addHistoryEntry, selectedProject],
   );
 
-  const updateTask = useCallback(async (updatedTask) => {
-    try {
-      const response = await newRequest.put(`/tasks/${updatedTask._id}`, updatedTask);
-      setTasks((prevTasks) =>
-        prevTasks.map((task) => (task?._id === updatedTask._id ? response : task)),
-      );
-    } catch (error) {
-      console.error('Error updating task:', error);
-      toast.error('Failed to update task. Please try again.');
-    }
+  const updateTask = useCallback((updatedTask) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) => (task?._id === updatedTask._id ? updatedTask : task)),
+    );
+
+    // Asynchronously update on the server
+    newRequest
+      .put(`/tasks/${updatedTask._id}`, updatedTask)
+      .then((response) => {
+        // Optionally update with server response if needed
+        setTasks((prevTasks) =>
+          prevTasks.map((task) => (task?._id === updatedTask._id ? response : task)),
+        );
+      })
+      .catch((error) => {
+        console.error('Error updating task:', error);
+        toast.error('Failed to update task on the server. Please try again.');
+        // Optionally revert the local change here if needed
+      });
   }, []);
 
   const updateTaskAssignee = useCallback(async (taskId, assignee) => {

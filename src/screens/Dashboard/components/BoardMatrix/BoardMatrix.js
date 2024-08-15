@@ -1,14 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useTasksContext } from '../../../../context/useTasksContext';
 
 const PriorityMatrixView = () => {
   const { tasks, updateTask } = useTasksContext();
-  const [localTasks, setLocalTasks] = useState(tasks);
-
-  useEffect(() => {
-    setLocalTasks(tasks);
-  }, [tasks]);
 
   const matrices = {
     'urgent-important': { title: 'Urgent & Important', priority: 3 },
@@ -20,19 +15,20 @@ const PriorityMatrixView = () => {
   const onDragEnd = (result) => {
     if (!result.destination) return;
 
-    const newTasks = Array.from(localTasks);
-    const [reorderedItem] = newTasks.splice(result.source.index, 1);
-    newTasks.splice(result.destination.index, 0, reorderedItem);
+    const taskId = result.draggableId;
+    const newPriority = matrices[result.destination.droppableId].priority;
+    const taskToUpdate = tasks.find((task) => task._id === taskId);
 
-    setLocalTasks(newTasks);
-    updateTask({
-      ...reorderedItem,
-      taskPriority: matrices[result.destination.droppableId].priority,
-    });
+    if (taskToUpdate) {
+      updateTask({
+        ...taskToUpdate,
+        taskPriority: newPriority,
+      });
+    }
   };
 
   const getTasksForQuadrant = (quadrant) => {
-    return localTasks.filter((task) => task.taskPriority === matrices[quadrant].priority);
+    return tasks.filter((task) => task.taskPriority === matrices[quadrant].priority);
   };
 
   const renderQuadrant = (key) => (
