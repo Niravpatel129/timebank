@@ -1,8 +1,10 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import { FaTimes } from 'react-icons/fa';
 import { FaWandMagicSparkles } from 'react-icons/fa6';
 import Select from 'react-select';
+import newRequest from '../../../api/newReqest';
 import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
 
@@ -11,6 +13,8 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
   const { addTask } = useTasksContext();
   const modalRef = useRef(null);
   const [showAI, setShowAI] = useState(false);
+  const [aiTaskDescription, setAiTaskDescription] = useState('');
+  const [disableAiSubmit, setDisableAiSubmit] = useState(false);
 
   const [taskData, setTaskData] = useState({
     taskName: '',
@@ -23,6 +27,48 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
     assignee: null,
     timerType: 'countdown',
   });
+
+  const submitAiTaskGenerate = async () => {
+    setDisableAiSubmit(true);
+    try {
+      const response = await newRequest.post('/tasks/ai-generate-task', {
+        projectId: selectedProject._id,
+        taskDescription: aiTaskDescription,
+      });
+      console.log('🚀  response:', response);
+      if (response.task) {
+        const task = response.task;
+        // Convert duration from seconds to appropriate format
+        const durationInSeconds = task.taskDuration;
+        let duration;
+        if (durationInSeconds < 3600) {
+          const minutes = Math.round(durationInSeconds / 60);
+          duration = [5, 15, 30, 45].includes(minutes) ? `${minutes}m` : 'custom';
+        } else {
+          const hours = Math.round(durationInSeconds / 3600);
+          duration = hours === 1 ? '1h' : 'custom';
+        }
+
+        setTaskData((prev) => ({
+          ...prev,
+          taskName: task.name,
+          duration: duration,
+          showCustomDuration: duration === 'custom',
+          customHours: duration === 'custom' ? Math.floor(durationInSeconds / 3600) : 0,
+          customMinutes: duration === 'custom' ? Math.round((durationInSeconds % 3600) / 60) : 0,
+          category: task.category,
+          date: new Date().toISOString().split('T')[0],
+          timerType: task.timerType,
+        }));
+      }
+      setAiTaskDescription('');
+      setShowAI(false);
+    } catch (error) {
+      toast.error('Error generating task, try again later');
+    } finally {
+      setDisableAiSubmit(false);
+    }
+  };
 
   useEffect(() => {
     if (selectedProject?.members.length > 0) {
@@ -382,10 +428,11 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
         >
           <label htmlFor='aiTaskDescription'>Describe your task</label>
           <textarea
+            value={aiTaskDescription}
+            onChange={(e) => setAiTaskDescription(e.target.value)}
             id='aiTaskDescription'
             rows='4'
             style={{
-              // width: '100%',
               padding: '8px',
               border: '1px solid #ccc',
               borderRadius: '4px',
@@ -395,16 +442,20 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
           ></textarea>
         </div>
         <motion.button
+          onClick={submitAiTaskGenerate}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           type='button'
+          disabled={disableAiSubmit}
           style={{
             padding: '15px',
             backgroundColor: colorGradients[0],
             color: 'white',
             border: 'none',
             borderRadius: '5px',
-            cursor: 'pointer',
+            cursor: disableAiSubmit ? 'not-allowed' : 'pointer',
+            backgroundColor: disableAiSubmit ? '#ccc' : colorGradients[0],
+            opacity: disableAiSubmit ? 0.5 : 1,
             width: '100%',
           }}
         >
