@@ -382,13 +382,14 @@ autoUpdater.on('error', (err) => {
   dialog.showErrorBox('Error: ', err == null ? 'unknown' : (err.stack || err).toString());
 });
 
-if (process.env.NODE_ENV === 'development') {
-  try {
-    require('electron-reloader')(module, {
-      debug: true,
-      watchRenderer: true,
-    });
-  } catch (_) {
-    console.log('Error');
-  }
-}
+// Hard hot reload
+// if (process.env.NODE_ENV === 'development') {
+//   try {
+//     require('electron-reloader')(module, {
+//       debug: true,
+//       watchRenderer: true,
+//     });
+//   } catch (_) {
+//     console.log('Error');
+//   }
+// }
