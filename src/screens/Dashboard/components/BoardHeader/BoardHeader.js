@@ -62,7 +62,7 @@ const Header = () => (
   </div>
 );
 
-const ProjectHeader = () => (
+const ProjectHeader = ({ setSelectedView, selectedView }) => (
   <div
     style={{
       paddingTop: '20px',
@@ -124,7 +124,7 @@ const ProjectHeader = () => (
         </div>
       </div>
     </div>
-    <Navigation />
+    <Navigation setSelectedView={setSelectedView} selectedView={selectedView} />
   </div>
 );
 
@@ -154,7 +154,7 @@ const MemberAvatars = () => (
   </div>
 );
 
-const Navigation = () => (
+const Navigation = ({ setSelectedView, selectedView }) => (
   <div
     style={{
       display: 'flex',
@@ -169,41 +169,18 @@ const Navigation = () => (
       paddingRight: '20px', // Add padding to maintain content alignment
     }}
   >
-    {['Board', 'Table', 'List'].map((item, index) => (
+    {['Board', 'Table', 'Matrix'].map((item, index) => (
       <div
         key={index}
+        onClick={() => setSelectedView(item.toLowerCase())}
         style={{
           padding: '10px 0px',
           color: '#0d2232',
-          borderBottom: index === 0 ? '2px solid #4285f4' : 'none',
+          borderBottom: selectedView === item.toLowerCase() ? '2px solid #4285f4' : 'none',
           cursor: 'pointer',
         }}
       >
         {item}
-      </div>
-    ))}
-  </div>
-);
-
-const ViewOptions = () => (
-  <div style={{ display: 'flex', padding: '10px 20px' }}>
-    {[
-      { icon: '􀏜', label: 'Board' },
-      { icon: '􀎫', label: 'Table' },
-      { icon: '􀋱', label: 'List' },
-    ].map((item, index) => (
-      <div
-        key={index}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          marginRight: '15px',
-          color: index === 0 ? '#4285f4' : '#666',
-          cursor: 'pointer',
-        }}
-      >
-        <span style={{ marginRight: '5px' }}>{item.icon}</span>
-        <span>{item.label}</span>
       </div>
     ))}
   </div>
@@ -228,7 +205,7 @@ const AddMemberButton = () => (
   </button>
 );
 
-const BoardingHeader = () => (
+const BoardingHeader = ({ setSelectedView, selectedView }) => (
   <div
     style={{
       margin: '0 auto',
@@ -237,7 +214,7 @@ const BoardingHeader = () => (
     }}
   >
     <Header />
-    <ProjectHeader />
+    <ProjectHeader setSelectedView={setSelectedView} selectedView={selectedView} />
   </div>
 );
 
