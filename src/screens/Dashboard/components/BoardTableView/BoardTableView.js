@@ -88,7 +88,7 @@ const TableView = () => {
           fontSize: '14px',
         }}
       >
-        <div style={{ width: '40px', padding: '10px', borderRight: '1px solid #e0e0e0' }}>
+        <div style={{ width: '20px', padding: '10px', borderRight: '1px solid #e0e0e0' }}>
           <input type='checkbox' />
         </div>
         <div style={{ flex: 2, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
@@ -130,7 +130,7 @@ const TableView = () => {
           backgroundColor: '#f9f9f9',
         }}
       >
-        <div style={{ width: '40px', padding: '10px' }}>
+        <div style={{ width: '20px', padding: '10px' }}>
           <input type='checkbox' />
         </div>
         <div style={{ flex: 2, padding: '10px' }}>
