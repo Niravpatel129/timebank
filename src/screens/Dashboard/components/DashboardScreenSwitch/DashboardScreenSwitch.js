@@ -1,8 +1,8 @@
 import React from 'react';
 import BoardScreen from './screens/BoardScreen';
 import CalendarScreen from './screens/CalendarScreen';
-import CompletedScreen from './screens/CompletedScreen';
 import ListScreen from './screens/ListScreen';
+import TeamScreen from './screens/TeamScreen';
 import TrashScreen from './screens/TrashScreen';
 
 const DashboardScreenSwitch = (props) => {
@@ -13,8 +13,8 @@ const DashboardScreenSwitch = (props) => {
       return <BoardScreen />;
     case 'calendar':
       return <CalendarScreen />;
-    case 'completed':
-      return <CompletedScreen />;
+    case 'team':
+      return <TeamScreen />;
     case 'trash':
       return <TrashScreen />;
     default:
