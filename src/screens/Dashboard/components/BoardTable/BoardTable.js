@@ -71,7 +71,7 @@ export default function BoardTable() {
           justifyContent: 'space-between',
           width: '100%',
           height: containerHeight,
-          //   overflow: 'hidden',
+          overflowX: 'auto',
         }}
       >
         {Object.values(columns).map((column) => (
@@ -81,9 +81,10 @@ export default function BoardTable() {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-start',
-              width: '24%',
-              minWidth: '200px',
+              width: '100%',
+              minWidth: '300px',
               height: '100%',
+              marginRight: '16px',
             }}
           >
             <div>
@@ -157,12 +158,13 @@ export default function BoardTable() {
                             style={{
                               userSelect: 'none',
                               padding: '16px',
-                              margin: '0 0 8px 0',
+                              margin: '0 0 10px 0',
                               minHeight: '100px',
                               backgroundColor: 'white',
                               borderRadius: '8px',
                               boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
-                              width: 'calc(100% - 32px)', // Subtracting padding from width
+                              width: '100%',
+                              boxSizing: 'border-box',
                               ...provided.draggableProps.style,
                             }}
                           >
