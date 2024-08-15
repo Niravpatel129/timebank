@@ -113,39 +113,83 @@ const TableView = () => {
         style={{
           display: 'flex',
           flexDirection: 'row',
-          borderBottom: '1px solid #e0e0e0',
+          borderBottom: '1px solid #f4f3f6',
           color: '#484560',
           fontWeight: 500,
           fontSize: '14px',
-          alignItems: 'center',
+          alignItems: 'stretch',
         }}
       >
-        <div style={{ width: '20px', padding: '10px', borderRight: '1px solid #e0e0e0' }}>
+        <div
+          style={{
+            width: '20px',
+            padding: '10px',
+            borderRight: '1px solid #f4f3f6',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
           <input type='checkbox' />
         </div>
-        <div style={{ flex: 2, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
+        <div
+          style={{
+            flex: 2,
+            padding: '10px',
+            borderRight: '1px solid #f4f3f6',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
           {task.name}
         </div>
-        <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
+        <div
+          style={{
+            flex: 1,
+            padding: '10px',
+            borderRight: '1px solid #f4f3f6',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
           {task.taskDuration / 60} minutes
         </div>
         <div
           style={{
             flex: 1,
             padding: '10px',
-            borderRight: '1px solid #e0e0e0',
+            borderRight: '1px solid #f4f3f6',
             textTransform: 'capitalize',
+            display: 'flex',
+            alignItems: 'center',
           }}
         >
           {task.status.split('-').join(' ')}
         </div>
-        <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
+        <div
+          style={{
+            flex: 1,
+            padding: '10px',
+            borderRight: '1px solid #f4f3f6',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
           {renderUserCircle(task.user.name[0])}
         </div>
-        <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #e0e0e0' }}>
+        <div
+          style={{
+            flex: 1,
+            padding: '10px',
+            borderRight: '1px solid #f4f3f6',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
           {renderPriorityBadge(task.taskPriority)}
         </div>
-        <div style={{ width: '40px', padding: '10px' }}>...</div>
+        <div style={{ width: '40px', padding: '10px', display: 'flex', alignItems: 'center' }}>
+          ...
+        </div>
       </div>
     );
   };
@@ -166,7 +210,7 @@ const TableView = () => {
         style={{
           display: 'flex',
           flexDirection: 'row',
-          borderBottom: '1px solid #e0e0e0',
+          borderBottom: '1px solid #f4f3f6',
           marginTop: '10px',
         }}
       >
