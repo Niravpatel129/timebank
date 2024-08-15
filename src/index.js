@@ -39,13 +39,13 @@ root.render(
             <ProjectProvider>
               <HistoryProvider>
                 <ScreenProvider>
-                  <TasksProvider>
-                    <NotificationProvider>
-                      <ModalsProvider>
+                  <ModalsProvider>
+                    <TasksProvider>
+                      <NotificationProvider>
                         <App />
-                      </ModalsProvider>
-                    </NotificationProvider>
-                  </TasksProvider>
+                      </NotificationProvider>
+                    </TasksProvider>
+                  </ModalsProvider>
                 </ScreenProvider>
               </HistoryProvider>
             </ProjectProvider>

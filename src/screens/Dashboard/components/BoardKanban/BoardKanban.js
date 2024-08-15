@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { FaPlus } from 'react-icons/fa';
+import { useModalsContext } from '../../../../context/useModalsContext';
 import { useProjectContext } from '../../../../context/useProjectContext';
 import { useTasksContext } from '../../../../context/useTasksContext';
 import BoardCard from '../BoardCard/BoardCard';
@@ -41,7 +42,7 @@ export default function BoardKanban() {
   const containerRef = useRef(null);
   const [hoveredColumn, setHoveredColumn] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
-
+  const { openCreateTaskModal } = useModalsContext();
   useEffect(() => {
     const updateHeight = () => {
       if (containerRef.current) {
@@ -243,6 +244,7 @@ export default function BoardKanban() {
                   <AnimatePresence>
                     {hoveredColumn === column.id && !isDragging && (
                       <motion.div
+                        onClick={() => openCreateTaskModal()}
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}

@@ -108,6 +108,7 @@ const Dashboard = () => {
 
   const handleAddTask = () => {
     console.log('Add new task');
+    openCreateTaskModal();
   };
 
   const profileDropdownItems = [
