@@ -1,5 +1,7 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { FaPlus } from 'react-icons/fa';
 import { useProjectContext } from '../../../../context/useProjectContext';
 import { useTasksContext } from '../../../../context/useTasksContext';
 import BoardCard from '../BoardCard/BoardCard';
@@ -233,19 +235,31 @@ export default function BoardTable() {
                     );
                   })}
                   {provided.placeholder}
-                  {hoveredColumn === column.id && (
-                    <div
-                      style={{
-                        padding: '8px 16px',
-                        backgroundColor: '#f0f0f0',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        marginTop: '8px',
-                      }}
-                    >
-                      Add Card
-                    </div>
-                  )}
+                  <AnimatePresence>
+                    {hoveredColumn === column.id && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        style={{
+                          padding: '8px 16px',
+                          backgroundColor: '#ffffff',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          marginTop: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          fontWeight: '500',
+                          fontSize: '14px',
+                          borderRadius: '10px',
+                        }}
+                      >
+                        <FaPlus /> <span>New</span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               )}
             </Droppable>
