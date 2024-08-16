@@ -57,7 +57,7 @@ export default function MusicPlayer({ colorGradients }) {
             for (const item of data.items) {
               const videoId = item.id.videoId;
               const videoResponse = await fetch(
-                `https://www.googleapis.com/youtube/v3/videos?part=status,contentDetails&id=${videoId}&key=AIzaSyBvuDAsAKqA0no7GXQkxAbyCf2mlc9AwsE`,
+                `https://www.googleapis.com/youtube/v3/videos?part=status,contentDetails&id=${videoId}&key=${process.env.REACT_APP_YOUTUBE_API_KEY}`,
               );
               const videoData = await videoResponse.json();
               if (
