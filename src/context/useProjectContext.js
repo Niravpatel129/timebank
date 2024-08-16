@@ -72,6 +72,15 @@ export const ProjectProvider = ({ children }) => {
 
   const updateProjectMutation = useMutation(
     async ({ projectId, updatedData }) => {
+      if (!projectId) {
+        toast.error('Project ID is required');
+        return;
+      }
+      if (projects.length >= 8) {
+        toast.error('Maximum of 8 projects allowed');
+        return;
+      }
+
       const response = await newRequest.put(`/projects/${projectId}`, updatedData);
       return response;
     },

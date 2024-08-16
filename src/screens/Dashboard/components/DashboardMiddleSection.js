@@ -225,7 +225,10 @@ export default function DashboardComponent({
                   value={title}
                   onChange={handleTitleChange}
                   onBlur={() => {
-                    updateProject(selectedProject._id, { ...selectedProject, name: title });
+                    updateProject({
+                      updatedData: { ...selectedProject, name: title },
+                      projectId: selectedProject._id,
+                    });
                     setIsEditingTitle(false);
                   }}
                   style={{
