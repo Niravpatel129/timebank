@@ -1,6 +1,7 @@
 // MusicPlayer.js
 import React, { useEffect, useState } from 'react';
-import { FaMusic, FaPlay, FaSearch } from 'react-icons/fa';
+import toast from 'react-hot-toast';
+import { FaMusic, FaPlay, FaSearch, FaSpinner } from 'react-icons/fa';
 
 const FAVORITE_TRACKS = [
   { id: 'ejQ3TK-4-L4', title: 'Lofi hip hop - relax/study' },
@@ -10,15 +11,23 @@ const FAVORITE_TRACKS = [
 ];
 
 export default function MusicPlayer({ colorGradients }) {
-  const [videoId, setVideoId] = useState('');
+  const [videoId, setVideoId] = useState(() => localStorage.getItem('lastPlayedVideoId') || '');
   const [searchTerm, setSearchTerm] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
+  const [isSearching, setIsSearching] = useState(
+    () => JSON.parse(localStorage.getItem('isSearching')) || false,
+  );
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!isSearching && FAVORITE_TRACKS.length > 0) {
+    if (!isSearching && FAVORITE_TRACKS.length > 0 && !videoId) {
       setVideoId(FAVORITE_TRACKS[0].id);
     }
-  }, [isSearching]);
+  }, [isSearching, videoId]);
+
+  useEffect(() => {
+    localStorage.setItem('lastPlayedVideoId', videoId);
+    localStorage.setItem('isSearching', JSON.stringify(isSearching));
+  }, [videoId, isSearching]);
 
   const handleFavoriteSelect = (id) => {
     setVideoId(id);
@@ -28,9 +37,12 @@ export default function MusicPlayer({ colorGradients }) {
   const handleSearch = async (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
+      setIsLoading(true);
       if (/^[a-zA-Z0-9_-]{11}$/.test(searchTerm)) {
+        toast.success('Searching for video...');
         // If the search term is a valid YouTube video ID
         setVideoId(searchTerm);
+        setIsLoading(false);
       } else {
         // If it's not a video ID, search YouTube and get the first available result
         try {
@@ -55,6 +67,7 @@ export default function MusicPlayer({ colorGradients }) {
                 !videoData.items[0].contentDetails.regionRestriction
               ) {
                 setVideoId(videoId);
+                setIsLoading(false);
                 return;
               }
             }
@@ -65,6 +78,7 @@ export default function MusicPlayer({ colorGradients }) {
         } catch (error) {
           console.error('Error searching YouTube:', error);
         }
+        setIsLoading(false);
       }
     }
   };
@@ -122,7 +136,7 @@ export default function MusicPlayer({ colorGradients }) {
       </div>
 
       {isSearching ? (
-        <form onSubmit={handleSearch} style={{ marginBottom: '10px' }}>
+        <form onSubmit={handleSearch} style={{ marginBottom: '10px', position: 'relative' }}>
           <input
             type='text'
             value={searchTerm}
@@ -131,12 +145,24 @@ export default function MusicPlayer({ colorGradients }) {
             style={{
               width: '100%',
               padding: '5px',
+              paddingRight: '30px',
               border: '1px solid #ccc',
               borderRadius: '15px',
               fontSize: '12px',
               outline: 'none',
             }}
           />
+          {isLoading && (
+            <FaSpinner
+              style={{
+                position: 'absolute',
+                right: '10px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                animation: 'spin 1s linear infinite',
+              }}
+            />
+          )}
         </form>
       ) : (
         <div style={{ marginBottom: '10px', maxHeight: '100px', overflowY: 'auto' }}>
