@@ -8,21 +8,23 @@ const Header = ({ setIsNotificationModalOpen, setIsInviteModalOpen }) => (
   <div
     style={{
       display: 'flex',
+      flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: '10px 0px',
       borderBottom: '1px solid #f2f2f2',
-      marginLeft: '-20px', // Adjust based on parent padding
-      marginRight: '-20px', // Adjust based on parent padding
-      paddingLeft: '20px', // Add padding to maintain content alignment
-      paddingRight: '20px', // Add padding to maintain content alignment
+      marginLeft: '-20px',
+      marginRight: '-20px',
+      paddingLeft: '20px',
+      paddingRight: '20px',
     }}
   >
     <div
       style={{
         display: 'flex',
         alignItems: 'center',
-        width: '200px',
+        width: '100%',
+        maxWidth: '200px',
         height: '40px',
         backgroundColor: '#f0f0f0',
         borderRadius: '20px',
@@ -87,14 +89,15 @@ const ProjectHeader = ({ setSelectedView, selectedView, setIsInviteModalOpen }) 
       <div
         style={{
           display: 'flex',
+          flexDirection: 'column',
           width: '100%',
-          justifyContent: 'space-between',
         }}
       >
         <div
           style={{
             width: '100%',
             maxWidth: '600px',
+            marginBottom: '20px',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
@@ -149,11 +152,16 @@ const ProjectHeader = ({ setSelectedView, selectedView, setIsInviteModalOpen }) 
           </div>
         </div>
 
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <MemberAvatars />
-            <AddMemberButton setIsInviteModalOpen={setIsInviteModalOpen} />
-          </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
+          <MemberAvatars />
+          <AddMemberButton setIsInviteModalOpen={setIsInviteModalOpen} />
         </div>
       </div>
       <Navigation setSelectedView={setSelectedView} selectedView={selectedView} />
@@ -165,7 +173,7 @@ const MemberAvatars = () => {
   const { selectedProject } = useProjectContext();
   const members = selectedProject?.members || [];
   return (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
+    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginBottom: '10px' }}>
       {members.slice(0, 4).map((member, index) => (
         <div
           key={index}
@@ -196,15 +204,16 @@ const Navigation = ({ setSelectedView, selectedView }) => (
   <div
     style={{
       display: 'flex',
+      flexWrap: 'wrap',
       gap: '30px',
       fontSize: '14px',
       fontWeight: 500,
       marginTop: '20px',
       borderBottom: '1px solid #f2f2f2',
-      marginLeft: '-20px', // Adjust based on parent padding
-      marginRight: '-20px', // Adjust based on parent padding
-      paddingLeft: '20px', // Add padding to maintain content alignment
-      paddingRight: '20px', // Add padding to maintain content alignment
+      marginLeft: '-20px',
+      marginRight: '-20px',
+      paddingLeft: '20px',
+      paddingRight: '20px',
     }}
   >
     {['Board', 'Table', 'Matrix'].map((item, index) => (
@@ -236,7 +245,7 @@ const AddMemberButton = ({ setIsInviteModalOpen }) => (
       cursor: 'pointer',
       display: 'flex',
       alignItems: 'center',
-      marginLeft: '20px',
+      marginTop: '10px',
     }}
   >
     <span style={{ marginRight: '5px' }}>+</span>
