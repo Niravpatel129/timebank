@@ -25,12 +25,47 @@ export default function MusicPlayer({ colorGradients }) {
     setIsSearching(false);
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      setVideoId(searchTerm);
-      // Remove this line to prevent going back to favorites tab
-      // setIsSearching(false);
+      if (/^[a-zA-Z0-9_-]{11}$/.test(searchTerm)) {
+        // If the search term is a valid YouTube video ID
+        setVideoId(searchTerm);
+      } else {
+        // If it's not a video ID, search YouTube and get the first available result
+        try {
+          const response = await fetch(
+            `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
+              searchTerm,
+            )}&type=video&key=AIzaSyBvuDAsAKqA0no7GXQkxAbyCf2mlc9AwsE`,
+          );
+          const data = await response.json();
+          if (data.items && data.items.length > 0) {
+            // Check if the video is available and embeddable
+            for (const item of data.items) {
+              const videoId = item.id.videoId;
+              const videoResponse = await fetch(
+                `https://www.googleapis.com/youtube/v3/videos?part=status,contentDetails&id=${videoId}&key=AIzaSyBvuDAsAKqA0no7GXQkxAbyCf2mlc9AwsE`,
+              );
+              const videoData = await videoResponse.json();
+              if (
+                videoData.items &&
+                videoData.items.length > 0 &&
+                videoData.items[0].status.embeddable &&
+                !videoData.items[0].contentDetails.regionRestriction
+              ) {
+                setVideoId(videoId);
+                return;
+              }
+            }
+            console.error('No available or embeddable videos found');
+          } else {
+            console.error('No videos found');
+          }
+        } catch (error) {
+          console.error('Error searching YouTube:', error);
+        }
+      }
     }
   };
 
