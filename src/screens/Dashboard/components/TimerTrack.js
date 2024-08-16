@@ -1,16 +1,18 @@
 // TimerTrack.js
 import { motion } from 'framer-motion';
-import React from 'react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { FaPause, FaPlay } from 'react-icons/fa'; // Import play and pause icons
+import { FaPause, FaPlay } from 'react-icons/fa';
 import { IoNotificationsOutline, IoTimerOutline } from 'react-icons/io5';
 import { useNotificationContext } from '../../../context/useNotificationContext';
 import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
 import { useTimerHook } from '../../../hooks/useTimerHook';
 import LastActivity from './LastActivity/LastActivity';
+import MusicPlayer from './MusicPlayer/MusicPlayer';
 
 export default function TimerTrack({ openNotificationModal }) {
+  const [activeTab, setActiveTab] = useState('activity');
   const { notifications } = useNotificationContext();
   const { tasks, activeTaskId, getRemainingTime, pauseTask, finishTask, startTask } =
     useTasksContext();
@@ -172,7 +174,6 @@ export default function TimerTrack({ openNotificationModal }) {
                 marginTop: '20px',
                 boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
                 opacity: activeTask ? 1 : 0.5,
-                // pointerEvents: activeTask ? 'auto' : 'none',
               }}
             >
               {activeTask?.timerState?.isActive ? (
@@ -244,7 +245,46 @@ export default function TimerTrack({ openNotificationModal }) {
           flexDirection: 'column',
         }}
       >
-        <LastActivity colorGradients={colorGradients} />
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '10px' }}>
+          <button
+            onClick={() => setActiveTab('activity')}
+            style={{
+              padding: '5px 10px',
+              marginRight: '10px',
+              backgroundColor: activeTab === 'activity' ? colorGradients[0] : 'white',
+              color: activeTab === 'activity' ? 'white' : 'black',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <IoTimerOutline style={{ marginRight: '5px' }} />
+            Last Activity
+          </button>
+          <button
+            onClick={() => setActiveTab('music')}
+            style={{
+              padding: '5px 10px',
+              backgroundColor: activeTab === 'music' ? colorGradients[0] : 'white',
+              color: activeTab === 'music' ? 'white' : 'black',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <FaPlay style={{ marginRight: '5px' }} />
+            Music
+          </button>
+        </div>
+        {activeTab === 'activity' ? (
+          <LastActivity colorGradients={colorGradients} />
+        ) : (
+          <MusicPlayer colorGradients={colorGradients} />
+        )}
       </div>
     </div>
   );
