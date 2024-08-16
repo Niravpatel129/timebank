@@ -49,7 +49,7 @@ export default function MusicPlayer({ colorGradients }) {
           const response = await fetch(
             `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
               searchTerm,
-            )}&type=video&key=AIzaSyBvuDAsAKqA0no7GXQkxAbyCf2mlc9AwsE`,
+            )}&type=video&key=${process.env.REACT_APP_YOUTUBE_API_KEY}`,
           );
           const data = await response.json();
           if (data.items && data.items.length > 0) {
