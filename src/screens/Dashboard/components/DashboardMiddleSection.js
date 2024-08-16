@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { BiPlus } from 'react-icons/bi';
@@ -23,7 +23,7 @@ export default function DashboardComponent({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { selectedProject, updateProject, colorGradients } = useProjectContext();
   const [filterType, setFilterType] = useState('all');
-  const { tasks, updateTask, totalTimeSpent, dailyTimeSpent, setTasks, isLoading } =
+  const { tasks, updateTask, totalTimeSpent, dailyTimeSpent, setTasks, isLoading, moveTask } =
     useTasksContext();
   const [title, setTitle] = useState(selectedProject?.name);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -113,26 +113,6 @@ export default function DashboardComponent({
           });
     return sortTasks(filteredTasks, 'thingsToDo');
   }, [tasks, filterType, user?.name, hideCompleted]);
-
-  const moveTask = useCallback(
-    (id, targetList, newIndex) => {
-      const task = tasks.find((t) => t?._id === id);
-      if (task) {
-        const updatedTask = { ...task, listType: targetList };
-        updateTask(updatedTask);
-
-        setTasks((prevTasks) => {
-          const newTasks = prevTasks.map((t) => (t?._id === id ? updatedTask : t));
-          const listTasks = newTasks.filter((t) => t.listType === targetList);
-          const newOrder = getTaskOrder(targetList).filter((taskId) => taskId !== id);
-          newOrder.splice(newIndex, 0, id);
-          setTaskOrder(targetList, newOrder);
-          return newTasks;
-        });
-      }
-    },
-    [tasks, updateTask],
-  );
 
   const handleTitleClick = () => {
     setIsEditingTitle(true);

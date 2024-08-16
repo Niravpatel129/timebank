@@ -25,7 +25,6 @@ const Checklist = ({
   timerState,
   assignee,
   timerType,
-  timeSpent,
 }) => {
   const [currentAssignee, setCurrentAssignee] = useState(assignee);
   const [isHovered, setIsHovered] = useState(false);
@@ -116,7 +115,8 @@ const Checklist = ({
         const threshold = 100;
         if (Math.abs(info.offset.y) > threshold) {
           const newListType = listType === 'currentWeek' ? 'thingsToDo' : 'currentWeek';
-          moveTask(id, newListType);
+          // Pass 0 as the new index when moving to a new list
+          moveTask(id, newListType, 0);
         }
       }}
       onClick={handleTaskClick}

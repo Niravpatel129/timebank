@@ -8,6 +8,13 @@ export const useTimerHook = (taskId) => {
   const [remainingTime, setRemainingTime] = useState(task?.timerState.remainingTime || 0);
 
   useEffect(() => {
+    console.log('my task updated');
+    if (task?.timerState.remainingTime) {
+      setRemainingTime(task.timerState.remainingTime);
+    }
+  }, [task]);
+
+  useEffect(() => {
     // if the taskId is the same as the active task, just return here
     if (task && task._id !== activeTaskId) {
       return;

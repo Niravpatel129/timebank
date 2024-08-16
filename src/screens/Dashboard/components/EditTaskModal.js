@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaTimes, FaTrash } from 'react-icons/fa';
-import Select from 'react-select';
 
 export default function EditTaskModal({ onClose, task, onSave, onDelete }) {
   const [taskName, setTaskName] = useState(task.name || '');
@@ -12,6 +11,7 @@ export default function EditTaskModal({ onClose, task, onSave, onDelete }) {
   const [category, setCategory] = useState(task.category || '');
   const [date, setDate] = useState(task.dateDue || new Date().toISOString().split('T')[0]);
   const [assignee, setAssignee] = useState(task.assignee || null);
+  const [timerType, setTimerType] = useState(task.timerType || 'countdown');
   const modalRef = useRef(null);
 
   useEffect(() => {
@@ -32,6 +32,7 @@ export default function EditTaskModal({ onClose, task, onSave, onDelete }) {
     } else {
       setDuration('45m');
     }
+    setTimerType(task.timerType || 'countdown');
   }, [task]);
 
   const handleSubmit = (e) => {
@@ -50,11 +51,16 @@ export default function EditTaskModal({ onClose, task, onSave, onDelete }) {
       ...task,
       name: taskName,
       duration: duration,
-      taskDuration: taskDuration,
-      timeSpent: 0,
+      taskDuration: timerType === 'countdown' ? taskDuration : '0',
+      timerState: {
+        ...task.timerState,
+        remainingTime: timerType === 'countdown' ? taskDuration : '0',
+        timeSpent: timerType === 'countup' ? task.timerState.timeSpent : '0',
+      },
       category: category,
       date: date,
       assignee: assignee,
+      timerType: timerType,
     };
 
     onSave(updatedTask);
@@ -238,40 +244,68 @@ export default function EditTaskModal({ onClose, task, onSave, onDelete }) {
             </div>
           </div>
 
-          {/* Duration Selection */}
+          {/* Timer Type Selection */}
           <div style={{ marginBottom: '15px' }}>
-            <label>How long will this take?</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
-              {['5m', '15m', '30m', '45m', '1h', 'Other'].map((time) => (
+            <label>Do you know how long this task will take?</label>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
+              {['countdown', 'countup'].map((type) => (
                 <motion.button
-                  key={time}
+                  key={type}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   type='button'
-                  onClick={() => handleDurationClick(time)}
+                  onClick={() => setTimerType(type)}
                   style={{
                     padding: '8px 12px',
                     border: 'none',
                     borderRadius: '20px',
-                    backgroundColor:
-                      duration === time || (time === 'Other' && duration === 'custom')
-                        ? 'black'
-                        : '#e0e0e0',
-                    color:
-                      duration === time || (time === 'Other' && duration === 'custom')
-                        ? 'white'
-                        : 'black',
+                    backgroundColor: timerType === type ? 'black' : '#e0e0e0',
+                    color: timerType === type ? 'white' : 'black',
                     cursor: 'pointer',
                   }}
                 >
-                  {time}
+                  {type === 'countdown' ? 'Yes, I know' : 'Not sure'}
                 </motion.button>
               ))}
             </div>
           </div>
 
+          {/* Duration Selection */}
+          {timerType === 'countdown' && (
+            <div style={{ marginBottom: '15px' }}>
+              <label>How long will this take?</label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '5px' }}>
+                {['5m', '15m', '30m', '45m', '1h', 'Other'].map((time) => (
+                  <motion.button
+                    key={time}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    type='button'
+                    onClick={() => handleDurationClick(time)}
+                    style={{
+                      padding: '8px 12px',
+                      border: 'none',
+                      borderRadius: '20px',
+                      backgroundColor:
+                        duration === time || (time === 'Other' && duration === 'custom')
+                          ? 'black'
+                          : '#e0e0e0',
+                      color:
+                        duration === time || (time === 'Other' && duration === 'custom')
+                          ? 'white'
+                          : 'black',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {time}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Custom Duration Input */}
-          {showCustomDuration && (
+          {showCustomDuration && timerType === 'countdown' && (
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '5px' }}>Custom Duration</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -381,21 +415,6 @@ export default function EditTaskModal({ onClose, task, onSave, onDelete }) {
             </div>
           </div>
 
-          {/* Assignee Select Dropdown */}
-          <div style={{ marginBottom: '15px' }}>
-            <label htmlFor='assignee'>Assignee</label>
-            <Select
-              id='assignee'
-              value={assignee}
-              onChange={setAssignee}
-              options={assignees}
-              styles={customStyles}
-              formatOptionLabel={formatOptionLabel}
-              placeholder='Select an assignee'
-              isClearable
-            />
-          </div>
-
           {/* Submit and Delete Buttons */}
           <div
             style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}
@@ -421,7 +440,7 @@ export default function EditTaskModal({ onClose, task, onSave, onDelete }) {
                 alignItems: 'center',
               }}
             >
-              <FaTrash /> Delete
+              <FaTrash /> Delete Task
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
