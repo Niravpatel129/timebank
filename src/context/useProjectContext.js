@@ -19,7 +19,7 @@ export const ProjectProvider = ({ children }) => {
     selectedProject?.projectColor?.gradient2 || '',
   ];
 
-  const { data: projects = [] } = useQuery(
+  const { data: projects = [], refetch: fetchProjects } = useQuery(
     'projects',
     async () => {
       const response = await newRequest.get('/projects');
@@ -133,6 +133,7 @@ export const ProjectProvider = ({ children }) => {
     closeModal,
     members,
     colorGradients,
+    fetchProjects,
   };
 
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>;
