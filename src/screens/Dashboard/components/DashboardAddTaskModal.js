@@ -8,6 +8,7 @@ import newRequest from '../../../api/newReqest';
 import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
 
+const MAX_TASK_NAME_LENGTH = 70;
 export default function DashboardAddTaskModal({ onClose, isOpen }) {
   const { selectedProject, colorGradients } = useProjectContext();
   const { addTask } = useTasksContext();
@@ -51,7 +52,7 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
 
         setTaskData((prev) => ({
           ...prev,
-          taskName: task.name,
+          taskName: task.name.slice(0, MAX_TASK_NAME_LENGTH), // Limit taskName to 100 characters
           duration: duration,
           showCustomDuration: duration === 'custom',
           customHours: duration === 'custom' ? Math.floor(durationInSeconds / 3600) : 0,
@@ -106,7 +107,7 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
     e.preventDefault();
     const taskDurationInSeconds = calculateDurationInSeconds(taskData.duration);
     const newTask = {
-      name: taskData.taskName,
+      name: taskData.taskName.slice(0, MAX_TASK_NAME_LENGTH), // Limit taskName to 100 characters
       status: 'not-started',
       taskDuration: taskData.timerType === 'countup' ? 0 : taskDurationInSeconds,
       hours: taskDurationInSeconds / 3600,
@@ -149,6 +150,9 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
   }, [onClose]);
 
   const handleInputChange = (field, value) => {
+    if (field === 'taskName') {
+      value = value.slice(0, MAX_TASK_NAME_LENGTH); // Limit taskName to 100 characters
+    }
     setTaskData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -243,6 +247,7 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
             outline: 'none',
             padding: '8px',
           }}
+          maxLength={id === 'taskName' ? MAX_TASK_NAME_LENGTH : undefined} // Add maxLength for taskName
         />
 
         <motion.button
@@ -260,6 +265,11 @@ export default function DashboardAddTaskModal({ onClose, isOpen }) {
           <FaTimes />
         </motion.button>
       </div>
+      {id === 'taskName' && (
+        <div style={{ fontSize: '0.8em', color: '#666', marginTop: '5px' }}>
+          {value.length}/{MAX_TASK_NAME_LENGTH} characters
+        </div>
+      )}
     </div>
   );
 
