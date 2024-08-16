@@ -160,6 +160,7 @@ const Checklist = ({
             text={title}
             isCompleted={status === 'completed'}
             strokeGradient={colorGradients}
+            isActive={timerState.isActive}
           />
           {tag && (
             <Tag

@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { BiPlus } from 'react-icons/bi';
-import { FaSearch } from 'react-icons/fa';
 import { Tooltip } from 'react-tooltip';
 import newRequest from '../../../api/newReqest';
 import AddTaskButton from '../../../components/AddTaskButton';
@@ -283,7 +282,9 @@ export default function DashboardComponent({
                   <div
                     key={user}
                     data-tooltip-id={`day-${index}`}
-                    data-tooltip-content={`${user} - Last active: 2 hours ago`}
+                    data-tooltip-content={`${
+                      user[0].toUpperCase() + user.slice(1)
+                    } - Last active: 2 hours ago`}
                     style={{ cursor: 'pointer' }}
                   >
                     {user?.profileImage ? (
@@ -377,7 +378,7 @@ export default function DashboardComponent({
                 />
               )}
             </AnimatePresence>
-            <FaSearch
+            {/* <FaSearch
               style={{
                 marginRight: '15px',
                 fontSize: '20px',
@@ -385,7 +386,7 @@ export default function DashboardComponent({
                 cursor: 'pointer',
               }}
               onClick={handleSearch}
-            />
+            /> */}
             <AddTaskButton
               handleTriggerAddTaskButton={handleTriggerAddTaskButton}
               colorGradients={colorGradients}
@@ -507,7 +508,7 @@ export default function DashboardComponent({
               gap: '4px',
             }}
           >
-            <span>Active Tasks</span>
+            <span>Currently Working On</span>
           </h2>
 
           <motion.div
@@ -564,7 +565,7 @@ export default function DashboardComponent({
         />
 
         <h2 style={{ color: colorGradients[0], marginTop: '30px', marginBottom: '20px' }}>
-          Not in the board
+          Not Working On
         </h2>
 
         <div style={{ marginBottom: '300px', marginTop: '30px' }}>

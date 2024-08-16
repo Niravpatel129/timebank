@@ -1,12 +1,18 @@
 import { motion } from 'framer-motion';
 import React from 'react';
 
-const ScribbleText = ({ text, isCompleted, strokeGradient }) => {
+const ScribbleText = ({ text, isCompleted, strokeGradient, isActive }) => {
   const pathLength = text.length * 15;
 
   return (
     <div style={{ position: 'relative' }}>
-      <motion.span transition={{ duration: 0.5, delay: 0.5 }} style={{}}>
+      <motion.span
+        transition={{ duration: 0.5, delay: 0.5 }}
+        style={{
+          color: isActive ? strokeGradient[0] : null,
+          fontWeight: isActive ? 'bold' : 'normal',
+        }}
+      >
         {text}
       </motion.span>
       {isCompleted && (
