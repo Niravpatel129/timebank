@@ -255,15 +255,16 @@ export default function DashboardComponent({
           </div>
           <div style={commonStyles.flexContainer}>
             <div style={{ display: 'flex', alignItems: 'center', marginRight: '30px' }}>
-              {members?.map((user, index) => {
+              {selectedProject?.members?.map((user, index) => {
                 if (!user) return null;
+                const userName = user?.user.name || user?.email;
 
                 return (
                   <div
-                    key={user}
+                    key={userName}
                     data-tooltip-id={`day-${index}`}
                     data-tooltip-content={`${
-                      user[0].toUpperCase() + user.slice(1)
+                      userName[0].toUpperCase() + userName.slice(1)
                     } - Last active: 2 hours ago`}
                     style={{ cursor: 'pointer' }}
                   >
@@ -302,7 +303,7 @@ export default function DashboardComponent({
                           color: '#fff',
                         }}
                       >
-                        {user?.charAt(0)?.toUpperCase()}
+                        {userName[0].toUpperCase()}
                       </motion.div>
                     )}
                   </div>
