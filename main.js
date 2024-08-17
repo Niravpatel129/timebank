@@ -182,9 +182,8 @@ function createDashboardWindow() {
     return false;
   });
 
-  if (process.env.NODE_ENV === 'development') {
-    dashboardWindow.show();
-  }
+  // Show dashboard window on launch
+  dashboardWindow.show();
 }
 
 function createTray() {
@@ -275,6 +274,9 @@ app.whenReady().then(() => {
 
     // Set the dock app title
     app.dock.setMenu(Menu.buildFromTemplate([{ label: 'Hour Block' }]));
+
+    // Show dashboard window on launch
+    dashboardWindow.show();
   }, 1000);
 
   // Add event listener for dock icon click
