@@ -19,7 +19,6 @@ let tray = null;
 let mainWindow = null;
 let settingsWindow = null;
 let dashboardWindow = null;
-let timerManager = null;
 
 const widthMultiplier = 0.18;
 const heightMultiplier = 0.48;
@@ -144,12 +143,14 @@ function createDashboardWindow() {
     frame: false,
     resizable: true,
     roundedCorners: true,
+    opacity: 0.98,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
       webSecurity: false,
     },
     icon,
+    blur: true,
   });
 
   icon.setTemplateImage(true);

@@ -4,6 +4,7 @@ import './App.css';
 import { useScreenContext } from './context/useScreenContext';
 import { useUserContext } from './context/useUserContext.js';
 import Dashboard from './screens/Dashboard/Dashboard.js';
+import Focus from './screens/Focus/Focus.js';
 import Home from './screens/Home';
 import Onboarding from './screens/Onboarding/Onboarding.js';
 import Results from './screens/Results';
@@ -36,6 +37,7 @@ function App() {
         <Route path='/tasks' element={<Tasks currentTask={currentTask} />} />
         <Route path='/results' element={<Results currentTask={currentTask} />} />
         <Route path='/dashboard' element={isLoggedIn ? <Dashboard /> : <Onboarding />} />
+        <Route path='/focus' element={<Focus />} />
       </Routes>
     </div>
   );

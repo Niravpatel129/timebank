@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaPause, FaPlay } from 'react-icons/fa';
 import { IoNotificationsOutline, IoTimerOutline } from 'react-icons/io5';
+import { SlControlPlay } from 'react-icons/sl';
+import { useNavigate } from 'react-router-dom';
 import { useNotificationContext } from '../../../context/useNotificationContext';
 import { useProjectContext } from '../../../context/useProjectContext';
 import { useTasksContext } from '../../../context/useTasksContext';
@@ -14,9 +16,9 @@ import MusicPlayer from './MusicPlayer/MusicPlayer';
 export default function TimerTrack({ openNotificationModal }) {
   const [activeTab, setActiveTab] = useState('activity');
   const { notifications } = useNotificationContext();
-  const { tasks, activeTaskId, getRemainingTime, pauseTask, finishTask, startTask } =
-    useTasksContext();
+  const { tasks, activeTaskId, pauseTask, startTask } = useTasksContext();
   const { colorGradients } = useProjectContext();
+  const navigate = useNavigate();
 
   const activeTask = tasks.find((task) => task?._id === activeTaskId);
   const remainingTime = useTimerHook(activeTaskId);
@@ -82,6 +84,14 @@ export default function TimerTrack({ openNotificationModal }) {
               style={{ fontSize: '20px', color: '#bebfca', cursor: 'pointer' }}
               onClick={openNotificationModal}
             />
+
+            <SlControlPlay
+              style={{ fontSize: '20px', color: '#bebfca', cursor: 'pointer' }}
+              onClick={() => {
+                navigate('/focus');
+              }}
+            />
+
             {notifications?.length > 0 && (
               <span
                 style={{
