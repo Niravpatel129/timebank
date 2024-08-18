@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import { CiClock2 } from 'react-icons/ci';
 import { FaCheck, FaPause, FaPlay } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
@@ -59,6 +60,13 @@ const Checklist = ({
 
   const handlePlay = (e) => {
     e.stopPropagation();
+    e.preventDefault();
+    // if task is completed, do not allow to start timer
+    if (status === 'completed') {
+      toast.error('Task is completed');
+      return;
+    }
+
     if (timerState.isActive) {
       pauseTask(id, remainingTime, timerType);
     } else {
@@ -197,8 +205,14 @@ const Checklist = ({
             fontWeight: 400,
             display: 'flex',
             alignItems: 'center',
-            color: timerState.isActive ? colorGradients[0] : '#c3c4cc',
+            color:
+              status === 'completed'
+                ? colorGradients[0]
+                : timerState.isActive
+                ? colorGradients[0]
+                : '#c3c4cc',
             gap: '4px',
+            opacity: status === 'completed' ? 0.5 : 1,
           }}
         >
           {timerType === 'countup' ? (
@@ -220,29 +234,30 @@ const Checklist = ({
           Icon={timerState.isActive ? FaPause : FaPlay}
           color={isDisabled ? '#ffffff' : '#ffffff'}
           style={{
-            backgroundColor: timerState.isActive
-              ? isPlayButtonHovered
+            backgroundColor:
+              status === 'completed'
                 ? colorGradients[0]
-                : colorGradients[1]
-              : isPlayButtonHovered
-              ? '#c3c4cc'
-              : '#d9dae3',
-            padding: '10px',
+                : timerState.isActive
+                ? isPlayButtonHovered
+                  ? colorGradients[0]
+                  : colorGradients[1]
+                : isPlayButtonHovered
+                ? '#c3c4cc'
+                : '#d9dae3',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '10px',
-            height: '10px',
-            cursor: 'pointer',
+            width: '30px',
+            height: '30px',
+            cursor: status === 'completed' ? 'not-allowed' : 'pointer',
             marginRight: '10px',
             transition: 'background-color 0.3s ease',
-            cursor: 'pointer',
+            opacity: status === 'completed' ? 0.5 : 1,
           }}
           onMouseEnter={() => setIsPlayButtonHovered(true)}
           onMouseLeave={() => setIsPlayButtonHovered(false)}
-        />
-
+        ></IconButton>
         <div
           ref={assigneeSelectRef}
           style={{

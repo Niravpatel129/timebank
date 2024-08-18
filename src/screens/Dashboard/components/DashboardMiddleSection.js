@@ -139,13 +139,27 @@ export default function DashboardComponent({
     setTotalHoursLastTwoMonths(totalHours.toFixed(2));
   }, [tasks]);
 
-  const getContributionColor = (timeSpent) => {
+  const getContributionColor = (timeSpent, isCompleted) => {
     if (timeSpent === 0) return '#f0f0f0';
-    if (timeSpent <= 1800) return '#d1c9f5'; // 30 minutes
-    if (timeSpent <= 3600) return '#a799e8'; // 1 hour
-    if (timeSpent <= 7200) return '#7d69db'; // 2 hours
-    if (timeSpent <= 14400) return '#5339ce'; // 4 hours
-    return commonStyles.primaryColor;
+    let color;
+    if (timeSpent <= 1800) color = '#d1c9f5'; // 30 minutes
+    else if (timeSpent <= 3600) color = '#a799e8'; // 1 hour
+    else if (timeSpent <= 7200) color = '#7d69db'; // 2 hours
+    else if (timeSpent <= 14400) color = '#5339ce'; // 4 hours
+    else color = commonStyles.primaryColor;
+
+    return isCompleted ? darkenColor(color, 20) : color;
+  };
+
+  const darkenColor = (color, amount) => {
+    return (
+      '#' +
+      color
+        .replace(/^#/, '')
+        .replace(/../g, (color) =>
+          ('0' + Math.min(255, Math.max(0, parseInt(color, 16) - amount)).toString(16)).substr(-2),
+        )
+    );
   };
 
   const loadingVariants = {
@@ -394,6 +408,7 @@ export default function DashboardComponent({
                 date.setDate(date.getDate() - (59 - i));
                 const dateString = date.toISOString().split('T')[0];
                 const timeSpent = lastTwoMonthsTimeSpent[i]?.timeSpent || 0;
+                const isCompleted = lastTwoMonthsTimeSpent[i]?.isCompleted || false;
                 return (
                   <div
                     data-tooltip-id={`day-${59 - i}`}
