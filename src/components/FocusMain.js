@@ -12,6 +12,8 @@ export default function FocusMain({
   isActive,
   fillAmount,
   currentFillAmount,
+  handleMarkComplete,
+  handleAddMoreTime,
 }) {
   console.log(
     '🚀  fillAmount currentFillAmount:',
@@ -39,11 +41,10 @@ export default function FocusMain({
   };
 
   const renderClock = ({ time, isActive, onClickTimeAction }) => {
-    const clockSize = 250;
     const initialRemainingTime = currentFillAmount;
 
     return (
-      <div style={{ position: 'relative', width: `${clockSize}px`, height: `${clockSize}px` }}>
+      <div style={{ position: 'relative' }}>
         <CountdownCircleTimer
           isPlaying={isActive}
           duration={fillAmount}
@@ -51,8 +52,8 @@ export default function FocusMain({
           colors={['#fff']}
           trailColor='rgba(255, 255, 255, 0.5)'
           colorsTime={[fillAmount]}
-          size={clockSize}
-          strokeWidth={10}
+          size={400}
+          strokeWidth={12}
         >
           {({ remainingTime }) => (
             <div
@@ -61,8 +62,8 @@ export default function FocusMain({
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: `${clockSize * 0.75}px`,
-                height: `${clockSize * 0.75}px`,
+                // width: `${clockSize * 0.75}%`,
+                // height: `${clockSize * 0.75}%`,
                 borderRadius: '50%',
                 backgroundColor: '#6366F1',
                 display: 'flex',
@@ -73,9 +74,9 @@ export default function FocusMain({
               onClick={onClickTimeAction}
             >
               {isActive ? (
-                <IoPauseOutline style={{ fontSize: '80px', color: 'white' }} />
+                <IoPauseOutline style={{ fontSize: '100px', color: 'white' }} />
               ) : (
-                <IoPlayOutline style={{ fontSize: '80px', color: 'white' }} />
+                <IoPlayOutline style={{ fontSize: '100px', color: 'white' }} />
               )}
             </div>
           )}
@@ -151,8 +152,8 @@ export default function FocusMain({
 
       {/* bottom section */}
       <div style={{ padding: '16px', display: 'flex', gap: '10px', marginBottom: '10px' }}>
-        <div>{renderIcon({ Icon: MdMoreTime })}</div>
-        <div>{renderIcon({ Icon: MdCheck })}</div>
+        <div onClick={handleMarkComplete}>{renderIcon({ Icon: MdCheck })}</div>
+        <div onClick={handleAddMoreTime}>{renderIcon({ Icon: MdMoreTime })}</div>
       </div>
     </div>
   );

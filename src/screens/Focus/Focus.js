@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import FocusMain from '../../components/FocusMain';
 import { useProjectContext } from '../../context/useProjectContext';
@@ -7,14 +8,13 @@ import { useTimerHook } from '../../hooks/useTimerHook';
 
 export default function Focus() {
   const navigate = useNavigate();
-  const { tasks, activeTaskId, pauseTask, startTask, completeTask } = useTasksContext();
+  const { tasks, activeTaskId, pauseTask, startTask, updateTaskStatus } = useTasksContext();
   const remainingTime = useTimerHook(activeTaskId);
   const [isActive, setIsActive] = useState(false);
   const [showMusicPlayer, setShowMusicPlayer] = useState(false);
   const { colorGradients } = useProjectContext();
 
   const activeTask = tasks.find((task) => task?._id === activeTaskId);
-  console.log('🚀  activeTask:', activeTask);
 
   useEffect(() => {
     if (activeTask) {
@@ -38,14 +38,43 @@ export default function Focus() {
     setIsActive(!isActive);
   };
 
+  const handleAddMoreTime = () => {
+    // do nothing
+  };
+
   const handleStop = () => {
-    completeTask(activeTaskId);
     navigate('/dashboard');
   };
 
   const handleClose = () => navigate('/dashboard');
 
   const toggleMusicPlayer = () => setShowMusicPlayer(!showMusicPlayer);
+
+  const handleEsc = () => {
+    navigate('/dashboard');
+  };
+
+  const handleMarkComplete = () => {
+    // pause task, update task state to complete
+    pauseTask(activeTaskId);
+    updateTaskStatus(activeTaskId, 'completed');
+    navigate('/dashboard');
+    toast.success('Task marked as complete');
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        handleEsc();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   return (
     <FocusMain
@@ -61,6 +90,8 @@ export default function Focus() {
       closeFocus={handleClose}
       fillAmount={activeTask?.taskDuration}
       currentFillAmount={remainingTime}
+      handleMarkComplete={handleMarkComplete}
+      handleAddMoreTime={handleAddMoreTime}
     />
   );
 }
