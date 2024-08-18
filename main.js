@@ -23,7 +23,6 @@ let timerManager = null;
 
 const widthMultiplier = 0.18;
 const heightMultiplier = 0.48;
-const dashboardAspectRatio = 16 / 9;
 
 // Configure logging for autoUpdater
 autoUpdater.logger = require('electron-log');
@@ -135,13 +134,11 @@ function createSettingsWindow() {
 
 function createDashboardWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  const dashboardWidth = Math.round(width * 0.9); // Increased from 0.8 to 0.9
-  const dashboardHeight = Math.round(dashboardWidth / dashboardAspectRatio);
   const icon = nativeImage.createFromPath(path.join(__dirname, 'assets', 'docker-icon.png'));
 
   dashboardWindow = new BrowserWindow({
-    width: dashboardWidth,
-    height: dashboardHeight,
+    width: width,
+    height: height,
     show: false,
     titleBarStyle: 'hiddenInset',
     frame: false,
