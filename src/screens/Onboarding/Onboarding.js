@@ -148,7 +148,7 @@ const Onboarding = () => {
         newLoginVerificationCode[i] = value[i];
       }
       setLoginVerificationCode(newLoginVerificationCode);
-      codeInputRefs[3].current.focus();
+      loginCodeInputRefs[3].current.focus();
     } else if (value.length <= 1) {
       // Handle single digit input and backspace
       newLoginVerificationCode[index] = value;
