@@ -1,4 +1,5 @@
 import React from 'react';
+import BlocksScreen from './screens/BlocksScreen.js';
 import BoardScreen from './screens/BoardScreen';
 import CalendarScreen from './screens/CalendarScreen';
 import ListScreen from './screens/ListScreen';
@@ -17,6 +18,8 @@ const DashboardScreenSwitch = (props) => {
       return <TeamScreen />;
     case 'trash':
       return <TrashScreen />;
+    case 'blocks':
+      return <BlocksScreen />;
     default:
       return <ListScreen />;
   }

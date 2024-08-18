@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
-import { FaChevronLeft, FaChevronRight, FaClipboardList, FaListAlt } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaClipboardList, FaCube, FaListAlt } from 'react-icons/fa';
 import { FaPeopleGroup } from 'react-icons/fa6';
 
 const iconStyle = {
@@ -37,6 +37,7 @@ export default function DashboardSubbar({
     },
     { icon: FaListAlt, label: 'List', screen: 'list' },
     { icon: FaClipboardList, label: 'Board', screen: 'board' },
+    { icon: FaCube, label: 'Blocks', screen: 'blocks' },
     // { icon: FaCalendarAlt, label: 'Calendar', screen: 'calendar' },
     { icon: FaPeopleGroup, label: 'Team', screen: 'team' },
     // { icon: FaTrash, label: 'Trash', screen: 'trash' },
