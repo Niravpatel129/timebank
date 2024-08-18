@@ -1,5 +1,6 @@
+import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
-import { FaCheckCircle, FaCog, FaRegCircle } from 'react-icons/fa';
+import { FaCheckCircle, FaCog, FaEye, FaEyeSlash, FaRegCircle } from 'react-icons/fa';
 import { useTasksContext } from '../../../../../context/useTasksContext';
 
 const BlocksScreen = () => {
@@ -11,8 +12,21 @@ const BlocksScreen = () => {
     showSettings: false,
   });
 
+  const muteColors = [
+    '#E6E6FA', // Lavender
+    '#F0FFF0', // Honeydew
+    '#FFF0F5', // Lavender Blush
+    '#F0FFFF', // Azure
+    '#F5F5DC', // Beige
+    '#FFF5EE', // Seashell
+    '#F0F8FF', // Alice Blue
+    '#F8F8FF', // Ghost White
+    '#FFF5E6', // Linen
+    '#FFFAF0', // Floral White
+  ];
+
   useEffect(() => {
-    const groupedTasks = tasks.reduce((acc, task) => {
+    const groupedTasks = tasks.reduce((acc, task, index) => {
       const startDate = new Date(task.date || task.updatedAt);
       const dayOfWeek = startDate.toLocaleString('en-US', { weekday: 'long' });
 
@@ -24,7 +38,10 @@ const BlocksScreen = () => {
         id: task._id,
         title: task.name,
         isDone: task.status === 'completed',
-        gradient: [task.tagColor, lightenColor(task.tagColor, 20)],
+        gradient: [
+          muteColors[index % muteColors.length],
+          lightenColor(muteColors[index % muteColors.length], 10),
+        ],
         category: task.category || 'Uncategorized',
       });
 
@@ -54,27 +71,33 @@ const BlocksScreen = () => {
   };
 
   const TaskItem = ({ task }) => (
-    <div
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
       style={{
         background: `linear-gradient(135deg, ${task.gradient[0]}, ${task.gradient[1]})`,
         borderRadius: '12px',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        color: '#141b35',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+        color: '#4A4A4A',
         padding: '12px',
         marginBottom: '12px',
-        transition: 'all 0.3s ease',
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontWeight: 'bold', fontSize: '1em' }}>{task.title}</span>
+        <span style={{ fontWeight: '600', fontSize: '1em' }}>{task.title}</span>
         {task.isDone ? (
-          <FaCheckCircle style={{ color: '#4CAF50', fontSize: '1.2em' }} />
+          <FaCheckCircle style={{ color: '#7CB342', fontSize: '1.2em' }} />
         ) : (
-          <FaRegCircle style={{ color: '#757575', fontSize: '1.2em' }} />
+          <FaRegCircle style={{ color: '#9E9E9E', fontSize: '1.2em' }} />
         )}
       </div>
-      <span style={{ fontSize: '0.9em', marginTop: '4px', display: 'block' }}>{task.category}</span>
-    </div>
+      <span style={{ fontSize: '0.9em', marginTop: '4px', display: 'block', color: '#757575' }}>
+        {task.category}
+      </span>
+    </motion.div>
   );
 
   const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -103,105 +126,177 @@ const BlocksScreen = () => {
   );
 
   return (
-    <div
-      style={{
-        padding: '30px',
-        width: '100%',
-        height: '100%',
-        overflow: 'auto',
-        backgroundColor: '#f5f7fa',
-        position: 'relative',
-      }}
-    >
-      <h1
+    <LayoutGroup>
+      <motion.div
+        layout
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
         style={{
-          fontSize: '2.8em',
-          marginTop: '0',
-          marginBottom: '30px',
-          color: '#141b35',
-          textAlign: 'center',
-          fontWeight: '600',
+          padding: '30px',
+          width: '100%',
+          height: '100%',
+          overflow: 'auto',
+          backgroundColor: '#FAFAFA',
+          position: 'relative',
         }}
       >
-        Weekly Schedule
-      </h1>
-      <div
-        style={{
-          position: 'absolute',
-          top: '30px',
-          right: '30px',
-          cursor: 'pointer',
-        }}
-        onClick={toggleSettings}
-      >
-        <FaCog size={24} color='#141b35' />
-      </div>
-      {settings.showSettings && (
-        <div
+        <motion.h1
+          layout
+          initial={{ y: -50 }}
+          animate={{ y: 0 }}
+          transition={{ type: 'spring', stiffness: 120 }}
           style={{
-            position: 'absolute',
-            top: '60px',
-            right: '30px',
-            backgroundColor: '#ffffff',
-            padding: '15px',
-            borderRadius: '10px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            fontSize: '2.8em',
+            marginTop: '0',
+            marginBottom: '30px',
+            color: '#3E4C59',
+            textAlign: 'center',
+            fontWeight: '600',
           }}
         >
-          <h3>Settings</h3>
-          <div>
-            <label>
-              <input type='checkbox' checked={settings.hideEmpty} onChange={toggleHideEmpty} />
-              Hide Empty Days
-            </label>
-          </div>
-          <h4>Hide Days:</h4>
-          {weekDays.map((day) => (
-            <div key={day}>
-              <label>
-                <input
-                  type='checkbox'
-                  checked={settings.hiddenDays.includes(day)}
-                  onChange={() => toggleHideDay(day)}
-                />
-                {day}
-              </label>
-            </div>
-          ))}
-        </div>
-      )}
-      <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '20px', flexWrap: 'wrap' }}>
-        {visibleDays.map((day) => (
-          <div
-            key={day}
-            style={{
-              width: `calc(${100 / visibleDays.length}% - ${
-                ((visibleDays.length - 1) * 20) / visibleDays.length
-              }px)`,
-              minWidth: '200px',
-              backgroundColor: '#ffffff',
-              borderRadius: '15px',
-              padding: '15px',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
-              marginBottom: '20px',
-            }}
-          >
-            <h2
+          Weekly Schedule
+        </motion.h1>
+        <motion.div
+          layout
+          whileHover={{ rotate: 90 }}
+          whileTap={{ scale: 0.9 }}
+          style={{
+            position: 'absolute',
+            top: '30px',
+            right: '30px',
+            cursor: 'pointer',
+          }}
+          onClick={toggleSettings}
+        >
+          <FaCog size={24} color='#3E4C59' />
+        </motion.div>
+        <AnimatePresence>
+          {settings.showSettings && (
+            <motion.div
+              layout
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3 }}
               style={{
-                fontSize: '1.3em',
-                textAlign: 'center',
-                marginBottom: '15px',
-                color: '#2c3e50',
+                position: 'absolute',
+                top: '60px',
+                right: '30px',
+                backgroundColor: '#FFFFFF',
+                padding: '20px',
+                borderRadius: '15px',
+                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                zIndex: 1000,
               }}
             >
-              {day}
-            </h2>
-            {weeklyTasks[day] &&
-              weeklyTasks[day].map((task) => <TaskItem key={task.id} task={task} />)}
-          </div>
-        ))}
-      </div>
-    </div>
+              <h3 style={{ color: '#3E4C59', marginBottom: '15px' }}>Settings</h3>
+              <div style={{ marginBottom: '15px' }}>
+                <label
+                  style={{
+                    color: '#4A4A4A',
+                    display: 'flex',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <input
+                    type='checkbox'
+                    checked={settings.hideEmpty}
+                    onChange={toggleHideEmpty}
+                    style={{ marginRight: '10px' }}
+                  />
+                  Hide Empty Days
+                  {settings.hideEmpty ? (
+                    <FaEyeSlash style={{ marginLeft: '10px' }} />
+                  ) : (
+                    <FaEye style={{ marginLeft: '10px' }} />
+                  )}
+                </label>
+              </div>
+              <h4 style={{ color: '#3E4C59', marginBottom: '10px' }}>Hide Days:</h4>
+              {weekDays.map((day) => (
+                <div key={day} style={{ marginBottom: '5px' }}>
+                  <label
+                    style={{
+                      color: '#4A4A4A',
+                      display: 'flex',
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <input
+                      type='checkbox'
+                      checked={settings.hiddenDays.includes(day)}
+                      onChange={() => toggleHideDay(day)}
+                      style={{ marginRight: '10px' }}
+                    />
+                    {day}
+                    {settings.hiddenDays.includes(day) ? (
+                      <FaEyeSlash style={{ marginLeft: '10px' }} />
+                    ) : (
+                      <FaEye style={{ marginLeft: '10px' }} />
+                    )}
+                  </label>
+                </div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <motion.div
+          layout
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          style={{ display: 'flex', justifyContent: 'flex-start', gap: '20px', flexWrap: 'nowrap' }}
+        >
+          <AnimatePresence>
+            {visibleDays.map((day) => (
+              <motion.div
+                layout
+                key={day}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.3 }}
+                style={{
+                  width: `calc(${100 / visibleDays.length}% - ${
+                    ((visibleDays.length - 1) * 20) / visibleDays.length
+                  }px)`,
+                  minWidth: '200px',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '15px',
+                  padding: '15px',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.03)',
+                  marginBottom: '20px',
+                }}
+              >
+                <motion.h2
+                  layout
+                  style={{
+                    fontSize: '1.3em',
+                    textAlign: 'center',
+                    marginBottom: '15px',
+                    color: '#3E4C59',
+                  }}
+                >
+                  {day}
+                </motion.h2>
+                <AnimatePresence>
+                  {weeklyTasks[day] &&
+                    weeklyTasks[day].map((task) => (
+                      <motion.div key={task.id} layout>
+                        <TaskItem task={task} />
+                      </motion.div>
+                    ))}
+                </AnimatePresence>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
+      </motion.div>
+    </LayoutGroup>
   );
 };
 
