@@ -322,6 +322,11 @@ export const TasksProvider = ({ children }) => {
     (taskId) => {
       if (!taskId) return;
 
+      // if (tasks.some((task) => task.timerState.isActive)) {
+      //   toast.error('Another task timer is active, please pause it before starting another one.');
+      //   return;
+      // }
+
       startTaskMutation.mutate(taskId);
     },
     [tasks, startTaskMutation],
