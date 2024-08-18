@@ -14,7 +14,7 @@ const makeRequest = async (method, url, data = null, options = {}) => {
 
     const requestOptions = {
       method,
-      url: `${localUrl}${url}`,
+      url: `${baseUrl}${url}`,
       ...(data && { data }),
       headers,
       timeout: 10000, // 10 seconds
