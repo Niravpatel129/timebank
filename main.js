@@ -143,7 +143,6 @@ function createDashboardWindow() {
     frame: false,
     resizable: true,
     roundedCorners: true,
-    opacity: 0.98,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,

@@ -14,6 +14,7 @@ export default function Focus() {
   const { colorGradients } = useProjectContext();
 
   const activeTask = tasks.find((task) => task?._id === activeTaskId);
+  console.log('🚀  activeTask:', activeTask);
 
   useEffect(() => {
     if (activeTask) {
@@ -57,6 +58,9 @@ export default function Focus() {
       showMusicPlayer={showMusicPlayer}
       toggleMusicPlayer={toggleMusicPlayer}
       colorGradients={colorGradients}
+      closeFocus={handleClose}
+      fillAmount={activeTask?.taskDuration}
+      currentFillAmount={remainingTime}
     />
   );
 }

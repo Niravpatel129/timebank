@@ -1,8 +1,24 @@
 import React from 'react';
+import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import { GrClose } from 'react-icons/gr';
+import { IoPauseOutline, IoPlayOutline } from 'react-icons/io5';
 import { MdCheck, MdMoreTime } from 'react-icons/md';
 
-export default function FocusMain({ title, time, onClickTimeAction }) {
+export default function FocusMain({
+  title,
+  time,
+  onClickTimeAction,
+  closeFocus,
+  isActive,
+  fillAmount,
+  currentFillAmount,
+}) {
+  console.log(
+    '🚀  fillAmount currentFillAmount:',
+    fillAmount,
+    currentFillAmount,
+    fillAmount / currentFillAmount,
+  );
   const renderIcon = ({ Icon }) => {
     return (
       <div
@@ -18,6 +34,52 @@ export default function FocusMain({ title, time, onClickTimeAction }) {
         }}
       >
         <Icon style={{ fontSize: '30px', color: 'white' }} />
+      </div>
+    );
+  };
+
+  const renderClock = ({ time, isActive, onClickTimeAction }) => {
+    const clockSize = 250;
+    const initialRemainingTime = currentFillAmount;
+
+    return (
+      <div style={{ position: 'relative', width: `${clockSize}px`, height: `${clockSize}px` }}>
+        <CountdownCircleTimer
+          isPlaying={isActive}
+          duration={fillAmount}
+          initialRemainingTime={initialRemainingTime}
+          colors={['#fff']}
+          trailColor='rgba(255, 255, 255, 0.5)'
+          colorsTime={[fillAmount]}
+          size={clockSize}
+          strokeWidth={10}
+        >
+          {({ remainingTime }) => (
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: `${clockSize * 0.75}px`,
+                height: `${clockSize * 0.75}px`,
+                borderRadius: '50%',
+                backgroundColor: '#6366F1',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                cursor: 'pointer',
+              }}
+              onClick={onClickTimeAction}
+            >
+              {isActive ? (
+                <IoPauseOutline style={{ fontSize: '80px', color: 'white' }} />
+              ) : (
+                <IoPlayOutline style={{ fontSize: '80px', color: 'white' }} />
+              )}
+            </div>
+          )}
+        </CountdownCircleTimer>
       </div>
     );
   };
@@ -44,7 +106,7 @@ export default function FocusMain({ title, time, onClickTimeAction }) {
         }}
       >
         <div style={{ color: 'white', fontSize: '18px', fontWeight: '500' }}>Focus Mode</div>
-        <div style={{ cursor: 'pointer', color: 'white', fontSize: '20px' }}>
+        <div style={{ cursor: 'pointer', color: 'white', fontSize: '20px' }} onClick={closeFocus}>
           <GrClose />
         </div>
       </div>
@@ -57,6 +119,7 @@ export default function FocusMain({ title, time, onClickTimeAction }) {
           alignItems: 'center',
           paddingLeft: '16px',
           paddingRight: '16px',
+          justifyContent: 'space-between',
         }}
       >
         <div>
@@ -83,6 +146,7 @@ export default function FocusMain({ title, time, onClickTimeAction }) {
             {time}
           </div>
         </div>
+        {renderClock({ time, isActive, onClickTimeAction })}
       </div>
 
       {/* bottom section */}
