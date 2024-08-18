@@ -5,25 +5,22 @@ import { commonStyles } from './sharedStyles/commonStyles';
 export default function Tracker({ lastTwoMonthsTimeSpent, totalTimeSpent, colorGradients, tasks }) {
   const getContributionColor = (timeSpent) => {
     if (timeSpent === 0) return '#f0f0f0';
-    let color;
-    if (timeSpent <= 1800) color = '#d1c9f5'; // 30 minutes
-    else if (timeSpent <= 3600) color = '#a799e8'; // 1 hour
-    else if (timeSpent <= 7200) color = '#7d69db'; // 2 hours
-    else if (timeSpent <= 14400) color = '#5339ce'; // 4 hours
-    else color = commonStyles.primaryColor;
+    const baseColor = colorGradients[0];
+    let opacity;
+    if (timeSpent <= 1800) opacity = 0.2; // 30 minutes
+    else if (timeSpent <= 3600) opacity = 0.4; // 1 hour
+    else if (timeSpent <= 7200) opacity = 0.6; // 2 hours
+    else if (timeSpent <= 14400) opacity = 0.8; // 4 hours
+    else opacity = 1;
 
-    return color;
+    return addOpacityToHex(baseColor, opacity);
   };
 
-  const darkenColor = (color, amount) => {
-    return (
-      '#' +
-      color
-        .replace(/^#/, '')
-        .replace(/../g, (color) =>
-          ('0' + Math.min(255, Math.max(0, parseInt(color, 16) - amount)).toString(16)).substr(-2),
-        )
-    );
+  const addOpacityToHex = (hex, opacity) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   };
 
   return (
@@ -106,16 +103,7 @@ export default function Tracker({ lastTwoMonthsTimeSpent, totalTimeSpent, colorG
                       width: '8px',
                       height: '8px',
                       borderRadius: '20%',
-                      backgroundColor:
-                        i === 0
-                          ? '#d1c9f5'
-                          : i === 1
-                          ? '#a799e8'
-                          : i === 2
-                          ? '#7d69db'
-                          : i === 3
-                          ? '#5339ce'
-                          : commonStyles.primaryColor,
+                      backgroundColor: addOpacityToHex(colorGradients[0], (i + 1) * 0.2),
                       marginLeft: '2px',
                     }}
                   />
