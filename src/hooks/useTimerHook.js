@@ -7,6 +7,7 @@ export const useTimerHook = (taskId) => {
   const task = tasks.find((t) => t._id === taskId);
   const [remainingTime, setRemainingTime] = useState(0);
   const initializedRef = useRef(false);
+  const previousActiveTaskIdRef = useRef(null);
 
   useEffect(() => {
     if (task && !initializedRef.current) {
@@ -25,7 +26,11 @@ export const useTimerHook = (taskId) => {
     }
 
     if (task.timerState.isActive) {
+      if (previousActiveTaskIdRef.current && previousActiveTaskIdRef.current !== taskId) {
+        ipcRenderer.send('stop-timer', previousActiveTaskIdRef.current);
+      }
       ipcRenderer.send('start-timer', task);
+      previousActiveTaskIdRef.current = taskId;
     }
 
     const handleTimerUpdate = (event, updatedTime) => {
