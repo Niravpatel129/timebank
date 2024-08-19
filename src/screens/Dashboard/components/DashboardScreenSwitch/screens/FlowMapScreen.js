@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactFlow, {
   addEdge,
   Background,
@@ -13,7 +13,7 @@ import { useProjectContext } from '../../../../../context/useProjectContext';
 import { useTasksContext } from '../../../../../context/useTasksContext';
 
 // Custom node components
-const ProjectNode = ({ data }) => (
+const ProjectNode = React.memo(({ data }) => (
   <div
     style={{
       padding: '15px',
@@ -52,9 +52,9 @@ const ProjectNode = ({ data }) => (
         );
       })}
   </div>
-);
+));
 
-const TaskNode = ({ data }) => (
+const TaskNode = React.memo(({ data }) => (
   <div
     style={{
       padding: '12px',
@@ -109,7 +109,7 @@ const TaskNode = ({ data }) => (
       isConnectable={true}
     />
   </div>
-);
+));
 
 const nodeTypes = {
   project: ProjectNode,
@@ -118,7 +118,7 @@ const nodeTypes = {
 
 const ProjectTodoFlow = () => {
   const { selectedProject } = useProjectContext();
-  const { tasks } = useTasksContext();
+  const { tasks, addTask, updateTask } = useTasksContext();
 
   const [isHorizontal, setIsHorizontal] = useState(true);
   const [nodePositions, setNodePositions] = useState({});
@@ -175,37 +175,33 @@ const ProjectTodoFlow = () => {
 
   const [newTask, setNewTask] = useState('');
 
-  const handleAddTask = (e) => {
-    e.preventDefault();
-    if (newTask.trim() === '') return;
+  const handleAddTask = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (newTask.trim() === '') return;
 
-    const newTaskItem = {
-      _id: `task-${tasks.length + 1}`,
-      name: newTask.trim(),
-      status: 'paused',
-      // Add other necessary fields here
-    };
+      const newTaskItem = {
+        name: newTask.trim(),
+        status: 'paused',
+      };
 
-    // You might want to update this to use your task creation API
-    // For now, we'll just add it to the local state
-    tasks.push(newTaskItem);
-    setNewTask('');
-  };
+      addTask(newTaskItem);
+      setNewTask('');
+    },
+    [newTask, addTask],
+  );
 
   const toggleTaskCompletion = useCallback(
     (taskId) => {
-      // Update this to use your task update API
-      // For now, we'll just update the local state
-      const updatedTasks = tasks.map((task) =>
-        task._id === taskId
-          ? { ...task, status: task.status === 'completed' ? 'paused' : 'completed' }
-          : task,
-      );
-      // You might want to update this to use your task update API
-      // For now, we'll just update the local state
-      tasks.splice(0, tasks.length, ...updatedTasks);
+      const task = tasks.find((t) => t._id === taskId);
+      if (task) {
+        updateTask(taskId, {
+          ...task,
+          status: task.status === 'completed' ? 'paused' : 'completed',
+        });
+      }
     },
-    [tasks],
+    [tasks, updateTask],
   );
 
   const toggleLayout = useCallback(() => {
@@ -224,6 +220,27 @@ const ProjectTodoFlow = () => {
       [node.id]: node.position,
     }));
   }, []);
+
+  const memoizedReactFlow = useMemo(
+    () => (
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onNodeDragStop={onNodeDragStop}
+        nodeTypes={nodeTypes}
+        fitView
+        style={{ flex: 1 }}
+        connectionMode='loose'
+      >
+        <Controls />
+        <Background variant='dots' gap={12} size={1} />
+      </ReactFlow>
+    ),
+    [nodes, edges, onNodesChange, onEdgesChange, onConnect, onNodeDragStop],
+  );
 
   return (
     <div style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -272,23 +289,9 @@ const ProjectTodoFlow = () => {
           {isHorizontal ? 'Vertical Layout' : 'Horizontal Layout'}
         </button>
       </div>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onNodeDragStop={onNodeDragStop}
-        nodeTypes={nodeTypes}
-        fitView
-        style={{ flex: 1 }}
-        connectionMode='loose'
-      >
-        <Controls />
-        <Background variant='dots' gap={12} size={1} />
-      </ReactFlow>
+      {memoizedReactFlow}
     </div>
   );
 };
 
-export default ProjectTodoFlow;
+export default React.memo(ProjectTodoFlow);
