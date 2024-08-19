@@ -14,7 +14,7 @@
     "package": "webpack --config webpack.config.js && electron-builder",
     "release": "npm run prebuild && cross-env IS_PROD=true webpack --config webpack.config.js && electron-builder --mac --publish always",
     "build-and-start": "npm run build:local && npm run start:local",
-    "build:win": "npm run prebuild && webpack --config webpack.config.js && electron-builder --win",
+    "build:win": "node build-win.js",
     "release:win": "npm run prebuild && cross-env IS_PROD=true webpack --config webpack.config.js && electron-builder --win --publish always"
   },
   "repository": {
@@ -58,14 +58,18 @@
     "webpack-dev-server": "^4.15.2"
   },
   "dependencies": {
+    "@octokit/core": "^6.1.2",
+    "@octokit/rest": "^21.0.2",
     "axios": "^1.7.3",
     "electron-log": "^5.1.7",
     "electron-store": "^10.0.0",
     "electron-updater": "^6.2.1",
     "framer-motion": "^11.3.21",
     "fs": "^0.0.1-security",
+    "install": "^0.13.0",
     "js-cookie": "^3.0.5",
     "jsplumb": "^2.15.6",
+    "npm": "^10.8.2",
     "react": "^18.3.1",
     "react-beautiful-dnd": "^13.1.1",
     "react-countdown-circle-timer": "^3.2.1",
@@ -123,6 +127,7 @@
       ],
       "icon": "icon.ico",
       "publisherName": "Strive Games Inc",
+      "sign": "./scripts/signing-script.js",
       "signingHashAlgorithms": [
         "sha256"
       ]
@@ -133,7 +138,8 @@
         "provider": "github",
         "owner": "niravpatel129",
         "repo": "timebank",
-        "releaseType": "release"
+        "releaseType": "release",
+        "publishAutoUpdate": true
       }
     ]
   },
