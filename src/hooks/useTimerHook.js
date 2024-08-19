@@ -34,12 +34,14 @@ export const useTimerHook = (taskId) => {
     }
 
     const handleTimerUpdate = (event, updatedTime) => {
+      console.log("got timer update", event, updatedTime);
       setRemainingTime(updatedTime);
     };
 
     ipcRenderer.on('timer-update', handleTimerUpdate);
 
     const handleTimerFinished = (event, finishedTaskId) => {
+      console.log("timer finished")
       if (finishedTaskId === taskId) {
         finishTask(taskId);
       }

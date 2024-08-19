@@ -2,10 +2,12 @@ const { ipcMain, Notification, BrowserWindow } = require('electron');
 
 class TimerManager {
   constructor(tray) {
+    console.log("initalized TrayManager");
     this.tray = tray;
     this.activeTimers = new Map();
     this.currentTask = null;
     this.uncompletedTasksCount = 0;
+    this.isMac = process.platform === 'darwin';
 
     this.setupIpcListeners();
   }
@@ -52,10 +54,12 @@ class TimerManager {
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send('timer-finished', task._id);
         });
-        this.tray.setTitle('Time up!');
-        setTimeout(() => {
-          this.tray.setTitle('');
-        }, 6000);
+        if (this.isMac) {
+          this.tray.setTitle('Time up!');
+          setTimeout(() => {
+            this.tray.setTitle('');
+          }, 6000);
+        }
       }
     }, 1000);
 
@@ -84,6 +88,8 @@ class TimerManager {
   }
 
   updateTrayTitle(time) {
+    if (!this.isMac) return;
+
     if (time === undefined) {
       if (this.uncompletedTasksCount > 0) {
         this.tray.setTitle(

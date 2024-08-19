@@ -229,10 +229,10 @@ function createTray() {
     tray.popUpContextMenu(contextMenu);
   });
 
+  
   // To prevent garbage collection
   global.tray = tray;
 }
-
 function cleanup() {
   if (tray) {
     tray.destroy();
@@ -249,6 +249,8 @@ function cleanup() {
 }
 
 app.whenReady().then(() => {
+  timerManager = new TimerManager(tray);
+  
   setTimeout(() => {
     createMainWindow();
     // createSettingsWindow();
