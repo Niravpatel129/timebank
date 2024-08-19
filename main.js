@@ -184,16 +184,20 @@ function createDashboardWindow() {
 }
 
 function createTray() {
-  const icon = nativeImage.createFromPath(path.join(__dirname, 'assets', 'trayIconTemplate.png'));
-  icon.setTemplateImage(true);
+  const iconPath =
+    process.platform === 'win32'
+      ? path.join(__dirname, 'assets', 'trayIcon.ico')
+      : path.join(__dirname, 'assets', 'trayIconTemplate.png');
 
-  tray = new Tray(icon);
+  const icon = nativeImage.createFromPath(iconPath);
+  // Optional: Resize for better compatibility, especially on Windows
+  const resizedIcon = icon.resize({ width: 16, height: 16 });
+
+  tray = new Tray(resizedIcon);
   tray.setToolTip('Time Tracker');
-  tray.setTitle('');
 
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Show App', click: () => mainWindow.show() },
-    { label: 'Settings', click: () => settingsWindow.show() },
     { label: 'Dashboard', click: () => dashboardWindow.show() },
     { label: 'Check for Updates', click: () => checkForUpdates() },
     {
@@ -204,6 +208,8 @@ function createTray() {
       },
     },
   ]);
+
+  tray.setContextMenu(contextMenu);
 
   tray.on('click', (event, bounds) => {
     mainWindow.webContents.send('tray-opened');
@@ -227,7 +233,8 @@ function createTray() {
     tray.popUpContextMenu(contextMenu);
   });
 
-  timerManager = new TimerManager(tray);
+  // To prevent garbage collection
+  global.tray = tray;
 }
 
 function cleanup() {
