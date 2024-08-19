@@ -147,7 +147,9 @@ function createDashboardWindow() {
       webSecurity: false,
     },
     icon,
-    ...(process.platform === 'darwin' ? { titleBarStyle: 'hiddenInset', roundedCorners: true } : {}),
+    ...(process.platform === 'darwin'
+      ? { titleBarStyle: 'hiddenInset', roundedCorners: true }
+      : {}),
   });
 
   if (process.platform === 'darwin') {
@@ -187,7 +189,7 @@ function createTray() {
   const icon = nativeImage.createFromPath(path.join(__dirname, 'assets', 'trayIconTemplate.png'));
   icon.setTemplateImage(true);
   const resizedIcon = icon.resize({ width: 16, height: 16 });
-  
+
   tray = new Tray(resizedIcon);
   tray.setToolTip('Time Tracker');
   tray.setTitle('');
@@ -229,7 +231,6 @@ function createTray() {
     tray.popUpContextMenu(contextMenu);
   });
 
-  
   // To prevent garbage collection
   global.tray = tray;
 }
@@ -250,8 +251,10 @@ function cleanup() {
 
 app.whenReady().then(() => {
   timerManager = new TimerManager(tray);
-  
+
   setTimeout(() => {
+    autoUpdater.checkForUpdatesAndNotify();
+
     createMainWindow();
     // createSettingsWindow();
     createDashboardWindow();
