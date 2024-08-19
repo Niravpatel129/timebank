@@ -119,10 +119,9 @@ const nodeTypes = {
 const ProjectTodoFlow = () => {
   const { selectedProject } = useProjectContext();
   const { tasks } = useTasksContext();
-  console.log('🚀  tasks:', tasks);
-  console.log('🚀  selectedProject:', selectedProject);
 
   const [isHorizontal, setIsHorizontal] = useState(true);
+  const [nodePositions, setNodePositions] = useState({});
 
   const createNodesAndEdges = useCallback(() => {
     const projectNode = {
@@ -136,7 +135,7 @@ const ProjectTodoFlow = () => {
           gradient2: '#4169E1',
         },
       },
-      position: { x: 250, y: 50 },
+      position: nodePositions['project'] || { x: 250, y: 50 },
     };
 
     const taskNodes = tasks.map((task, index) => ({
@@ -146,9 +145,11 @@ const ProjectTodoFlow = () => {
         ...task,
         onToggle: () => toggleTaskCompletion(task._id),
       },
-      position: isHorizontal
-        ? { x: 50 + 300 * (index % 3), y: 200 + 150 * Math.floor(index / 3) }
-        : { x: 250, y: 200 + 120 * index },
+      position:
+        nodePositions[task._id] ||
+        (isHorizontal
+          ? { x: 50 + 300 * (index % 3), y: 200 + 150 * Math.floor(index / 3) }
+          : { x: 250, y: 200 + 120 * index }),
     }));
 
     const nodes = [projectNode, ...taskNodes];
@@ -162,7 +163,7 @@ const ProjectTodoFlow = () => {
     }));
 
     return { nodes, edges };
-  }, [tasks, isHorizontal, selectedProject]);
+  }, [tasks, isHorizontal, selectedProject, nodePositions]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -217,6 +218,13 @@ const ProjectTodoFlow = () => {
     setEdges(newEdges);
   }, [tasks, setNodes, setEdges, createNodesAndEdges, isHorizontal]);
 
+  const onNodeDragStop = useCallback((event, node) => {
+    setNodePositions((prev) => ({
+      ...prev,
+      [node.id]: node.position,
+    }));
+  }, []);
+
   return (
     <div style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column' }}>
       <div style={{ margin: '20px', display: 'flex', gap: '10px' }}>
@@ -270,6 +278,7 @@ const ProjectTodoFlow = () => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeDragStop={onNodeDragStop}
         nodeTypes={nodeTypes}
         fitView
         style={{ flex: 1 }}
