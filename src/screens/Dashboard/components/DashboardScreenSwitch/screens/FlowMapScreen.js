@@ -136,7 +136,7 @@ const ProjectTodoFlow = () => {
           gradient2: '#4169E1',
         },
       },
-      position: { x: 250, y: 0 },
+      position: { x: 250, y: 50 },
     };
 
     const taskNodes = tasks.map((task, index) => ({
@@ -147,8 +147,8 @@ const ProjectTodoFlow = () => {
         onToggle: () => toggleTaskCompletion(task._id),
       },
       position: isHorizontal
-        ? { x: 100 + 220 * (index + 1), y: 120 }
-        : { x: 250, y: 120 + 120 * (index + 1) },
+        ? { x: 50 + 300 * (index % 3), y: 200 + 150 * Math.floor(index / 3) }
+        : { x: 250, y: 200 + 120 * index },
     }));
 
     const nodes = [projectNode, ...taskNodes];
