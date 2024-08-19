@@ -1,71 +1,285 @@
-import { jsPlumb } from 'jsplumb';
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import ReactFlow, {
+  addEdge,
+  Background,
+  Controls,
+  Handle,
+  Position,
+  useEdgesState,
+  useNodesState,
+} from 'reactflow';
+import 'reactflow/dist/style.css';
+import { useProjectContext } from '../../../../../context/useProjectContext';
+import { useTasksContext } from '../../../../../context/useTasksContext';
 
-export default function FlowMapScreen() {
-  const containerRef = useRef(null);
+// Custom node components
+const ProjectNode = ({ data }) => (
+  <div
+    style={{
+      padding: '15px',
+      border: '3px solid #4169E1',
+      borderRadius: '8px',
+      background:
+        data.projectColor && data.projectColor.gradient1 && data.projectColor.gradient2
+          ? `linear-gradient(135deg, ${data.projectColor.gradient1}, ${data.projectColor.gradient2})`
+          : '#4169E1',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      position: 'relative',
+      transition: 'all 0.3s ease',
+    }}
+  >
+    <h2 style={{ margin: '0', color: '#fff' }}>{data.label}</h2>
+    {data.handles &&
+      data.handles.map((handle, index) => {
+        const totalHandles = data.handles.length;
+        const spacing = 100 / (totalHandles + 1);
+        return (
+          <Handle
+            key={index}
+            type='source'
+            position={Position.Bottom}
+            id={`handle-${index}`}
+            style={{
+              width: '7px',
+              height: '7px',
+              backgroundColor: 'white',
+              left: `calc(${spacing * (index + 1)}% - 5px)`,
+              transition: 'all 0.3s ease',
+              bottom: '-5px',
+            }}
+            isConnectable={true}
+          />
+        );
+      })}
+  </div>
+);
 
-  useEffect(() => {
-    const instance = jsPlumb.getInstance({
-      Container: containerRef.current,
-      Connector: 'Bezier',
-      PaintStyle: { stroke: '#7AB02C', strokeWidth: 2 },
-      Endpoint: 'Dot',
-      EndpointStyle: { fill: '#7AB02C', radius: 5 },
-    });
+const TaskNode = ({ data }) => (
+  <div
+    style={{
+      padding: '12px',
+      border: '2px solid #ddd',
+      borderRadius: '8px',
+      background: 'white',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+      transition: 'all 0.3s ease',
+    }}
+  >
+    <Handle
+      type='target'
+      position={Position.Top}
+      style={{
+        width: '0',
+        height: '0',
+        borderLeft: '6px solid transparent',
+        borderRight: '6px solid transparent',
+        borderTop: '10px solid black',
+        backgroundColor: 'transparent',
+        top: '-10px',
+        transition: 'all 0.3s ease',
+      }}
+      isConnectable={true}
+    />
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <input
+        type='checkbox'
+        checked={data.status === 'completed'}
+        onChange={data.onToggle}
+        style={{ cursor: 'pointer', transition: 'all 0.3s ease' }}
+      />
+      <span
+        style={{
+          textDecoration: data.status === 'completed' ? 'line-through' : 'none',
+          color: data.status === 'completed' ? '#888' : '#333',
+          transition: 'all 0.3s ease',
+        }}
+      >
+        {data.name}
+      </span>
+    </div>
+    <Handle
+      type='source'
+      position={Position.Bottom}
+      style={{
+        width: '10px',
+        height: '10px',
+        backgroundColor: 'black',
+        transition: 'all 0.3s ease',
+      }}
+      isConnectable={true}
+    />
+  </div>
+);
 
-    // Example nodes
-    const nodes = [
-      { id: 'task1', label: 'Task 1', position: { top: 50, left: 100 } },
-      { id: 'task2', label: 'Task 2', position: { top: 200, left: 300 } },
-    ];
+const nodeTypes = {
+  project: ProjectNode,
+  task: TaskNode,
+};
 
-    // Add nodes to the container
-    nodes.forEach((node) => {
-      const div = document.createElement('div');
-      div.id = node.id;
-      div.className = 'task-node';
-      div.innerText = node.label;
-      div.style.position = 'absolute';
-      div.style.top = `${node.position.top}px`;
-      div.style.left = `${node.position.left}px`;
+const ProjectTodoFlow = () => {
+  const { selectedProject } = useProjectContext();
+  const { tasks } = useTasksContext();
+  console.log('🚀  tasks:', tasks);
+  console.log('🚀  selectedProject:', selectedProject);
 
-      containerRef.current.appendChild(div);
+  const [isHorizontal, setIsHorizontal] = useState(true);
 
-      instance.draggable(div);
-      instance.addEndpoint(div, { anchor: 'RightMiddle' }, { isSource: true, isTarget: true });
-    });
+  const createNodesAndEdges = useCallback(() => {
+    const projectNode = {
+      id: 'project',
+      type: 'project',
+      data: {
+        label: selectedProject?.name || 'Untitled Project',
+        handles: Array(tasks.length).fill({ position: Position.Bottom }),
+        projectColor: selectedProject?.projectColor || {
+          gradient1: '#4169E1',
+          gradient2: '#4169E1',
+        },
+      },
+      position: { x: 250, y: 0 },
+    };
 
-    // Example connection
-    instance.connect({
-      source: 'task1',
-      target: 'task2',
-    });
+    const taskNodes = tasks.map((task, index) => ({
+      id: task._id,
+      type: 'task',
+      data: {
+        ...task,
+        onToggle: () => toggleTaskCompletion(task._id),
+      },
+      position: isHorizontal
+        ? { x: 100 + 220 * (index + 1), y: 120 }
+        : { x: 250, y: 120 + 120 * (index + 1) },
+    }));
 
-    // Cleanup
-    return () => instance.reset();
+    const nodes = [projectNode, ...taskNodes];
+
+    const edges = tasks.map((task, index) => ({
+      id: `edge-${index}`,
+      source: 'project',
+      target: task._id,
+      sourceHandle: `handle-${index}`,
+      animated: true,
+    }));
+
+    return { nodes, edges };
+  }, [tasks, isHorizontal, selectedProject]);
+
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
+  const onConnect = useCallback(
+    (params) => setEdges((eds) => addEdge({ ...params, animated: true }, eds)),
+    [setEdges],
+  );
+
+  const [newTask, setNewTask] = useState('');
+
+  const handleAddTask = (e) => {
+    e.preventDefault();
+    if (newTask.trim() === '') return;
+
+    const newTaskItem = {
+      _id: `task-${tasks.length + 1}`,
+      name: newTask.trim(),
+      status: 'paused',
+      // Add other necessary fields here
+    };
+
+    // You might want to update this to use your task creation API
+    // For now, we'll just add it to the local state
+    tasks.push(newTaskItem);
+    setNewTask('');
+  };
+
+  const toggleTaskCompletion = useCallback(
+    (taskId) => {
+      // Update this to use your task update API
+      // For now, we'll just update the local state
+      const updatedTasks = tasks.map((task) =>
+        task._id === taskId
+          ? { ...task, status: task.status === 'completed' ? 'paused' : 'completed' }
+          : task,
+      );
+      // You might want to update this to use your task update API
+      // For now, we'll just update the local state
+      tasks.splice(0, tasks.length, ...updatedTasks);
+    },
+    [tasks],
+  );
+
+  const toggleLayout = useCallback(() => {
+    setIsHorizontal((prev) => !prev);
   }, []);
 
+  useEffect(() => {
+    const { nodes: newNodes, edges: newEdges } = createNodesAndEdges();
+    setNodes(newNodes);
+    setEdges(newEdges);
+  }, [tasks, setNodes, setEdges, createNodesAndEdges, isHorizontal]);
+
   return (
-    <div
-      ref={containerRef}
-      style={{ position: 'relative', width: '100%', height: '500px', minHeight: '100vh' }}
-    >
-      {/* Nodes will be dynamically added here */}
+    <div style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ margin: '20px', display: 'flex', gap: '10px' }}>
+        <form onSubmit={handleAddTask} style={{ display: 'flex', gap: '10px', flex: 1 }}>
+          <input
+            type='text'
+            value={newTask}
+            onChange={(e) => setNewTask(e.target.value)}
+            placeholder='Add new task'
+            style={{
+              flex: 1,
+              padding: '8px',
+              borderRadius: '4px',
+              border: '1px solid #ccc',
+              transition: 'all 0.3s ease',
+            }}
+          />
+          <button
+            type='submit'
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#4CAF50',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+            }}
+          >
+            Add Task
+          </button>
+        </form>
+        <button
+          onClick={toggleLayout}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#2196F3',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+          }}
+        >
+          {isHorizontal ? 'Vertical Layout' : 'Horizontal Layout'}
+        </button>
+      </div>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        nodeTypes={nodeTypes}
+        fitView
+        style={{ flex: 1 }}
+        connectionMode='loose'
+      >
+        <Controls />
+        <Background variant='dots' gap={12} size={1} />
+      </ReactFlow>
     </div>
   );
-}
+};
 
-// Add some basic styles
-const styles = `
-  .task-node {
-    padding: 10px;
-    background-color: #eee;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100px;
-    text-align: center;
-  }
-`;
-
-document.head.insertAdjacentHTML('beforeend', `<style>${styles}</style>`);
+export default ProjectTodoFlow;
