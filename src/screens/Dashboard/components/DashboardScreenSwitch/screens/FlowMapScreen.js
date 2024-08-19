@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import ReactFlow, {
   addEdge,
   Background,
@@ -28,7 +29,24 @@ const ProjectNode = React.memo(({ data }) => (
       transition: 'all 0.3s ease',
     }}
   >
-    <h2 style={{ margin: '0', color: '#fff' }}>{data.label}</h2>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <h2 style={{ margin: '0', color: '#fff' }}>{data.label}</h2>
+      <div style={{ width: '60px', height: '60px' }}>
+        <CountdownCircleTimer
+          isPlaying
+          duration={100}
+          colors={['#2ecc71']}
+          size={60}
+          strokeWidth={6}
+          trailColor='rgba(255, 255, 255, 0.3)'
+          initialRemainingTime={100 - data.progress}
+        >
+          {({ remainingTime }) => (
+            <div style={{ color: '#fff', fontSize: '14px' }}>{Math.round(data.progress)}%</div>
+          )}
+        </CountdownCircleTimer>
+      </div>
+    </div>
     {data.handles &&
       data.handles.map((handle, index) => {
         const totalHandles = data.handles.length;
@@ -124,6 +142,9 @@ const ProjectTodoFlow = () => {
   const [nodePositions, setNodePositions] = useState({});
 
   const createNodesAndEdges = useCallback(() => {
+    const completedTasks = tasks.filter((task) => task.status === 'completed').length;
+    const progress = tasks.length > 0 ? (completedTasks / tasks.length) * 100 : 0;
+
     const projectNode = {
       id: 'project',
       type: 'project',
@@ -134,6 +155,7 @@ const ProjectTodoFlow = () => {
           gradient1: '#4169E1',
           gradient2: '#4169E1',
         },
+        progress: progress,
       },
       position: nodePositions['project'] || { x: 250, y: 50 },
     };
