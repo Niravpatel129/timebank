@@ -69,7 +69,7 @@ function createMainWindow() {
       nodeIntegration: true,
       contextIsolation: false,
     },
-    icon: path.join(__dirname, 'assets', 'icon.icns'),
+    icon: path.join(__dirname, 'assets', process.platform === 'darwin' ? 'icon.icns' : 'icon.ico'),
   });
 
   const startUrl =
@@ -111,16 +111,16 @@ function createSettingsWindow() {
       nodeIntegration: true,
       contextIsolation: false,
     },
-    icon: path.join(__dirname, 'assets', 'icon.icns'),
+    icon: path.join(__dirname, 'assets', process.platform === 'darwin' ? 'icon.icns' : 'icon.ico'),
   });
 
-  const settingsUrl = url.format({
-    pathname: path.join(__dirname, 'dist', 'settings.html'),
-    protocol: 'file:',
-    slashes: true,
-  });
+  // const settingsUrl = url.format({
+  //   pathname: path.join(__dirname, 'dist', 'settings.html'),
+  //   protocol: 'file:',
+  //   slashes: true,
+  // });
 
-  settingsWindow.loadURL(settingsUrl);
+  // settingsWindow.loadURL(settingsUrl);
 
   settingsWindow.on('close', (event) => {
     if (!app.isQuitting) {
@@ -139,21 +139,21 @@ function createDashboardWindow() {
     width: width,
     height: height,
     show: false,
-    titleBarStyle: 'hiddenInset',
     frame: false,
     resizable: true,
-    roundedCorners: true,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
       webSecurity: false,
     },
     icon,
-    blur: true,
+    ...(process.platform === 'darwin' ? { titleBarStyle: 'hiddenInset', roundedCorners: true } : {}),
   });
 
-  icon.setTemplateImage(true);
-  app.dock.setIcon(icon);
+  if (process.platform === 'darwin') {
+    icon.setTemplateImage(true);
+    app.dock.setIcon(icon);
+  }
 
   const dashboardUrl =
     process.env.NODE_ENV === 'development'
@@ -184,17 +184,12 @@ function createDashboardWindow() {
 }
 
 function createTray() {
-  const iconPath =
-    process.platform === 'win32'
-      ? path.join(__dirname, 'assets', 'trayIcon.ico')
-      : path.join(__dirname, 'assets', 'trayIconTemplate.png');
-
-  const icon = nativeImage.createFromPath(iconPath);
-  // Optional: Resize for better compatibility, especially on Windows
-  const resizedIcon = icon.resize({ width: 16, height: 16 });
+  const icon = nativeImage.createFromPath(path.join(__dirname, 'assets', 'trayIconTemplate.png'));
+  icon.setTemplateImage(true);
 
   tray = new Tray(resizedIcon);
   tray.setToolTip('Time Tracker');
+  tray.setTitle('');
 
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Show App', click: () => mainWindow.show() },
@@ -255,7 +250,7 @@ function cleanup() {
 app.whenReady().then(() => {
   setTimeout(() => {
     createMainWindow();
-    createSettingsWindow();
+    // createSettingsWindow();
     createDashboardWindow();
     createTray();
     mainWindow.setSize(400, 1);
@@ -276,22 +271,29 @@ app.whenReady().then(() => {
       });
     }
 
-    // Set the dock app title
-    app.dock.setMenu(Menu.buildFromTemplate([{ label: 'Hour Block' }]));
+    if (process.platform === 'darwin') {
+      // Set the dock app title
+      app.dock.setMenu(Menu.buildFromTemplate([{ label: 'Hour Block' }]));
+    }
 
     // Show dashboard window on launch
     dashboardWindow.show();
   }, 1000);
 
-  // Add event listener for dock icon click
-  app.on('activate', () => {
-    if (dashboardWindow) {
-      dashboardWindow.show();
-    }
-  });
+  // Add event listener for dock icon click (macOS only)
+  if (process.platform === 'darwin') {
+    app.on('activate', () => {
+      if (dashboardWindow) {
+        dashboardWindow.show();
+      }
+    });
+  }
 });
 
-// app.dock.hide();
+// Uncomment if you want to hide the dock icon on macOS
+// if (process.platform === 'darwin') {
+//   app.dock.hide();
+// }
 
 app.on('before-quit', cleanup);
 
@@ -369,26 +371,11 @@ autoUpdater.on('update-available', () => {
     });
 });
 
-// autoUpdater.on('update-downloaded', () => {
-//   dialog
-//     .showMessageBox({
-//       type: 'info',
-//       title: 'Update ready',
-//       message: 'Install and restart now?',
-//       buttons: ['Yes', 'Later'],
-//     })
-//     .then((result) => {
-//       if (result.response === 0) {
-//         autoUpdater.quitAndInstall(false, true);
-//       }
-//     });
-// });
-
 autoUpdater.on('error', (err) => {
   dialog.showErrorBox('Error: ', err == null ? 'unknown' : (err.stack || err).toString());
 });
 
-// Hard hot reload
+// Uncomment for development hot reload
 // if (process.env.NODE_ENV === 'development') {
 //   try {
 //     require('electron-reloader')(module, {
