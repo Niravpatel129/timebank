@@ -118,7 +118,7 @@ const nodeTypes = {
 
 const ProjectTodoFlow = () => {
   const { selectedProject } = useProjectContext();
-  const { tasks, addTask, updateTask } = useTasksContext();
+  const { tasks, updateTask } = useTasksContext();
 
   const [isHorizontal, setIsHorizontal] = useState(true);
   const [nodePositions, setNodePositions] = useState({});
@@ -171,24 +171,6 @@ const ProjectTodoFlow = () => {
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge({ ...params, animated: true }, eds)),
     [setEdges],
-  );
-
-  const [newTask, setNewTask] = useState('');
-
-  const handleAddTask = useCallback(
-    (e) => {
-      e.preventDefault();
-      if (newTask.trim() === '') return;
-
-      const newTaskItem = {
-        name: newTask.trim(),
-        status: 'paused',
-      };
-
-      addTask(newTaskItem);
-      setNewTask('');
-    },
-    [newTask, addTask],
   );
 
   const toggleTaskCompletion = useCallback(
@@ -245,35 +227,6 @@ const ProjectTodoFlow = () => {
   return (
     <div style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column' }}>
       <div style={{ margin: '20px', display: 'flex', gap: '10px' }}>
-        <form onSubmit={handleAddTask} style={{ display: 'flex', gap: '10px', flex: 1 }}>
-          <input
-            type='text'
-            value={newTask}
-            onChange={(e) => setNewTask(e.target.value)}
-            placeholder='Add new task'
-            style={{
-              flex: 1,
-              padding: '8px',
-              borderRadius: '4px',
-              border: '1px solid #ccc',
-              transition: 'all 0.3s ease',
-            }}
-          />
-          <button
-            type='submit'
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#4CAF50',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-            }}
-          >
-            Add Task
-          </button>
-        </form>
         <button
           onClick={toggleLayout}
           style={{
