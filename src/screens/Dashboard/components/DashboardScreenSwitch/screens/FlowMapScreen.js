@@ -194,7 +194,7 @@ const ProjectTodoFlow = () => {
     const { nodes: newNodes, edges: newEdges } = createNodesAndEdges();
     setNodes(newNodes);
     setEdges(newEdges);
-  }, [tasks, setNodes, setEdges, createNodesAndEdges, isHorizontal]);
+  }, [createNodesAndEdges]);
 
   const onNodeDragStop = useCallback((event, node) => {
     setNodePositions((prev) => ({
