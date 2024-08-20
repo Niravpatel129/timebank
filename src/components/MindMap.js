@@ -145,6 +145,13 @@ const ProjectBoard = () => {
             onDrop={onDrop}
             nodeTypes={nodeTypes}
             fitView
+            fitViewOptions={{
+              padding: 2,
+              includeHiddenNodes: false,
+              minZoom: 0.5,
+              maxZoom: 2,
+              duration: 800,
+            }}
           >
             <Controls />
             <Background variant='dots' gap={12} size={1} />
