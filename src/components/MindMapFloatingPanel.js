@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { FiEdit2, FiPlus, FiTrash2, FiX } from 'react-icons/fi';
+import { FiEdit2, FiTrash2, FiX } from 'react-icons/fi';
 import styled from 'styled-components';
 
 const FloatingPanelContainer = styled.div`
@@ -15,6 +15,22 @@ const FloatingPanelContainer = styled.div`
   padding: 30px;
   display: flex;
   flex-direction: column;
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 5px;
+  right: 3px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  color: #888;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #333;
+  }
 `;
 
 const SearchInput = styled.input`
@@ -146,6 +162,9 @@ const FloatingPanel = ({
 
   return (
     <FloatingPanelContainer>
+      <CloseButton onClick={onClose}>
+        <FiX />
+      </CloseButton>
       <SearchInput
         type='text'
         placeholder={`Search ${type}s...`}
@@ -174,14 +193,6 @@ const FloatingPanel = ({
             </Item>
           ))}
       </ItemList>
-      <ActionButton onClick={onAdd}>
-        <FiPlus size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-        Add {type}
-      </ActionButton>
-      <ActionButton onClick={onClose} style={{ backgroundColor: '#6c757d', marginTop: '10px' }}>
-        <FiX size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-        Close
-      </ActionButton>
     </FloatingPanelContainer>
   );
 };

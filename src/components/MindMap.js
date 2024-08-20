@@ -1,5 +1,4 @@
-// ProjectBoard.js
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactFlow, {
   addEdge,
   Background,
@@ -63,8 +62,20 @@ const nodeTypes = {
 const ProjectBoard = () => {
   const reactFlowWrapper = useRef(null);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(
+    JSON.parse(localStorage.getItem('mindmap-nodes')) || initialNodes,
+  );
+  const [edges, setEdges, onEdgesChange] = useEdgesState(
+    JSON.parse(localStorage.getItem('mindmap-edges')) || initialEdges,
+  );
+
+  useEffect(() => {
+    localStorage.setItem('mindmap-nodes', JSON.stringify(nodes));
+  }, [nodes]);
+
+  useEffect(() => {
+    localStorage.setItem('mindmap-edges', JSON.stringify(edges));
+  }, [edges]);
 
   const onConnect = useCallback(
     (params) =>
