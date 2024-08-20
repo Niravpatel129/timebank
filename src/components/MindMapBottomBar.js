@@ -1,5 +1,6 @@
 // BottomBar.js
 import React, { useState } from 'react';
+import FloatingBar from './FloatingBar';
 
 const customNodeStyles = {
   epic: {
@@ -32,7 +33,7 @@ const FloatingPanel = ({
   <div
     style={{
       position: 'absolute',
-      bottom: '60px',
+      bottom: '80px',
       left: '50%',
       transform: 'translateX(-50%)',
       width: '300px',
@@ -93,36 +94,6 @@ const FloatingPanel = ({
   </div>
 );
 
-const FloatingBar = ({ onOpenPanel }) => (
-  <div
-    style={{
-      position: 'absolute',
-      bottom: '20px',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      display: 'flex',
-      gap: '10px',
-      background: 'white',
-      padding: '10px',
-      borderRadius: '25px',
-      boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-    }}
-  >
-    <button
-      onClick={() => onOpenPanel('task')}
-      style={{ padding: '5px 15px', borderRadius: '20px' }}
-    >
-      Tasks
-    </button>
-    <button
-      onClick={() => onOpenPanel('epic')}
-      style={{ padding: '5px 15px', borderRadius: '20px' }}
-    >
-      Epics
-    </button>
-  </div>
-);
-
 const MindMapBottomBar = ({ onDragStart }) => {
   const [openPanel, setOpenPanel] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -156,7 +127,7 @@ const MindMapBottomBar = ({ onDragStart }) => {
 
   return (
     <>
-      <FloatingBar onOpenPanel={setOpenPanel} />
+      <FloatingBar onOpenPanel={setOpenPanel} currentPanel={openPanel} />
       {openPanel && (
         <FloatingPanel
           items={openPanel === 'epic' ? epics : tasks}
