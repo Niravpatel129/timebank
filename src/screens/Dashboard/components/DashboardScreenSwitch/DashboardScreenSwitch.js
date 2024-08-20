@@ -1,8 +1,8 @@
 import React from 'react';
+import MindMap from '../../../../components/MindMap.js';
 import BlocksScreen from './screens/BlocksScreen.js';
 import BoardScreen from './screens/BoardScreen';
 import CalendarScreen from './screens/CalendarScreen';
-import FlowMapScreen from './screens/FlowMapScreen';
 import ListScreen from './screens/ListScreen';
 import TeamScreen from './screens/TeamScreen';
 import TrashScreen from './screens/TrashScreen';
@@ -22,7 +22,8 @@ const DashboardScreenSwitch = (props) => {
     case 'blocks':
       return <BlocksScreen />;
     case 'flow-map':
-      return <FlowMapScreen />;
+      return <MindMap />;
+    // return <FlowMapScreen />;
     default:
       return <ListScreen />;
   }
