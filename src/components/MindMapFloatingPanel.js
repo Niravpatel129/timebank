@@ -7,40 +7,40 @@ const FloatingPanelContainer = styled.div`
   bottom: 80px;
   left: 50%;
   transform: translateX(-50%);
-  width: 300px;
-  max-height: 400px;
+  width: 600px;
+  max-height: 600px;
   background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15);
+  padding: 30px;
   display: flex;
   flex-direction: column;
 `;
 
 const SearchInput = styled.input`
-  margin-bottom: 15px;
-  padding: 10px;
-  border-radius: 5px;
+  margin-bottom: 20px;
+  padding: 12px;
+  border-radius: 8px;
   border: 1px solid #e0e0e0;
-  font-size: 14px;
+  font-size: 16px;
   transition: all 0.3s ease;
 
   &:focus {
     outline: none;
     border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
   }
 `;
 
 const ItemList = styled.div`
   overflow-y: auto;
   flex: 1;
-  max-height: 250px;
+  max-height: 350px;
   scrollbar-width: thin;
   scrollbar-color: #888 #f1f1f1;
 
   &::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
   }
 
   &::-webkit-scrollbar-track {
@@ -49,7 +49,7 @@ const ItemList = styled.div`
 
   &::-webkit-scrollbar-thumb {
     background: #888;
-    border-radius: 3px;
+    border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
@@ -60,18 +60,18 @@ const ItemList = styled.div`
 const Item = styled.div`
   background: ${(props) => (props.type === 'epic' ? '#ff7e67' : '#ffa500')};
   color: white;
-  padding: 10px;
-  border-radius: 5px;
-  margin: 8px 0;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 12px 0;
   cursor: move;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   transition: all 0.3s ease;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 `;
 
@@ -79,12 +79,19 @@ const ItemLabel = styled.span`
   font-weight: 500;
   word-break: break-word;
   flex: 1;
-  margin-right: 10px;
+  margin-right: 15px;
+  max-height: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  font-size: 16px;
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
-  gap: 5px;
+  gap: 8px;
   flex-shrink: 0;
 `;
 
@@ -93,8 +100,8 @@ const IconButton = styled.button`
   border: none;
   color: white;
   cursor: pointer;
-  padding: 5px;
-  border-radius: 3px;
+  padding: 8px;
+  border-radius: 4px;
   transition: background-color 0.3s ease;
 
   &:hover {
@@ -103,14 +110,15 @@ const IconButton = styled.button`
 `;
 
 const ActionButton = styled.button`
-  margin-top: 10px;
-  padding: 10px;
+  margin-top: 15px;
+  padding: 12px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   background-color: #007bff;
   color: white;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  font-size: 16px;
 
   &:hover {
     background-color: #0056b3;
@@ -154,24 +162,24 @@ const FloatingPanel = ({
               onDragStart={(event) => onDragStart(event, type, item.label)}
               type={type}
             >
-              <ItemLabel>{item.label}</ItemLabel>
+              <ItemLabel title={item.label}>{item.label}</ItemLabel>
               <ButtonGroup>
                 <IconButton onClick={() => onEdit(item.id)}>
-                  <FiEdit2 size={16} />
+                  <FiEdit2 size={20} />
                 </IconButton>
                 <IconButton onClick={() => onDelete(item.id)}>
-                  <FiTrash2 size={16} />
+                  <FiTrash2 size={20} />
                 </IconButton>
               </ButtonGroup>
             </Item>
           ))}
       </ItemList>
       <ActionButton onClick={onAdd}>
-        <FiPlus size={16} style={{ marginRight: '5px' }} />
+        <FiPlus size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
         Add {type}
       </ActionButton>
-      <ActionButton onClick={onClose} style={{ backgroundColor: '#6c757d' }}>
-        <FiX size={16} style={{ marginRight: '5px' }} />
+      <ActionButton onClick={onClose} style={{ backgroundColor: '#6c757d', marginTop: '10px' }}>
+        <FiX size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
         Close
       </ActionButton>
     </FloatingPanelContainer>
