@@ -22,7 +22,7 @@ root.render(
       <div
         className='title-bar'
         style={{
-          height: '3vh',
+          height: '2vh',
           position: 'absolute',
           top: 0,
           left: 0,

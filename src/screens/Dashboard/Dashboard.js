@@ -20,6 +20,7 @@ import { useModalsContext } from '../../context/useModalsContext';
 import { useProjectContext } from '../../context/useProjectContext';
 import { useTasksContext } from '../../context/useTasksContext';
 import { useUserContext } from '../../context/useUserContext';
+import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts';
 import './Dashboard.css';
 import Bubble from './components/Bubble';
 import DashboardAddTaskModal from './components/DashboardAddTaskModal';
@@ -31,12 +32,14 @@ import IntroductionModal from './components/IntroductionModal';
 const { ipcRenderer } = window.require('electron');
 
 const Dashboard = () => {
+  const isMac = navigator.userAgent.includes('Mac');
   const { tasks, editTask, deleteTask } = useTasksContext();
   const [data, setData] = useState(null);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isIntroModalOpen, setIsIntroModalOpen] = useState(false);
   const profileDropdownRef = useRef(null);
   const [selectedDashboardScreen, setSelectedDashboardScreen] = useState('list');
+  useKeyboardShortcuts();
   const {
     isCreateTaskModalOpen,
     openCreateTaskModal,
@@ -111,14 +114,29 @@ const Dashboard = () => {
   };
 
   const profileDropdownItems = [
-    { icon: FaCog, text: 'Settings', shortcut: '⌘,' },
-    { icon: FaUserPlus, text: 'Add a team', shortcut: '⌘T' },
-    { icon: FaChartLine, text: 'Activity log', shortcut: 'G then A' },
-    { icon: FaPrint, text: 'Print', shortcut: '⌘P' },
-    { icon: FaBook, text: 'Resources' },
-    { icon: FaGift, text: "What's new" },
-    { icon: FaStar, text: 'Upgrade to Pro' },
-    { icon: FaSync, text: 'Sync', subtext: '7 seconds ago' },
+    {
+      icon: FaCog,
+      text: 'Settings',
+      shortcut: isMac ? '⌘,' : 'Ctrl+,',
+      onClick: () => openModal(),
+    },
+    {
+      icon: FaUserPlus,
+      text: 'Add a project',
+      shortcut: isMac ? '⌘P' : 'Ctrl+P',
+      onClick: () => openModal(),
+    },
+    {
+      icon: FaChartLine,
+      text: 'Activity log',
+      shortcut: isMac ? '⌘A' : 'Ctrl+A',
+      onClick: () => openModal(),
+    },
+    { icon: FaPrint, text: 'Print', shortcut: isMac ? '⌘P' : 'Ctrl+P', onClick: () => openModal() },
+    { icon: FaBook, text: 'Resources', onClick: () => openModal() },
+    { icon: FaGift, text: "What's new", onClick: () => openModal() },
+    { icon: FaStar, text: 'Upgrade to Pro', onClick: () => openModal() },
+    { icon: FaSync, text: 'Sync', subtext: 'Last synced 1 minute ago', onClick: () => openModal() },
     { icon: FaSignOutAlt, text: 'Log out', onClick: () => logout() },
   ];
 
@@ -246,7 +264,7 @@ const Dashboard = () => {
             >
               <div style={{ padding: '10px', borderBottom: '1px solid #eee' }}>
                 <div style={{ fontWeight: 'bold' }}>Nirav</div>
-                <div style={{ color: '#888', fontSize: '0.9em' }}>0/5 tasks</div>
+                <div style={{ color: '#888', fontSize: '0.9em' }}>Regular user</div>
               </div>
               {profileDropdownItems.map((item, index) => (
                 <motion.div

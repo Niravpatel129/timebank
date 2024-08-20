@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaPause, FaPlay } from 'react-icons/fa';
 import { IoNotificationsOutline, IoTimerOutline } from 'react-icons/io5';
-import { SlControlPlay } from 'react-icons/sl';
+import { LuFocus } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
 import { useNotificationContext } from '../../../context/useNotificationContext';
 import { useProjectContext } from '../../../context/useProjectContext';
@@ -81,12 +81,12 @@ export default function TimerTrack({ openNotificationModal }) {
           <div></div>
           <div style={{ position: 'relative' }}>
             <IoNotificationsOutline
-              style={{ fontSize: '20px', color: '#bebfca', cursor: 'pointer' }}
+              style={{ fontSize: '25px', color: '#bebfca', cursor: 'pointer' }}
               onClick={openNotificationModal}
             />
 
-            <SlControlPlay
-              style={{ fontSize: '20px', color: '#bebfca', cursor: 'pointer' }}
+            <LuFocus
+              style={{ fontSize: '25px', color: '#bebfca', cursor: 'pointer', marginLeft: '10px' }}
               onClick={() => {
                 navigate('/focus');
               }}
